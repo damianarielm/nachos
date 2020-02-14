@@ -17,8 +17,8 @@
 
 
 #include "address_space.hh"
-#include "bin/noff.h"
-#include "machine/endianness.hh"
+#include ".bin/noff.h"
+#include "machine/.endianness.hh"
 #include "threads/system.hh"
 
 

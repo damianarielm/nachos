@@ -14,7 +14,7 @@
 
 #include "coff.h"
 #include "extern/syms.h"
-#include "threads/copyright.h"
+#include "threads/.copyright.h"
 
 #include <ctype.h>
 #include <inttypes.h>

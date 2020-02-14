@@ -3,7 +3,7 @@
 /// limitation of liability and disclaimer of warranty provisions.
 
 
-#include "debugger_command_manager.hh"
+#include ".debugger_command_manager.hh"
 #include "lib/utility.hh"
 
 #include <string.h>

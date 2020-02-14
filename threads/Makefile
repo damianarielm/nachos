@@ -17,5 +17,5 @@ SRC_FILES    = $(THREAD_SRC)
 OBJ_FILES    = $(THREAD_OBJ)
 
 include ../Makefile.common
-include ../Makefile.env
+include ../.Makefile.env
 -include Makefile.depends

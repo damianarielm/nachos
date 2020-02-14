@@ -11,7 +11,7 @@
 /// limitation of liability and disclaimer of warranty provisions.
 
 
-#include "instruction.hh"
+#include ".instruction.hh"
 #include "machine.hh"
 #include "threads/system.hh"
 

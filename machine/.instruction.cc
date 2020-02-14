@@ -6,8 +6,8 @@
 /// limitation of liability and disclaimer of warranty provisions.
 
 
-#include "instruction.hh"
-#include "encoding.hh"
+#include ".instruction.hh"
+#include ".encoding.hh"
 #include "../lib/utility.hh"
 
 

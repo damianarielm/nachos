@@ -62,7 +62,7 @@ typedef void (*VoidNoArgFunctionPtr)();
 
 // Include interface that isolates us from the host machine system library.
 // Requires definition of `VoidFunctionPtr`.
-#include "machine/system_dep.hh"
+#include "machine/.system_dep.hh"
 
 
 /// Global object for debug output.

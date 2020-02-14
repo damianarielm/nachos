@@ -3,7 +3,7 @@
 /// machine is also little endian (DEC and Intel).
 
 
-#include "endianness.hh"
+#include ".endianness.hh"
 
 
 unsigned

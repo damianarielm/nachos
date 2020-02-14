@@ -7,10 +7,10 @@
 
 
 #include "system.hh"
-#include "preemptive.hh"
+#include ".preemptive.hh"
 
 #ifdef USER_PROGRAM
-#include "userprog/debugger.hh"
+#include "userprog/.debugger.hh"
 #include "userprog/exception.hh"
 #endif
 

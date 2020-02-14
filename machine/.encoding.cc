@@ -8,7 +8,7 @@
 /// limitation of liability and disclaimer of warranty provisions.
 
 
-#include "encoding.hh"
+#include ".encoding.hh"
 
 
 const OpInfo OP_TABLE[] = {

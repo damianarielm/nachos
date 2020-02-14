@@ -6,7 +6,7 @@
 #define NACHOS_USERPROG_DEBUGGER__HH
 
 
-#include "debugger_command_manager.hh"
+#include ".debugger_command_manager.hh"
 #include "machine/machine.hh"
 
 

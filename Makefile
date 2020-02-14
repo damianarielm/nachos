@@ -18,9 +18,9 @@ all:
 	$(MAKE) -C vmem all
 	$(MAKE) -C filesys depend
 	$(MAKE) -C filesys all
-	$(MAKE) -C network depend
-	$(MAKE) -C network all
-	$(MAKE) -C bin
+	$(MAKE) -C .network depend
+	$(MAKE) -C .network all
+	$(MAKE) -C .bin
 	$(MAKE) -C userland
 
 # Do not delete executables in `userland` in case there is no cross-compiler.
@@ -29,8 +29,8 @@ clean:
 	$(MAKE) -C userprog clean
 	$(MAKE) -C vmem clean
 	$(MAKE) -C filesys clean
-	$(MAKE) -C network clean
-	$(MAKE) -C bin clean
+	$(MAKE) -C .network clean
+	$(MAKE) -C .bin clean
 	$(MAKE) -C userland clean
 
 test:
@@ -41,7 +41,7 @@ print:
 	                 threads/*.h threads/*.hh threads/*.cc threads/*.s \
 	                 userprog/*.h userprog/*.hh userprog/*.cc          \
 	                 filesys/*.hh filesys/*.cc                         \
-	                 network/*.hh network/*.cc                         \
+	                 .network/*.hh .network/*.cc                       \
 	                 machine/*.hh machine/*.cc                         \
 	                 bin/noff.h bin/coff.h bin/coff2noff.c             \
 	                 userland/*.h userland/*.c userland/*.s'

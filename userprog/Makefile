@@ -26,5 +26,5 @@ OBJ_FILES    = $(THREAD_OBJ) $(USERPROG_OBJ)
 #OBJ_FILES    = $(THREAD_OBJ) $(USERPROG_OBJ) $(FILESYS_OBJ)
 
 include ../Makefile.common
-include ../Makefile.env
+include ../.Makefile.env
 -include Makefile.depends

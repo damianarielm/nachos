@@ -26,5 +26,5 @@ OBJ_FILES    = $(THREAD_OBJ) $(USERPROG_OBJ) $(VMEM_OBJ) $(FILESYS_OBJ) $(NETWOR
 #OBJ_FILES    = $(THREAD_OBJ) $(NETWORK_OBJ)
 
 include ../Makefile.common
-include ../Makefile.env
+include ../.Makefile.env
 -include Makefile.depends

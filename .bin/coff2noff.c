@@ -22,7 +22,7 @@
 #include "coff_reader.h"
 #include "coff_section.h"
 #include "noff.h"
-#include "threads/copyright.h"
+#include "threads/.copyright.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>

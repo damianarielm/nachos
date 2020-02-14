@@ -13,7 +13,7 @@
 # change the flags to ld and the build procedure for as:
 #GCC_PREFIX = mips-suse-linux-
 GCC_PREFIX = mipsel-linux-gnu-
-LDFLAGS    = -T arrangement.ld -N -s
+LDFLAGS    = -T .arrangement.ld -N -s
 ASFLAGS    = -mips1
 CPPFLAGS   = $(INCLUDE_DIRS)
 
@@ -58,4 +58,4 @@ start.o: start.s ../userprog/syscall.h
 
 $(PROGRAMS): %: %.o start.o
 	$(LD) $(LDFLAGS) start.o $*.o -o $*.coff
-	../bin/coff2noff $*.coff $@
+	../.bin/coff2noff $*.coff $@

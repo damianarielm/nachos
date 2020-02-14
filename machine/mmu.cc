@@ -29,7 +29,7 @@
 
 
 #include "mmu.hh"
-#include "endianness.hh"
+#include ".endianness.hh"
 
 
 MMU::MMU()

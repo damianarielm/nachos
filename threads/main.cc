@@ -63,7 +63,7 @@
 /// limitation of liability and disclaimer of warranty provisions.
 
 
-#include "copyright.h"
+#include ".copyright.h"
 #include "lib/utility.hh"
 #include "system.hh"
 

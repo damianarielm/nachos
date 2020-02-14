@@ -9,7 +9,7 @@
 #define NACHOS_MACHINE_MMU__HH
 
 
-#include "exception_type.hh"
+#include ".exception_type.hh"
 #include "disk.hh"
 #include "translation_entry.hh"
 

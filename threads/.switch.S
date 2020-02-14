@@ -37,7 +37,7 @@
 /// of liability and disclaimer of warranty provisions.
 
 
-#include "switch.h"
+#include ".switch.h"
 
 
 #ifdef HOST_i386

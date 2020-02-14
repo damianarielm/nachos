@@ -3,7 +3,7 @@
 /// limitation of liability and disclaimer of warranty provisions.
 
 
-#include "debugger.hh"
+#include ".debugger.hh"
 #include "lib/utility.hh"
 #include "machine/interrupt.hh"
 #include "machine/statistics.hh"

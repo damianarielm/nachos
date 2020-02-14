@@ -6,7 +6,7 @@
 /// copies of this software.
 
 
-#include "preemptive.hh"
+#include ".preemptive.hh"
 
 // Access to global objects: `currentThread`, `interrupt`...
 #include "system.hh"

@@ -7,7 +7,7 @@
 #define NACHOS_MACHINE_INSTRUCTION__HH
 
 
-#include "encoding.hh"
+#include ".encoding.hh"
 
 
 /// The following class defines an instruction, represented in both:

@@ -18,7 +18,7 @@
 /// limitation of liability and disclaimer of warranty provisions.
 
 
-#include "network.hh"
+#include ".network.hh"
 #include "post.hh"
 #include "machine/interrupt.hh"
 #include "threads/system.hh"

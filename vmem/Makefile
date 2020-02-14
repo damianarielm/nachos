@@ -30,5 +30,5 @@ OBJ_FILES    = $(THREAD_OBJ) $(USERPROG_OBJ) $(VMEM_OBJ)
 #C_OFILES     = $(THREAD_OBJ) $(USERPROG_OBJ) $(FILESYS_OBJ) $(VMEM_OBJ)
 
 include ../Makefile.common
-include ../Makefile.env
+include ../.Makefile.env
 -include Makefile.depends

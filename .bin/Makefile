@@ -21,7 +21,7 @@
 # all: coff2noff
 
 
-include ../Makefile.env
+include ../.Makefile.env
 
 CC     = gcc
 CFLAGS = -std=c99 -I./ -I../ $(HOST)

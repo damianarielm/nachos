@@ -27,7 +27,7 @@
 #define NACHOS_NETWORK_POST__HH
 
 
-#include "network.hh"
+#include ".network.hh"
 #include "threads/synch_list.hh"
 
 
