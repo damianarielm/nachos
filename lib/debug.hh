@@ -20,10 +20,8 @@
 /// All rights reserved.  See `copyright.h` for copyright notice and
 /// limitation of liability and disclaimer of warranty provisions.
 
-
 #ifndef NACHOS_LIB_DEBUG__HH
 #define NACHOS_LIB_DEBUG__HH
-
 
 /// Interface to debugging routines.
 class Debug {
@@ -66,6 +64,5 @@ private:
     /// String that controls which debug messages are printed.
     const char *flags;
 };
-
 
 #endif

@@ -4,16 +4,13 @@
 /// All rights reserved.  See `copyright.h` for copyright notice and
 /// limitation of liability and disclaimer of warranty provisions.
 
-
 #include "noff.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
-
 static void
-PrintSegment(noffSegment *s, const char *description)
-{
+PrintSegment(noffSegment *s, const char *description) {
     printf("    %s segment:\n"
            "        Virtual address: %u (0x%X)\n"
            "        In-file address: %u (0x%X)\n"
@@ -25,8 +22,7 @@ PrintSegment(noffSegment *s, const char *description)
 }
 
 int
-main(int argc, char *argv[])
-{
+main(int argc, char *argv[]) {
     if (argc < 2) {
         fprintf(stderr, "Usage: %s <path to NOFF file>\n", argv[0]);
         return 1;
@@ -35,7 +31,7 @@ main(int argc, char *argv[])
     // Open the NOFF file.
     const char *path = argv[1];
     FILE *f = fopen(path, "rb");
-    if (f == NULL) {
+    if (!f) {
         perror(path);
         return 1;
     }
@@ -51,15 +47,13 @@ main(int argc, char *argv[])
 
     // Analyze the header and print the results.
     if (h.noffMagic == NOFF_MAGIC)
-        printf("%s: NOFF file\n"
-               "    Magic: 0x%X\n",
-               path, h.noffMagic);
+        printf("%s: NOFF file\n   Magic: 0x%X\n", path, h.noffMagic);
     else
-        printf("%s: not a NOFF file\n"
-               "    Magic: 0x%X (should be 0x%X)\n",
+        printf("%s: not a NOFF file\n    Magic: 0x%X (should be 0x%X)\n",
                path, h.noffMagic, NOFF_MAGIC);
     PrintSegment(&h.code, "Code");
     PrintSegment(&h.initData, "Initialized data");
     PrintSegment(&h.uninitData, "Uninitialized data");
+
     return 0;
 }

@@ -10,7 +10,6 @@
 #ifndef NACHOS_USERPROG_ARGS__HH
 #define NACHOS_USERPROG_ARGS__HH
 
-
 /// Save command-line arguments from the memory of a user process.
 ///
 /// It moves an `argv`-like array from user memory to kernel memory, and
@@ -39,6 +38,5 @@ char **SaveArgs(int address);
 ///
 /// * `args` is a kernel-space pointer to the start of an `argv`-like array.
 void WriteArgs(char **args);
-
 
 #endif

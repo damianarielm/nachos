@@ -3,17 +3,14 @@
 /// All rights reserved.  See `copyright.h` for copyright notice and
 /// limitation of liability and disclaimer of warranty provisions.
 
-
 #include "instr.h"
 #include "encode.h"
 
 #include <stdbool.h>
 
-
 static const bool LONG_OUTPUT = true;
 
 extern char *NORMAL_OPS[], *SPECIAL_OPS[];
-
 
 static const char *REG_STRINGS[] = {
     "0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8", "r9",
@@ -23,20 +20,17 @@ static const char *REG_STRINGS[] = {
 };
 
 const char *
-R(unsigned i)
-{
+R(unsigned i) {
     return REG_STRINGS[i];
 }
 
 static void
-DumpAscii(unsigned instruction, unsigned pc)
-{
+DumpAscii(unsigned instruction, unsigned pc) {
     int addr;
     char *s;
     unsigned opcode;
 
-    if (LONG_OUTPUT)
-        printf("%08X: %08X  ", pc, instruction);
+    if (LONG_OUTPUT) printf("%08X: %08X  ", pc, instruction);
     printf("\t");
     opcode = instruction >> 26;
     if (instruction == I_NOP)
@@ -46,7 +40,6 @@ DumpAscii(unsigned instruction, unsigned pc)
         printf("%s\t", SPECIAL_OPS[opcode]);
 
         switch (opcode) {
-
             // rd, rt, shamt
             case I_SLL:
             case I_SRL:
@@ -90,9 +83,7 @@ DumpAscii(unsigned instruction, unsigned pc)
             case I_MULTU:
             case I_DIV:
             case I_DIVU:
-                printf("%s, %s",
-                       R(rs(instruction)),
-                       R(rt(instruction)));
+                printf("%s, %s", R(rs(instruction)), R(rt(instruction)));
                 break;
 
             // rd, rs, rt
@@ -130,9 +121,7 @@ DumpAscii(unsigned instruction, unsigned pc)
             default:
                 printf("BCOND");
         }
-        printf("\t%s, %08x",
-               R(rs(instruction)),
-               off16(instruction) + pc + 4);
+        printf("\t%s, %08x", R(rs(instruction)), off16(instruction) + pc + 4);
     } else {
         printf("%s\t", NORMAL_OPS[opcode]);
 
@@ -168,9 +157,7 @@ DumpAscii(unsigned instruction, unsigned pc)
 
             // rt, immediate
             case I_LUI:
-                printf("%s, 0x%X",
-                       R(rt(instruction)),
-                       immed(instruction));
+                printf("%s, 0x%X", R(rt(instruction)), immed(instruction));
                 break;
 
             // Coprocessor garbage

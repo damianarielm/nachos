@@ -11,10 +11,8 @@
 #ifndef NACHOS_THREADS_SYNCHLIST__HH
 #define NACHOS_THREADS_SYNCHLIST__HH
 
-
 #include "synch.hh"
 #include "lib/list.hh"
-
 
 /// The following class defines a "synchronized list" -- a list for which
 /// these constraints hold:
@@ -61,8 +59,7 @@ private:
 ///
 /// Elements can now be added to the list.
 template <class Item>
-SynchList<Item>::SynchList()
-{
+SynchList<Item>::SynchList() {
     list      = new List<Item>;
     lock      = new Lock("list lock");
     listEmpty = new Condition("list empty cond", lock);
@@ -71,8 +68,7 @@ SynchList<Item>::SynchList()
 
 /// De-allocate the data structures created for synchronizing a list.
 template <class Item>
-SynchList<Item>::~SynchList()
-{
+SynchList<Item>::~SynchList() {
     delete list;
     delete lock;
     delete listEmpty;
@@ -84,12 +80,11 @@ SynchList<Item>::~SynchList()
 /// * `item` is the thing to put on the list
 template <class Item>
 void
-SynchList<Item>::Append(Item item)
-{
+SynchList<Item>::Append(Item item) {
     lock->Acquire();      // Enforce mutual exclusive access to the list.
-    list->Append(item);
-    listEmpty->Signal();  // Wake up a waiter, if any.
-    // original // listEmpty->Signal(lock);    // wake up a waiter, if any
+        list->Append(item);
+        listEmpty->Signal();  // Wake up a waiter, if any.
+        // original // listEmpty->Signal(lock);    // wake up a waiter, if any
     lock->Release();
 }
 
@@ -99,16 +94,15 @@ SynchList<Item>::Append(Item item)
 /// Returns the removed item.
 template <class Item>
 Item
-SynchList<Item>::Pop()
-{
+SynchList<Item>::Pop() {
     Item item;
 
     lock->Acquire();    // Enforce mutual exclusion.
-    while (list->IsEmpty())
-    listEmpty->Wait();  // Wait until list is not empty.
-    // Original: //listEmpty->Wait(lock);  // Wait until list is not empty.
-    item = list->Pop();
-    //ASSERT(item != nullptr);
+        while (list->IsEmpty())
+        listEmpty->Wait();  // Wait until list is not empty.
+        // Original: //listEmpty->Wait(lock);  // Wait until list is not empty.
+        item = list->Pop();
+        //ASSERT(item);
     lock->Release();
     return item;
 }
@@ -120,13 +114,12 @@ SynchList<Item>::Pop()
 /// * `func` is the procedure to be applied.
 template <class Item>
 void
-SynchList<Item>::Apply(void (*func)(Item))
-{
-    ASSERT(func != nullptr);
+SynchList<Item>::Apply(void (*func)(Item)) {
+    ASSERT(func);
+
     lock->Acquire();
-    list->Apply(func);
+        list->Apply(func);
     lock->Release();
 }
-
 
 #endif

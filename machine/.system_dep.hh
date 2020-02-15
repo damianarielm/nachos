@@ -12,9 +12,7 @@
 #ifndef NACHOS_MACHINE_SYSDEP__HH
 #define NACHOS_MACHINE_SYSDEP__HH
 
-
 #include <stddef.h>
-
 
 /// Check file to see if there are any characters to be read.
 ///
@@ -88,6 +86,5 @@ extern "C" {
 #include <stdio.h>   // for `printf`, `fprintf`
 #include <string.h>  // for `DEBUG`, etc.
 }
-
 
 #endif

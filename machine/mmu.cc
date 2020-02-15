@@ -27,21 +27,16 @@
 /// All rights reserved.  See `copyright.h` for copyright notice and
 /// limitation of liability and disclaimer of warranty provisions.
 
-
 #include "mmu.hh"
 #include ".endianness.hh"
 
-
-MMU::MMU()
-{
+MMU::MMU() {
     mainMemory = new char [MEMORY_SIZE];
-    for (unsigned i = 0; i < MEMORY_SIZE; i++)
-          mainMemory[i] = 0;
+    for (unsigned i = 0; i < MEMORY_SIZE; i++) mainMemory[i] = 0;
 
 #ifdef USE_TLB
     tlb = new TranslationEntry[TLB_SIZE];
-    for (unsigned i = 0; i < TLB_SIZE; i++)
-        tlb[i].valid = false;
+    for (unsigned i = 0; i < TLB_SIZE; i++) tlb[i].valid = false;
     pageTable = nullptr;
 #else  // Use linear page table.
     tlb = nullptr;
@@ -49,11 +44,9 @@ MMU::MMU()
 #endif
 }
 
-MMU::~MMU()
-{
+MMU::~MMU() {
     delete [] mainMemory;
-    if (tlb != nullptr)
-        delete [] tlb;
+    if (tlb) delete [] tlb;
 }
 
 /// Read `size` (1, 2, or 4) bytes of virtual memory at `addr` into
@@ -66,16 +59,13 @@ MMU::~MMU()
 /// * `size` is the number of bytes to read (1, 2, or 4).
 /// * `value` is the place to write the result.
 ExceptionType
-MMU::ReadMem(unsigned addr, unsigned size, int *value)
-{
-    ASSERT(value != nullptr);
-
-    DEBUG('a', "Reading VA 0x%X, size %u\n", addr, size);
+MMU::ReadMem(unsigned addr, unsigned size, int *value) {
+    DEBUG('a', "Reading VA 0x%X, size %u.\n", addr, size);
+    ASSERT(value);
 
     unsigned physicalAddress;
     ExceptionType e = Translate(addr, &physicalAddress, size, false);
-    if (e != NO_EXCEPTION)
-        return e;
+    if (e != NO_EXCEPTION) return e;
 
     int data;
     switch (size) {
@@ -98,7 +88,7 @@ MMU::ReadMem(unsigned addr, unsigned size, int *value)
             ASSERT(false);
     }
 
-    DEBUG('a', "\tValue read: %8.8X\n", *value);
+    DEBUG('a', "\tValue read: %8.8X.\n", *value);
     return NO_EXCEPTION;
 }
 
@@ -112,61 +102,53 @@ MMU::ReadMem(unsigned addr, unsigned size, int *value)
 /// * `size` is the number of bytes to be written (1, 2, or 4).
 /// * `value` is the data to be written.
 ExceptionType
-MMU::WriteMem(unsigned addr, unsigned size, int value)
-{
-    DEBUG('a', "Writing VA 0x%X, size %u, value 0x%X\n", addr, size, value);
+MMU::WriteMem(unsigned addr, unsigned size, int value) {
+    DEBUG('a', "Writing VA 0x%X, size %u, value 0x%X.\n", addr, size, value);
 
     unsigned physicalAddress;
     ExceptionType e = Translate(addr, &physicalAddress, size, true);
-    if (e != NO_EXCEPTION)
-        return e;
+    if (e != NO_EXCEPTION) return e;
 
     switch (size) {
-        case 1:
-            mainMemory[physicalAddress]
-              = (unsigned char) (value & 0xFF);
-            break;
+      case 1:
+          mainMemory[physicalAddress] = (unsigned char) (value & 0xFF);
+          break;
 
-        case 2:
-            *(unsigned short *) &mainMemory[physicalAddress]
-              = ShortToMachine((unsigned short) (value & 0xFFFF));
-            break;
+      case 2:
+          *(unsigned short *) &mainMemory[physicalAddress]
+            = ShortToMachine((unsigned short) (value & 0xFFFF));
+          break;
 
-        case 4:
-            *(unsigned *) &mainMemory[physicalAddress]
-              = WordToMachine((unsigned) value);
-            break;
+      case 4:
+          *(unsigned *) &mainMemory[physicalAddress] = WordToMachine((unsigned) value);
+          break;
 
-        default:
-            ASSERT(false);
+      default:
+          ASSERT(false);
     }
 
     return NO_EXCEPTION;
 }
 
 ExceptionType
-MMU::RetrievePageEntry(unsigned vpn, TranslationEntry **entry) const
-{
-    ASSERT(entry != nullptr);
+MMU::RetrievePageEntry(unsigned vpn, TranslationEntry **entry) const {
+    ASSERT(entry);
 
-    if (tlb == nullptr) {
+    if (!tlb) {
         // Use a page table; `vpn` is an index in the table.
 
         if (vpn >= pageTableSize) {
-            DEBUG_CONT('a', "virtual page # %u too large for"
-                            " page table size %u!\n",
+            DEBUG_CONT('a', "virtual page # %u too large for page table size %u!\n",
                        vpn, pageTableSize);
             return ADDRESS_ERROR_EXCEPTION;
         } else if (!pageTable[vpn].valid) {
-            DEBUG_CONT('a', "virtual page # %u too large for"
-                            " page table size %u!\n",
+            DEBUG_CONT('a', "virtual page # %u too large for page table size %u!\n",
                        vpn, pageTableSize);
             return PAGE_FAULT_EXCEPTION;
         }
 
         *entry = &pageTable[vpn];
         return NO_EXCEPTION;
-
     } else {
         // Use the TLB.
 
@@ -198,19 +180,16 @@ MMU::RetrievePageEntry(unsigned vpn, TranslationEntry **entry) const
 /// * `size" is the amount of memory being read or written.
 /// * `writing` -- if true, check the “read-only” bit in the TLB.
 ExceptionType
-MMU::Translate(unsigned virtAddr, unsigned *physAddr,
-               unsigned size, bool writing)
-{
-    ASSERT(physAddr != nullptr);
-    // We must have either a TLB or a page table, but not both!
-    ASSERT((tlb == nullptr) != (pageTable == nullptr));
-
+MMU::Translate(unsigned virtAddr, unsigned *physAddr, unsigned size, bool writing) {
     DEBUG('a', "\tTranslate: ");
+
+    // We must have either a TLB or a page table, but not both!
+    ASSERT((!tlb) != (!pageTable));
+    ASSERT(physAddr);
 
     // Check for alignment errors.
     if ((size == 4 && virtAddr & 0x3) || (size == 2 && virtAddr & 0x1)) {
-        DEBUG_CONT('a', "alignment problem at %u, size %u!\n",
-                   virtAddr, size);
+        DEBUG_CONT('a', "alignment problem at %u, size %u!\n", virtAddr, size);
         return ADDRESS_ERROR_EXCEPTION;
     }
 
@@ -221,8 +200,7 @@ MMU::Translate(unsigned virtAddr, unsigned *physAddr,
 
     TranslationEntry *entry;
     ExceptionType exception = RetrievePageEntry(vpn, &entry);
-    if (exception != NO_EXCEPTION)
-        return exception;
+    if (exception != NO_EXCEPTION) return exception;
 
     if (entry->readOnly && writing) {  // Trying to write to a read-only
                                        // page.
@@ -241,11 +219,11 @@ MMU::Translate(unsigned virtAddr, unsigned *physAddr,
 
     // Set the `use` and `dirty` flags.
     entry->use = true;
-    if (writing)
-        entry->dirty = true;
+    if (writing) entry->dirty = true;
 
     *physAddr = pageFrame * PAGE_SIZE + offset;
+
+    DEBUG_CONT('a', "physical address 0x%X.\n", *physAddr);
     ASSERT(*physAddr >= 0 && *physAddr + size <= MEMORY_SIZE);
-    DEBUG_CONT('a', "physical address 0x%X\n", *physAddr);
     return NO_EXCEPTION;
 }

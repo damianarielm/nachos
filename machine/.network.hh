@@ -16,9 +16,7 @@
 #ifndef NACHOS_MACHINE_NETWORK__HH
 #define NACHOS_MACHINE_NETWORK__HH
 
-
 #include "lib/utility.hh"
-
 
 /// Network address -- uniquely identifies a machine.
 ///
@@ -34,11 +32,11 @@ typedef int NetworkAddress;
 /// 2. data (containing `MailHeader` from the `PostOffice`!).
 class PacketHeader {
 public:
-    NetworkAddress to;  ///< Destination machine ID.
-    NetworkAddress from;  ///< source machine ID.
-    unsigned length;  ///< Bytes of packet data, excluding the packet header
-                      ///< (but including the `MailHeader` prepended by the
-                      ///< by the post office).
+    NetworkAddress to;   ///< Destination machine ID.
+    NetworkAddress from; ///< source machine ID.
+    unsigned length;     ///< Bytes of packet data, excluding the packet header
+                         ///< (but including the `MailHeader` prepended by the
+                         ///< by the post office).
 };
 
 /// Largest packet that can go out on the wire.
@@ -46,7 +44,6 @@ const unsigned MAX_WIRE_SIZE = 64;
 
 /// Data “payload” of the largest packet.
 const unsigned MAX_PACKET_SIZE = MAX_WIRE_SIZE - sizeof (PacketHeader);
-
 
 /// The following class defines a physical network device.
 ///
@@ -63,8 +60,7 @@ public:
 
     /// Allocate and initialize network driver.
     Network(NetworkAddress addr, double reliability,
-            VoidFunctionPtr readAvail, VoidFunctionPtr writeDone,
-            void *callArg);
+            VoidFunctionPtr readAvail, VoidFunctionPtr writeDone, void *callArg);
 
     /// De-allocate the network driver data.
     ~Network();
@@ -127,6 +123,5 @@ private:
     /// Data for arrived packet.
     char inbox[MAX_PACKET_SIZE];
 };
-
 
 #endif

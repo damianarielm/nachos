@@ -21,16 +21,13 @@
 /// All rights reserved.  See `copyright.h` for copyright notice and
 /// limitation of liability and disclaimer of warranty provisions.
 
-
 #include "transfer.hh"
 #include "syscall.h"
 #include "filesys/directory_entry.hh"
 #include "threads/system.hh"
 
-
 static void
-IncrementPC()
-{
+IncrementPC() {
     unsigned pc;
 
     pc = machine->ReadRegister(PC_REG);
@@ -46,12 +43,12 @@ IncrementPC()
 /// * `et` is the kind of exception.  The list of possible exceptions is in
 ///   `machine/exception_type.hh`.
 static void
-DefaultHandler(ExceptionType et)
-{
+DefaultHandler(ExceptionType et) {
     int exceptionArg = machine->ReadRegister(2);
 
     fprintf(stderr, "Unexpected user mode exception: %s, arg %d.\n",
             ExceptionTypeToString(et), exceptionArg);
+
     ASSERT(false);
 }
 
@@ -72,12 +69,10 @@ DefaultHandler(ExceptionType et)
 /// And do not forget to increment the program counter before returning. (Or
 /// else you will loop making the same system call forever!)
 static void
-SyscallHandler(ExceptionType _et)
-{
+SyscallHandler(ExceptionType _et) {
     int scid = machine->ReadRegister(2);
 
     switch (scid) {
-
         case SC_HALT:
             DEBUG('a', "Shutdown, initiated by user program.\n");
             interrupt->Halt();
@@ -106,18 +101,15 @@ SyscallHandler(ExceptionType _et)
         default:
             fprintf(stderr, "Unexpected system call: id %d.\n", scid);
             ASSERT(false);
-
     }
 
     IncrementPC();
 }
 
-
 /// By default, only system calls have their own handler.  All other
 /// exception types are assigned the default handler.
 void
-SetExceptionHandlers()
-{
+SetExceptionHandlers() {
     machine->SetHandler(NO_EXCEPTION,            &DefaultHandler);
     machine->SetHandler(SYSCALL_EXCEPTION,       &SyscallHandler);
     machine->SetHandler(PAGE_FAULT_EXCEPTION,    &DefaultHandler);

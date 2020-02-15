@@ -8,7 +8,6 @@
 /// All rights reserved.  See `copyright.h` for copyright notice and
 /// limitation of liability and disclaimer of warranty provisions.
 
-
 #include "debug.hh"
 #include "utility.hh"
 
@@ -16,41 +15,33 @@
 #include <stdio.h>
 #include <string.h>
 
-
-Debug::Debug()
-{
+Debug::Debug() {
     flags = "";
 }
 
 bool
-Debug::IsEnabled(char flag) const
-{
-    if (flags != nullptr)
-        return strchr(flags, flag) != 0
-               || strchr(flags, '+') != 0;
+Debug::IsEnabled(char flag) const {
+    if (flags)
+        return strchr(flags, flag) != 0 || strchr(flags, '+') != 0;
     else
         return false;
 }
 
 const char *
-Debug::GetFlags() const
-{
+Debug::GetFlags() const {
     return flags;
 }
 
 void
-Debug::SetFlags(const char *new_flags)
-{
+Debug::SetFlags(const char *new_flags) {
     flags = new_flags;
 }
 
 void
-Debug::Print(char flag, const char *format, ...) const
-{
-    ASSERT(format != nullptr);
+Debug::Print(char flag, const char *format, ...) const {
+    ASSERT(format);
 
-    if (!IsEnabled(flag))
-        return;
+    if (!IsEnabled(flag)) return;
 
     fprintf(stderr, "[%c] ", flag);
 
@@ -64,12 +55,10 @@ Debug::Print(char flag, const char *format, ...) const
 }
 
 void
-Debug::PrintCont(char flag, const char *format, ...) const
-{
-    ASSERT(format != nullptr);
+Debug::PrintCont(char flag, const char *format, ...) const {
+    ASSERT(format);
 
-    if (!IsEnabled(flag))
-        return;
+    if (!IsEnabled(flag)) return;
 
     va_list ap;
     // You will get an unused variable message here -- ignore it.

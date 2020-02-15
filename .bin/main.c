@@ -5,7 +5,6 @@
 /// All rights reserved.  See `copyright.h` for copyright notice and
 /// limitation of liability and disclaimer of warranty provisions.
 
-
 #include "copyright.h"
 #include "int.h"
 
@@ -17,7 +16,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 
 static FILE   *fp;
 static LDFILE *ldptr;
@@ -31,8 +29,7 @@ int  TRACE, Traptrace, Regtrace;
 int  NROWS = 64, ASSOC = 1, LINESIZE = 4, RAND = 0, LRD = 0;
 
 void
-main(int argc, char *argv[])
-{
+main(int argc, char *argv[]) {
     char *s;
     char *fakeargv[3];
 
@@ -55,36 +52,31 @@ main(int argc, char *argv[])
                     ASSOC = atoi(*++argv);
                     LINESIZE = atoi(*++argv);
                     RAND = (*++argv)[0] == 'r';
-                    LRD = (*argv)[0] == 'l'
-                          && (*argv)[1] == 'r'
-                          && (*argv)[2] == 'd';
+                    LRD = (*argv)[0] == 'l' && (*argv)[1] == 'r' && (*argv)[2] == 'd';
                     argc -= 4;
                     break;
             }
     }
 
-    if (argc >= 2)
-        strncpy(filename, argv[1], sizeof filename);
+    if (argc >= 2) strncpy(filename, argv[1], sizeof filename);
     fp = fopen(filename, "r");
-    if (fp == NULL) {
+    if (!fp) {
         fprintf(stderr, "%s: Could not open '%s'\n", self, filename);
         exit(0);
     }
     fclose(fp);
     LoadProgram(filename);
-    if (argv[1] == NULL) {
+    if (!argv[1]) {
         fakeargv[1] = "a.out";
         fakeargv[2] = NULL;
         argv = fakeargv;
         ++argc;
     }
-    RunProgram(memoffset, argc - 1, argv + 1);
-      // Where things normally start.
+    RunProgram(memoffset, argc - 1, argv + 1); // Where things normally start.
 }
 
 static char *
-String(const char *s)
-{
+String(const char *s) {
     char *p;
     size_t size = strlen(s) + 1;
 
@@ -94,7 +86,7 @@ String(const char *s)
 }
 
 #define LOADSECTION(head)                                       \
-    if (head.s_scnptr != 0) {                                   \
+    if (head.s_scnptr) {                                        \
         /*printf("loading %s\n", head.s_name);*/                \
         pc = head.s_vaddr;                                      \
         FSEEK(ldptr, head.s_scnptr, 0);                         \
@@ -107,20 +99,18 @@ String(const char *s)
     }
 
 void
-LoadProgram(char *filename)
-{
+LoadProgram(char *filename) {
     int  pc, i, j, strindex, stl;
     char str[1111];
     int  rc1, rc2;
 
     ldptr = ldopen(filename, NULL);
-    if (ldptr == NULL) {
+    if (!ldptr) {
         fprintf(stderr, "%s: Load read error on %s\n", self, filename);
         exit(0);
     }
     if (TYPE(ldptr) != 0x162) {
-        fprintf(stderr,
-                "big-endian object file (little-endian interp)\n");
+        fprintf(stderr, "big-endian object file (little-endian interp)\n");
         exit(0);
     }
 

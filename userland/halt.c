@@ -8,13 +8,10 @@
 /// procedure, but if you do this, you have to be careful to allocate a big
 /// enough stack to hold the automatics!
 
-
 #include "syscall.h"
 
-
 int
-main(void)
-{
+main(void) {
     Halt();
     // Not reached.
 }

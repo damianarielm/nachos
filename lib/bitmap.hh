@@ -13,20 +13,16 @@
 /// All rights reserved.  See `copyright.h` for copyright notice and
 /// limitation of liability and disclaimer of warranty provisions.
 
-
 #ifndef NACHOS_LIB_BITMAP__HH
 #define NACHOS_LIB_BITMAP__HH
 
-
 #include "utility.hh"
 #include "filesys/open_file.hh"
-
 
 /// Definitions helpful for representing a bitmap as an array of integers.
 
 const unsigned BITS_IN_BYTE = 8;
 const unsigned BITS_IN_WORD = 32;
-
 
 /// A “bitmap” -- an array of bits, each of which can be independently set,
 /// cleared, and tested.
@@ -92,6 +88,5 @@ private:
     unsigned *map;
 
 };
-
 
 #endif

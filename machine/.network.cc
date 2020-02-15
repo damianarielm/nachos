@@ -8,24 +8,22 @@
 /// All rights reserved.  See `copyright.h` for copyright notice and
 /// limitation of liability and disclaimer of warranty provisions.
 
-
 #include "threads/system.hh"
-
 
 /// Dummy functions because C++ cannot call member functions indirectly.
 
 static void
-NetworkReadPoll(void *arg)
-{
-    ASSERT(arg != nullptr);
+NetworkReadPoll(void *arg) {
+    ASSERT(arg);
+
     Network *net = (Network *) arg;
     net->CheckPktAvail();
 }
 
 static void
-NetworkSendDone(void *arg)
-{
-    ASSERT(arg != nullptr);
+NetworkSendDone(void *arg) {
+    ASSERT(arg);
+
     Network *net = (Network *) arg;
     net->SendDone();
 }
@@ -36,19 +34,14 @@ NetworkSendDone(void *arg)
 /// * `reliability` says whether we drop packets to emulate unreliable links.
 /// * `readAvail`, `writeDone`, `callArg` -- analogous to console.
 Network::Network(NetworkAddress addr, double reliability,
-                 VoidFunctionPtr readAvail, VoidFunctionPtr writeDone,
-                 void *callArg)
-{
-    ASSERT(readAvail != nullptr);
-    ASSERT(writeDone != nullptr);
+                 VoidFunctionPtr readAvail, VoidFunctionPtr writeDone, void *callArg) {
+    ASSERT(readAvail);
+    ASSERT(writeDone);
 
     ident = addr;
-    if (reliability < 0)
-        chanceToWork = 0;
-    else if (reliability > 1)
-        chanceToWork = 1;
-    else
-        chanceToWork = reliability;
+    if (reliability < 0) chanceToWork = 0;
+    else if (reliability > 1) chanceToWork = 1;
+    else chanceToWork = reliability;
 
     // Set up the stuff to emulate asynchronous interrupts.
     writeHandler = writeDone;
@@ -67,8 +60,7 @@ Network::Network(NetworkAddress addr, double reliability,
                         NETWORK_TIME, NETWORK_RECV_INT);
 }
 
-Network::~Network()
-{
+Network::~Network() {
     CloseSocket(sock);
     DeAssignNameToSocket(sockName);
 }
@@ -77,16 +69,12 @@ Network::~Network()
 /// packet.  In real life, the incoming packet might be dropped if we cannot
 /// read it in time.
 void
-Network::CheckPktAvail()
-{
+Network::CheckPktAvail() {
     // Schedule the next time to poll for a packet.
-    interrupt->Schedule(NetworkReadPoll, this,
-                        NETWORK_TIME, NETWORK_RECV_INT);
+    interrupt->Schedule(NetworkReadPoll, this, NETWORK_TIME, NETWORK_RECV_INT);
 
-    if (inHdr.length != 0)  // Do nothing if packet is already buffered.
-        return;
-    if (!PollSocket(sock))  // Do nothing if no packet to be read.
-        return;
+    if (inHdr.length != 0) return; // Do nothing if packet is already buffered.
+    if (!PollSocket(sock)) return; // Do nothing if no packet to be read.
 
     // Otherwise, read packet in.
     char *buffer = new char [MAX_WIRE_SIZE];
@@ -108,8 +96,7 @@ Network::CheckPktAvail()
 
 /// Notify user that another packet can be sent.
 void
-Network::SendDone()
-{
+Network::SendDone() {
     sendBusy = false;
     stats->numPacketsSent++;
     (*writeHandler)(handlerArg);
@@ -121,20 +108,18 @@ Network::SendDone()
 /// Note we always pad out a packet to `MAX_WIRE_SIZE` before putting it into
 /// the socket, because it is simpler at the receive end.
 void
-Network::Send(PacketHeader hdr, const char *data)
-{
-    ASSERT(data != nullptr);
+Network::Send(PacketHeader hdr, const char *data) {
+    ASSERT(data);
 
     char toName[32];
 
     snprintf(toName, sizeof toName, "SOCKET_%u", (unsigned) hdr.to);
 
+    DEBUG('n', "Sending to addr %u, %u bytes... ", hdr.to, hdr.length);
     ASSERT(!sendBusy && hdr.length > 0
            && hdr.length <= MAX_PACKET_SIZE && hdr.from == ident);
-    DEBUG('n', "Sending to addr %u, %u bytes... ", hdr.to, hdr.length);
 
-    interrupt->Schedule(NetworkSendDone, this,
-                        NETWORK_TIME, NETWORK_SEND_INT);
+    interrupt->Schedule(NetworkSendDone, this, NETWORK_TIME, NETWORK_SEND_INT);
 
     if (Random() % 100 >= chanceToWork * 100) { // Emulate a lost packet.
         DEBUG('n', "oops, lost it!\n");
@@ -146,19 +131,19 @@ Network::Send(PacketHeader hdr, const char *data)
     *(PacketHeader *) buffer = hdr;
     memcpy(buffer + sizeof (PacketHeader), data, hdr.length);
     SendToSocket(sock, buffer, MAX_WIRE_SIZE, toName);
+
     delete [] buffer;
 }
 
 // Read a packet, if one is buffered.
 PacketHeader
-Network::Receive(char *data)
-{
-    ASSERT(data != nullptr);
+Network::Receive(char *data) {
+    ASSERT(data);
 
     PacketHeader hdr = inHdr;
 
     inHdr.length = 0;
-    if (hdr.length != 0)
-        memmove(data, inbox, hdr.length);
+    if (hdr.length != 0) memmove(data, inbox, hdr.length);
+
     return hdr;
 }

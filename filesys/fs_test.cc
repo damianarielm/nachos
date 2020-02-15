@@ -15,7 +15,6 @@
 /// All rights reserved.  See `copyright.h` for copyright notice and
 /// limitation of liability and disclaimer of warranty provisions.
 
-
 #include "file_system.hh"
 #include "lib/utility.hh"
 #include "machine/disk.hh"
@@ -23,21 +22,18 @@
 #include "threads/thread.hh"
 #include "threads/system.hh"
 
-
-static const unsigned TRANSFER_SIZE = 10;  // Make it small, just to be
-                                           // difficult.
+static const unsigned TRANSFER_SIZE = 10;  // Make it small, just to be difficult.
 
 /// Copy the contents of the UNIX file `from` to the Nachos file `to`.
 void
-Copy(const char *from, const char *to)
-{
-    ASSERT(from != nullptr);
-    ASSERT(to != nullptr);
+Copy(const char *from, const char *to) {
+    ASSERT(from);
+    ASSERT(to);
 
     // Open UNIX file.
     FILE *fp = fopen(from, "r");
-    if (fp == nullptr) {
-        printf("Copy: could not open input file %s\n", from);
+    if (!fp) {
+        printf("Copy: could not open input file %s.\n", from);
         return;
     }
 
@@ -46,24 +42,22 @@ Copy(const char *from, const char *to)
     int fileLength = ftell(fp);
     fseek(fp, 0, 0);
 
-    DEBUG('f', "Copying file %s, size %u, to file %s\n",
-          from, fileLength, to);
+    DEBUG('f', "Copying file %s, size %u, to file %s.\n", from, fileLength, to);
 
     // Create a Nachos file of the same length.
     if (!fileSystem->Create(to, fileLength)) {  // Create Nachos file.
-        printf("Copy: could not create output file %s\n", to);
+        printf("Copy: could not create output file %s.\n", to);
         fclose(fp);
         return;
     }
 
     OpenFile *openFile = fileSystem->Open(to);
-    ASSERT(openFile != nullptr);
+    ASSERT(openFile);
 
     // Copy the data in `TRANSFER_SIZE` chunks.
     char *buffer = new char [TRANSFER_SIZE];
     int amountRead;
-    while ((amountRead = fread(buffer, sizeof(char),
-                               TRANSFER_SIZE, fp)) > 0)
+    while ((amountRead = fread(buffer, sizeof(char), TRANSFER_SIZE, fp)) > 0)
         openFile->Write(buffer, amountRead);
     delete [] buffer;
 
@@ -74,13 +68,12 @@ Copy(const char *from, const char *to)
 
 /// Print the contents of the Nachos file `name`.
 void
-Print(const char *name)
-{
-    ASSERT(name != nullptr);
+Print(const char *name) {
+    ASSERT(name);
 
     OpenFile *openFile = fileSystem->Open(name);
-    if (openFile == nullptr) {
-        fprintf(stderr, "Print: unable to open file %s\n", name);
+    if (!openFile) {
+        fprintf(stderr, "Print: unable to open file %s.\n", name);
         return;
     }
 
@@ -93,7 +86,6 @@ Print(const char *name)
     delete [] buffer;
     delete openFile;  // close the Nachos file
 }
-
 
 /// Performance test
 ///
@@ -112,26 +104,25 @@ static const unsigned CONTENT_SIZE = sizeof CONTENTS - 1;
 static const unsigned FILE_SIZE = CONTENT_SIZE * 5000;
 
 static void
-FileWrite()
-{
-    printf("Sequential write of %u byte file, in %u byte chunks\n",
+FileWrite() {
+    printf("Sequential write of %u byte file, in %u byte chunks.\n",
            FILE_SIZE, CONTENT_SIZE);
 
     if (!fileSystem->Create(FILE_NAME, 0)) {
-        fprintf(stderr, "Perf test: cannot create %s\n", FILE_NAME);
+        fprintf(stderr, "Perf test: cannot create %s.\n", FILE_NAME);
         return;
     }
 
     OpenFile *openFile = fileSystem->Open(FILE_NAME);
-    if (openFile == nullptr) {
-        fprintf(stderr, "Perf test: unable to open %s\n", FILE_NAME);
+    if (!openFile) {
+        fprintf(stderr, "Perf test: unable to open %s.\n", FILE_NAME);
         return;
     }
 
     for (unsigned i = 0; i < FILE_SIZE; i += CONTENT_SIZE) {
         int numBytes = openFile->Write(CONTENTS, CONTENT_SIZE);
         if (numBytes < 10) {
-            fprintf(stderr, "Perf test: unable to write %s\n", FILE_NAME);
+            fprintf(stderr, "Perf test: unable to write %s.\n", FILE_NAME);
             break;
         }
     }
@@ -140,14 +131,13 @@ FileWrite()
 }
 
 static void
-FileRead()
-{
-    printf("Sequential read of %u byte file, in %u byte chunks\n",
+FileRead() {
+    printf("Sequential read of %u byte file, in %u byte chunks.\n",
            FILE_SIZE, CONTENT_SIZE);
 
     OpenFile *openFile = fileSystem->Open(FILE_NAME);
-    if (openFile == nullptr) {
-        fprintf(stderr, "Perf test: unable to open file %s\n", FILE_NAME);
+    if (!openFile) {
+        fprintf(stderr, "Perf test: unable to open file %s.\n", FILE_NAME);
         return;
     }
 
@@ -155,7 +145,7 @@ FileRead()
     for (unsigned i = 0; i < FILE_SIZE; i += CONTENT_SIZE) {
         int numBytes = openFile->Read(buffer, CONTENT_SIZE);
         if (numBytes < 10 || strncmp(buffer, CONTENTS, CONTENT_SIZE)) {
-            printf("Perf test: unable to read %s\n", FILE_NAME);
+            printf("Perf test: unable to read %s.\n", FILE_NAME);
             break;
         }
     }
@@ -165,14 +155,13 @@ FileRead()
 }
 
 void
-PerformanceTest()
-{
+PerformanceTest() {
     printf("Starting file system performance test:\n");
     stats->Print();
     FileWrite();
     FileRead();
     if (!fileSystem->Remove(FILE_NAME)) {
-        printf("Perf test: unable to remove %s\n", FILE_NAME);
+        printf("Perf test: unable to remove %s.\n", FILE_NAME);
         return;
     }
     stats->Print();

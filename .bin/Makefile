@@ -20,7 +20,6 @@
 # CFLAGS = -I./ -I../threads -DHOST_IS_BIG_ENDIAN
 # all: coff2noff
 
-
 include ../.Makefile.env
 
 CC     = gcc
@@ -28,7 +27,6 @@ CFLAGS = -std=c99 -I./ -I../ $(HOST)
 LD     = gcc
 
 TARGETS = coff2noff coff2flat disassemble readnoff
-
 
 .PHONY: all clean
 

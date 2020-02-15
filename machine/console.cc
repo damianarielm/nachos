@@ -13,25 +13,23 @@
 /// All rights reserved.  See `copyright.h` for copyright notice and
 /// limitation of liability and disclaimer of warranty provisions.
 
-
 #include "console.hh"
 #include "threads/system.hh"
-
 
 /// Dummy functions because C++ is weird about pointers to member functions.
 
 static void
-ConsoleReadPoll(void *c)
-{
-    ASSERT(c != nullptr);
+ConsoleReadPoll(void *c) {
+    ASSERT(c);
+
     Console *console = (Console *) c;
     console->CheckCharAvail();
 }
 
 static void
-ConsoleWriteDone(void *c)
-{
-    ASSERT(c != nullptr);
+ConsoleWriteDone(void *c) {
+    ASSERT(c);
+
     Console *console = (Console *) c;
     console->WriteDone();
 }
@@ -47,21 +45,16 @@ ConsoleWriteDone(void *c)
 /// * `writeDone` is the interrupt handler called when a character has been
 ///   output, so that it is ok to request the next char be output.
 Console::Console(const char *readFile, const char *writeFile,
-        VoidFunctionPtr readAvail,
-        VoidFunctionPtr writeDone, void *callArg)
-{
-    ASSERT(readAvail != nullptr);
-    ASSERT(writeDone != nullptr);
+        VoidFunctionPtr readAvail, VoidFunctionPtr writeDone, void *callArg) {
+    ASSERT(readAvail);
+    ASSERT(writeDone);
 
-    if (readFile == nullptr)
-        readFileNo = 0;  // keyboard = stdin
-    else
-        readFileNo = OpenForReadWrite(readFile, true);
+    if (!readFile) readFileNo = 0;  // keyboard = stdin
+    else readFileNo = OpenForReadWrite(readFile, true);
+
     // should be read-only
-    if (writeFile == nullptr)
-        writeFileNo = 1;  // display = stdout
-    else
-        writeFileNo = OpenForWrite(writeFile);
+    if (!writeFile) writeFileNo = 1;  // display = stdout
+    else writeFileNo = OpenForWrite(writeFile);
 
     // Set up the stuff to emulate asynchronous interrupts.
     writeHandler = writeDone;
@@ -71,17 +64,13 @@ Console::Console(const char *readFile, const char *writeFile,
     incoming     = EOF;
 
     // Start polling for incoming packets.
-    interrupt->Schedule(ConsoleReadPoll, this,
-                        CONSOLE_TIME, CONSOLE_READ_INT);
+    interrupt->Schedule(ConsoleReadPoll, this, CONSOLE_TIME, CONSOLE_READ_INT);
 }
 
 /// Clean up console emulation.
-Console::~Console()
-{
-    if (readFileNo != 0)
-        Close(readFileNo);
-    if (writeFileNo != 1)
-        Close(writeFileNo);
+Console::~Console() {
+    if (readFileNo) Close(readFileNo);
+    if (writeFileNo != 1) Close(writeFileNo);
 }
 
 /// Periodically called to check if a character is available for
@@ -91,18 +80,15 @@ Console::~Console()
 /// character has been grabbed out of the buffer by the Nachos kernel).
 /// Invoke the “read” interrupt handler, once the character has been put into
 /// the buffer.
-    void
-Console::CheckCharAvail()
-{
+void
+Console::CheckCharAvail() {
     char c;
 
     // Schedule the next time to poll for a packet.
-    interrupt->Schedule(ConsoleReadPoll, this,
-            CONSOLE_TIME, CONSOLE_READ_INT);
+    interrupt->Schedule(ConsoleReadPoll, this, CONSOLE_TIME, CONSOLE_READ_INT);
 
     // Do nothing if character is already buffered, or none to be read.
-    if (incoming != EOF || !PollFile(readFileNo))
-        return;
+    if (incoming != EOF || !PollFile(readFileNo)) return;
 
     // Otherwise, read character and tell user about it.
     Read(readFileNo, &c, sizeof c);
@@ -114,8 +100,7 @@ Console::CheckCharAvail()
 /// Internal routine called when it is time to invoke the interrupt handler
 /// to tell the Nachos kernel that the output character has completed.
 void
-Console::WriteDone()
-{
+Console::WriteDone() {
     putBusy = false;
     stats->numConsoleCharsWritten++;
     (*writeHandler)(handlerArg);
@@ -124,10 +109,8 @@ Console::WriteDone()
 /// Read a character from the input buffer, if there is any there.
 /// Either return the character, or EOF if none buffered.
 char
-Console::GetChar()
-{
+Console::GetChar() {
     char ch = incoming;
-
     incoming = EOF;
     return ch;
 }
@@ -135,11 +118,10 @@ Console::GetChar()
 /// Write a character to the simulated display, schedule an interrupt to
 /// occur in the future, and return.
 void
-Console::PutChar(char ch)
-{
+Console::PutChar(char ch) {
     ASSERT(!putBusy);
+
     WriteFile(writeFileNo, &ch, sizeof (char));
     putBusy = true;
-    interrupt->Schedule(ConsoleWriteDone, this,
-                        CONSOLE_TIME, CONSOLE_WRITE_INT);
+    interrupt->Schedule(ConsoleWriteDone, this, CONSOLE_TIME, CONSOLE_WRITE_INT);
 }

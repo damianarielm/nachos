@@ -11,7 +11,6 @@
 /// Assumes coff file compiled with -N -T 0 to make sure it is not shared
 /// text.
 
-
 #include "coff_reader.h"
 #include "coff_section.h"
 #include "threads/.copyright.h"
@@ -28,16 +27,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 // NOTE -- once you have implemented large files, it is ok to make this
 // bigger!
-#define STACK_SIZE              1024  // In bytes.
+#define STACK_SIZE             1024  // In bytes.
 #define ReadStructOrDie(f, s)  ReadOrDie(f, (char *) &(s), sizeof (s))
 
 static inline void
-Die(const char *format, ...)
-{
-    assert(format != NULL);
+Die(const char *format, ...) {
+    assert(format);
 
     va_list args;
     va_start(args, format);
@@ -50,50 +47,44 @@ Die(const char *format, ...)
 
 /// Read and check for error.
 static void
-ReadOrDie(FILE *f, char *buffer, size_t numBytes)
-{
-    assert(f != NULL);
-    assert(buffer != NULL);
+ReadOrDie(FILE *f, char *buffer, size_t numBytes) {
+    assert(f);
+    assert(buffer);
 
-    if (fread(buffer, numBytes, 1, f) != 1)
-        Die("File is too short");
+    if (fread(buffer, numBytes, 1, f) != 1) Die("File is too short");
 }
 
 /// Write and check for error.
 static void
-WriteOrDie(FILE *f, const char *buffer, size_t numBytes)
-{
-    assert(f != NULL);
-    assert(buffer != NULL);
+WriteOrDie(FILE *f, const char *buffer, size_t numBytes) {
+    assert(f);
+    assert(buffer);
 
-    if (fwrite(buffer, numBytes, 1, f) != 1)
-        Die("Unable to write file");
+    if (fwrite(buffer, numBytes, 1, f) != 1) Die("Unable to write file");
 }
 
 /// Do the real work.
 void
-main(int argc, char *argv[])
-{
+main(int argc, char *argv[]) {
     FILE *in, *out;
     int   top, tmp;
     char *buffer;
 
     if (argc < 2) {
-        fprintf(stderr, "Usage: %s <coffFileName> <flatFileName>\n",
-                argv[0]);
+        fprintf(stderr, "Usage: %s <coffFileName> <flatFileName>\n", argv[0]);
         exit(1);
     }
 
     // Open the object file (input).
     in = fopen(argv[1], "rb");
-    if (in == NULL) {
+    if (!in) {
         perror(argv[1]);
         exit(1);
     }
 
     // Open the flat file (output).
     out = fopen(argv[2], "wb");
-    if (out == NULL) {
+    if (!out) {
         perror(argv[2]);
         exit(1);
     }
@@ -101,26 +92,24 @@ main(int argc, char *argv[])
     /// Load the COFF file.
     char *errorS;
     coffReaderData d;
-    if (!CoffReaderLoad(&d, in, &errorS))
-        Die(errorS);
+    if (!CoffReaderLoad(&d, in, &errorS)) Die(errorS);
 
     // Copy the segments in.
     CoffSection *sc;
     top = 0;
     printf("Translating COFF sections into flat:\n");
-    while ((sc = CoffReaderNextSection(&d)) != NULL) {
+    while (sc = CoffReaderNextSection(&d)) {
         CoffSectionPrint(sc);
 
         size_t addr = CoffSectionAddr(sc);
         const char *name = CoffSectionName(sc);
         size_t size = CoffSectionSize(sc);
 
-        if (addr + size > top)
-            top = addr + size;
+        if (addr + size > top) top = addr + size;
+
         // No need to copy if `.bss`.
         if (strcmp(name, ".bss") && strcmp(name, ".sbss")) {
-            if ((buffer = CoffSectionRead(sc, in, &errorS)) == NULL)
-                Die(errorS);
+            if (!(buffer = CoffSectionRead(sc, in, &errorS))) Die(errorS);
             WriteOrDie(out, buffer, sc->size);
             free(buffer);
         }

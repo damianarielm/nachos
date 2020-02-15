@@ -10,9 +10,7 @@
 #ifndef NACHOS_LIB_UTILITY__HH
 #define NACHOS_LIB_UTILITY__HH
 
-
 #include "debug.hh"
-
 
 /// Miscellaneous useful routines.
 
@@ -32,15 +30,13 @@ typedef unsigned int HostMemoryAddress;
 
 template <typename T>
 inline T
-DivRoundDown(T n, T s)
-{
+DivRoundDown(T n, T s) {
     return n / s;
 }
 
 template <typename T>
 inline T
-DivRoundUp(T n, T s)
-{
+DivRoundUp(T n, T s) {
     return n / s + (n % s > 0 ? 1 : 0);
 }
 
@@ -59,11 +55,9 @@ typedef void (*VoidFunctionPtr)(void *arg);
 
 typedef void (*VoidNoArgFunctionPtr)();
 
-
 // Include interface that isolates us from the host machine system library.
 // Requires definition of `VoidFunctionPtr`.
 #include "machine/.system_dep.hh"
-
 
 /// Global object for debug output.
 extern Debug debug;
@@ -86,6 +80,5 @@ extern Debug debug;
         fflush(stderr);                                                   \
         abort();                                                          \
     }
-
 
 #endif

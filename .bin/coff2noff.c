@@ -18,7 +18,6 @@
 /// All rights reserved.  See `copyright.h` for copyright notice and
 /// limitation of liability and disclaimer of warranty provisions.
 
-
 #include "coff_reader.h"
 #include "coff_section.h"
 #include "noff.h"
@@ -36,15 +35,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 #define ReadStructOrDie(f, s)  ReadOrDie(f, (char *) &(s), sizeof (s))
 
 static char *outFileName = NULL;
 
 static void
-Die(const char *format, ...)
-{
-    assert(format != NULL);
+Die(const char *format, ...) {
+    assert(format);
 
     va_list args;
     va_start(args, format);
@@ -58,29 +55,24 @@ Die(const char *format, ...)
 
 /// Read and check for error.
 static void
-ReadOrDie(FILE *f, char *buffer, size_t numBytes)
-{
-    assert(f != NULL);
-    assert(buffer != NULL);
+ReadOrDie(FILE *f, char *buffer, size_t numBytes) {
+    assert(f);
+    assert(buffer);
 
-    if (fread(buffer, numBytes, 1, f) != 1)
-        Die("File is too short");
+    if (fread(buffer, numBytes, 1, f) != 1) Die("File is too short");
 }
 
 /// Write and check for error.
 static void
-WriteOrDie(FILE *f, const char *buffer, size_t numBytes)
-{
-    assert(f != NULL);
-    assert(buffer != NULL);
+WriteOrDie(FILE *f, const char *buffer, size_t numBytes) {
+    assert(f);
+    assert(buffer);
 
-    if (fwrite(buffer, numBytes, 1, f) != 1)
-        Die("Unable to write file");
+    if (fwrite(buffer, numBytes, 1, f) != 1) Die("Unable to write file");
 }
 
 void
-main(int argc, char *argv[])
-{
+main(int argc, char *argv[]) {
     FILE      *in, *out;
     int        inNoffFile;
     unsigned   numSections, i;
@@ -88,21 +80,20 @@ main(int argc, char *argv[])
     noffHeader noffH;
 
     if (argc < 2) {
-        fprintf(stderr, "Usage: %s <coffFileName> <noffFileName>\n",
-                argv[0]);
+        fprintf(stderr, "Usage: %s <coffFileName> <noffFileName>\n", argv[0]);
         exit(1);
     }
 
     /// Open the COFF file (input).
     in = fopen(argv[1], "rb");
-    if (in == NULL) {
+    if (!in) {
         perror(argv[1]);
         exit(1);
     }
 
     /// Open the NOFF file (output).
     out = fopen(argv[2], "wb");
-    if (out == NULL) {
+    if (!out) {
         perror(argv[2]);
         exit(1);
     }
@@ -111,8 +102,7 @@ main(int argc, char *argv[])
     /// Load the COFF file.
     char *errorS;
     coffReaderData d;
-    if (!CoffReaderLoad(&d, in, &errorS))
-        Die(errorS);
+    if (!CoffReaderLoad(&d, in, &errorS)) Die(errorS);
 
     /// Initialize the NOFF header, in case not all the segments are defined
     /// in the COFF file.
@@ -126,11 +116,11 @@ main(int argc, char *argv[])
     inNoffFile = sizeof noffH;
     fseek(out, inNoffFile, SEEK_SET);
     printf("Translating COFF sections into NOFF:\n");
-    while ((sc = CoffReaderNextSection(&d)) != NULL) {
+    while (sc = CoffReaderNextSection(&d)) {
         CoffSectionPrint(sc);
-        if (CoffSectionEmpty(sc))
-            // Do nothing!
-            continue;
+
+        // Do nothing!
+        if (CoffSectionEmpty(sc)) continue;
 
         size_t addr = CoffSectionAddr(sc);
         char *name = CoffSectionName(sc);
@@ -140,22 +130,18 @@ main(int argc, char *argv[])
             noffH.code.virtualAddr = addr;
             noffH.code.inFileAddr  = inNoffFile;
             noffH.code.size        = size;
-            if ((buffer = CoffSectionRead(sc, in, &errorS)) == NULL)
-                Die(errorS);
+            if (!(buffer = CoffSectionRead(sc, in, &errorS))) Die(errorS);
             WriteOrDie(out, buffer, size);
             free(buffer);
             inNoffFile += size;
-        } else if (!strcmp(name, ".data")
-                     || !strcmp(name, ".rdata")) {
+        } else if (!strcmp(name, ".data") || !strcmp(name, ".rdata")) {
             /// Need to check if we have both `.data` and `.rdata` -- make
             /// sure one or the other is empty!
-            if (noffH.initData.size != 0)
-                Die("Cannot handle both data and rdata");
+            if (noffH.initData.size != 0) Die("Cannot handle both data and rdata");
             noffH.initData.virtualAddr = addr;
             noffH.initData.inFileAddr  = inNoffFile;
             noffH.initData.size        = size;
-            if ((buffer = CoffSectionRead(sc, in, &errorS)) == NULL)
-                Die(errorS);
+            if (!(buffer = CoffSectionRead(sc, in, &errorS))) Die(errorS);
             WriteOrDie(out, buffer, size);
             free(buffer);
             inNoffFile += size;
@@ -163,8 +149,7 @@ main(int argc, char *argv[])
             /// Need to check if we have both `.bss` and `.sbss` -- make sure
             /// they are contiguous.
             if (noffH.uninitData.size != 0) {
-                if (addr == noffH.uninitData.virtualAddr +
-                            noffH.uninitData.size)
+                if (addr == noffH.uninitData.virtualAddr + noffH.uninitData.size)
                     Die("Cannot handle both bss and sbss");
                 noffH.uninitData.size += size;
             } else {

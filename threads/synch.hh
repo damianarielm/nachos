@@ -19,10 +19,8 @@
 #ifndef NACHOS_THREADS_SYNCH__HH
 #define NACHOS_THREADS_SYNCH__HH
 
-
 #include "thread.hh"
 #include "lib/list.hh"
-
 
 /// This class defines a “semaphore”, which has a positive integer as its
 /// value.
@@ -167,6 +165,5 @@ private:
 
     // Other needed fields are to be added here.
 };
-
 
 #endif

@@ -5,7 +5,6 @@
 /// All rights reserved.  See `copyright.h` for copyright notice and
 /// limitation of liability and disclaimer of warranty provisions.
 
-
 #include "system.hh"
 #include ".preemptive.hh"
 
@@ -13,7 +12,6 @@
 #include "userprog/.debugger.hh"
 #include "userprog/exception.hh"
 #endif
-
 
 /// This defines *all* of the global data structures used by Nachos.
 ///
@@ -65,10 +63,8 @@ extern void Cleanup();
 /// * `dummy` is because every interrupt handler takes one argument, whether
 ///   it needs it or not.
 static void
-TimerInterruptHandler(void *dummy)
-{
-    if (interrupt->GetStatus() != IDLE_MODE)
-        interrupt->YieldOnReturn();
+TimerInterruptHandler(void *dummy) {
+    if (interrupt->GetStatus() != IDLE_MODE) interrupt->YieldOnReturn();
 }
 
 /// Initialize Nachos global data structures.
@@ -84,9 +80,8 @@ TimerInterruptHandler(void *dummy)
 ///   Example:
 ///       nachos -d +  ->  argv = {"nachos", "-d", "+"}
 void
-Initialize(int argc, char **argv)
-{
-    ASSERT(argc == 0 || argv != nullptr);
+Initialize(int argc, char **argv) {
+    ASSERT(argc == 0 || argv);
 
     int argCount;
     const char *debugArgs = "";
@@ -199,8 +194,7 @@ Initialize(int argc, char **argv)
 
 /// Nachos is halting.  De-allocate global data structures.
 void
-Cleanup()
-{
+Cleanup() {
     DEBUG('i', "Cleaning up...\n");
 
     // 2007, Jose Miguel Santos Espino

@@ -10,26 +10,22 @@
 /// All rights reserved.  See `copyright.h` for copyright notice and
 /// limitation of liability and disclaimer of warranty provisions.
 
-
 #include "open_file.hh"
 #include "file_header.hh"
 #include "threads/system.hh"
-
 
 /// Open a Nachos file for reading and writing.  Bring the file header into
 /// memory while the file is open.
 ///
 /// * `sector` is the location on disk of the file header for this file.
-OpenFile::OpenFile(int sector)
-{
+OpenFile::OpenFile(int sector) {
     hdr = new FileHeader;
     hdr->FetchFrom(sector);
     seekPosition = 0;
 }
 
 /// Close a Nachos file, de-allocating any in-memory data structures.
-OpenFile::~OpenFile()
-{
+OpenFile::~OpenFile() {
     delete hdr;
 }
 
@@ -38,8 +34,7 @@ OpenFile::~OpenFile()
 ///
 /// * `position` is the location within the file for the next `Read`/`Write`.
 void
-OpenFile::Seek(unsigned position)
-{
+OpenFile::Seek(unsigned position) {
     seekPosition = position;
 }
 
@@ -56,10 +51,9 @@ OpenFile::Seek(unsigned position)
 /// * `numBytes` is the number of bytes to transfer.
 
 int
-OpenFile::Read(char *into, unsigned numBytes)
-{
-    ASSERT(into != nullptr);
-    ASSERT(numBytes > 0);
+OpenFile::Read(char *into, unsigned numBytes) {
+    ASSERT(into);
+    ASSERT(numBytes);
 
     int result = ReadAt(into, numBytes, seekPosition);
     seekPosition += result;
@@ -67,13 +61,13 @@ OpenFile::Read(char *into, unsigned numBytes)
 }
 
 int
-OpenFile::Write(const char *into, unsigned numBytes)
-{
-    ASSERT(into != nullptr);
-    ASSERT(numBytes > 0);
+OpenFile::Write(const char *into, unsigned numBytes) {
+    ASSERT(into);
+    ASSERT(numBytes);
 
     int result = WriteAt(into, numBytes, seekPosition);
     seekPosition += result;
+
     return result;
 }
 
@@ -103,19 +97,17 @@ OpenFile::Write(const char *into, unsigned numBytes)
 ///   read/written.
 
 int
-OpenFile::ReadAt(char *into, unsigned numBytes, unsigned position)
-{
-    ASSERT(into != nullptr);
-    ASSERT(numBytes > 0);
+OpenFile::ReadAt(char *into, unsigned numBytes, unsigned position) {
+    ASSERT(into);
+    ASSERT(numBytes);
 
     unsigned fileLength = hdr->FileLength();
     unsigned firstSector, lastSector, numSectors;
     char *buf;
 
-    if (position >= fileLength)
-        return 0;  // Check request.
-    if (position + numBytes > fileLength)
-        numBytes = fileLength - position;
+    if (position >= fileLength) return 0;  // Check request.
+    if (position + numBytes > fileLength) numBytes = fileLength - position;
+
     DEBUG('f', "Reading %u bytes at %u, from file of length %u.\n",
           numBytes, position, fileLength);
 
@@ -131,25 +123,24 @@ OpenFile::ReadAt(char *into, unsigned numBytes, unsigned position)
 
     // Copy the part we want.
     memcpy(into, &buf[position - firstSector * SECTOR_SIZE], numBytes);
+
     delete [] buf;
     return numBytes;
 }
 
 int
-OpenFile::WriteAt(const char *from, unsigned numBytes, unsigned position)
-{
-    ASSERT(from != nullptr);
-    ASSERT(numBytes > 0);
+OpenFile::WriteAt(const char *from, unsigned numBytes, unsigned position) {
+    ASSERT(from);
+    ASSERT(numBytes);
 
     unsigned fileLength = hdr->FileLength();
     unsigned firstSector, lastSector, numSectors;
     bool firstAligned, lastAligned;
     char *buf;
 
-    if (position >= fileLength)
-        return 0;  // Check request.
-    if (position + numBytes > fileLength)
-        numBytes = fileLength - position;
+    if (position >= fileLength) return 0;  // Check request.
+    if (position + numBytes > fileLength) numBytes = fileLength - position;
+
     DEBUG('f', "Writing %u bytes at %u, from file of length %u.\n",
           numBytes, position, fileLength);
 
@@ -163,8 +154,7 @@ OpenFile::WriteAt(const char *from, unsigned numBytes, unsigned position)
     lastAligned  = position + numBytes == (lastSector + 1) * SECTOR_SIZE;
 
     // Read in first and last sector, if they are to be partially modified.
-    if (!firstAligned)
-        ReadAt(buf, SECTOR_SIZE, firstSector * SECTOR_SIZE);
+    if (!firstAligned) ReadAt(buf, SECTOR_SIZE, firstSector * SECTOR_SIZE);
     if (!lastAligned && (firstSector != lastSector || firstAligned))
         ReadAt(&buf[(lastSector - firstSector) * SECTOR_SIZE],
                SECTOR_SIZE, lastSector * SECTOR_SIZE);
@@ -176,13 +166,13 @@ OpenFile::WriteAt(const char *from, unsigned numBytes, unsigned position)
     for (unsigned i = firstSector; i <= lastSector; i++)
         synchDisk->WriteSector(hdr->ByteToSector(i * SECTOR_SIZE),
                                &buf[(i - firstSector) * SECTOR_SIZE]);
+
     delete [] buf;
     return numBytes;
 }
 
 /// Return the number of bytes in the file.
 unsigned
-OpenFile::Length() const
-{
+OpenFile::Length() const {
     return hdr->FileLength();
 }

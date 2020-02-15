@@ -12,10 +12,8 @@
 #ifndef NACHOS_FILESYS_FILEHEADER__HH
 #define NACHOS_FILESYS_FILEHEADER__HH
 
-
 #include "raw_file_header.hh"
 #include "lib/bitmap.hh"
-
 
 /// The following class defines the Nachos "file header" (in UNIX terms, the
 /// “i-node”), describing where on disk to find all of the data in the file.
@@ -66,6 +64,5 @@ public:
 private:
     RawFileHeader raw;
 };
-
 
 #endif

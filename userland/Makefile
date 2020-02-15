@@ -23,7 +23,6 @@ CPPFLAGS   = $(INCLUDE_DIRS)
 #ASFLAGS  =
 #CPPFLAGS = -P $(INCLUDE_DIRS)
 
-
 CC  = $(GCC_PREFIX)gcc
 AS  = $(GCC_PREFIX)as
 LD  = $(GCC_PREFIX)ld
@@ -34,7 +33,6 @@ CFLAGS       = -std=c99 -G 0 -c $(INCLUDE_DIRS) -mips1 -mfp32 \
                -nostdlib -nostartfiles -nodefaultlibs -mno-abicalls
 
 PROGRAMS = halt shell tiny_shell matmult sort filetest
-
 
 .PHONY: all clean
 
@@ -47,7 +45,6 @@ start.o: start.s ../userprog/syscall.h
 	$(CPP) $(CPPFLAGS) $< >strt.s
 	$(AS) $(ASFLAGS) -o $@ strt.s
 	$(RM) strt.s
-
 
 # Las reglas genéricas que siguen sirven para compilar programas simples,
 # que consistan en un único archivo fuente. Si se quieren compilar programas

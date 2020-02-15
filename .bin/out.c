@@ -11,7 +11,6 @@
 /// All rights reserved.  See `copyright.h` for copyright notice and
 /// limitation of liability and disclaimer of warranty provisions.
 
-
 #include "coff.h"
 #include "extern/syms.h"
 #include "threads/.copyright.h"
@@ -23,7 +22,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 
 #define ReadStruct(f, s) (fread(&(s), sizeof (s), 1, (f)) == 1)
 
@@ -64,8 +62,7 @@ static const char *STORAGE_CLASS[] = {
 static unsigned column = 1;
 
 void
-MyPrintf(const char *format, ...)
-{
+MyPrintf(const char *format, ...) {
     va_list ap;
     char buffer[100];
 
@@ -76,22 +73,19 @@ MyPrintf(const char *format, ...)
     printf("%s", buffer);
 
     for (unsigned i = 0; buffer[i] != '\0'; i++) {
-        if (buffer[i] == '\n')
-            column = 1;
-        else if (buffer[i] == '\t')
-            column = ((column + 7) & ~7) + 1;
-        else
-            column += 1;
+        if (buffer[i] == '\n') column = 1;
+        else if (buffer[i] == '\t') column = ((column + 7) & ~7) + 1;
+        else column += 1;
     }
 }
 
 static int
-MyTab(unsigned n)
-{
+MyTab(unsigned n) {
     while (column < n) {
         putchar(' ');
         column++;
     }
+
     return column == n;
 }
 
@@ -105,8 +99,7 @@ static const char *RELOC_TYPE[] = {
 };
 
 static void
-PrintReloc(int vaddr, int i, int j)
-{
+PrintReloc(int vaddr, int i, int j) {
     for (unsigned k = 0; k < section[i].relocs; k++) {
         coffReloc *rp;
         rp = &section[i].reloc[k];
@@ -132,8 +125,7 @@ PrintReloc(int vaddr, int i, int j)
 #include "d.c"
 
 static void
-PrintSection(int i)
-{
+PrintSection(int i) {
     bool is_text;
     long pc;
     long word;
@@ -144,7 +136,7 @@ PrintSection(int i)
     is_text = strncmp(sectionHeader[i].name, ".text", 5) == 0;
 
     for (unsigned j = 0, pc = sectionHeader[i].virtAddr;
-         j < section[i].length; j++) {
+        j < section[i].length; j++) {
         word = section[i].data[j];
         if (is_text)
             DumpAscii(word, pc);
@@ -164,8 +156,7 @@ PrintSection(int i)
 }
 
 int
-main(int argc, char *argv[])
-{
+main(int argc, char *argv[]) {
     char *filename = "a.out";
     FILE *f;
     long l;
@@ -174,7 +165,7 @@ main(int argc, char *argv[])
 
     if (argc == 2)
         filename = argv[1];
-    if ((f = fopen(filename, "r")) == NULL) {
+    if (!(f = fopen(filename, "r"))) {
         fprintf(stderr, "out: could not open `%s`.\n", filename);
         perror("out");
         exit(1);
@@ -182,8 +173,7 @@ main(int argc, char *argv[])
     if (!ReadStruct(f, fileHeader)
           || !ReadStruct(f, optHeader)
           || fileHeader.magic != COFF_MIPSELMAGIC) {
-        fprintf(stderr,
-                "out: %s is not a MIPS Little-Endian COFF object file.\n",
+        fprintf(stderr, "out: %s is not a MIPS Little-Endian COFF object file.\n",
                 filename);
         exit(1);
     }
@@ -229,16 +219,13 @@ main(int argc, char *argv[])
     fseek(f, symbolHeader.cbSsExtOffset, 0);
     fread(sspace, 1, symbolHeader.issExtMax, f);
 
-    for (unsigned i = 0; i < fileHeader.nSections; i++)
-        PrintSection(i);
+    for (unsigned i = 0; i < fileHeader.nSections; i++) PrintSection(i);
 
     printf("External Symbols:\nValue\t Type\t\tStorage Class\tName\n");
     for (unsigned i = 0; i < MAX_SYMBOLS && i < symbolHeader.iextMax; i++) {
         SYMR *sym = &symbols[i].asym;
-        if (sym->sc == scUndefined)
-            MyPrintf("\t ");
-        else
-            MyPrintf("%08x ", sym->value);
+        if (sym->sc == scUndefined) MyPrintf("\t ");
+        else MyPrintf("%08x ", sym->value);
         MyPrintf("%s", SYMBOL_TYPE[sym->st]);
         MyTab(25);
         MyPrintf("%s", STORAGE_CLASS[sym->sc]);

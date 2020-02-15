@@ -14,7 +14,6 @@
 #ifndef NACHOS_THREADS_SWITCH__H
 #define NACHOS_THREADS_SWITCH__H
 
-
 #ifdef HOST_i386
 
 /// The offsets of the registers from the beginning of the thread object.
@@ -73,6 +72,5 @@
 #else
 #error "Architecture not recognized!"
 #endif
-
 
 #endif

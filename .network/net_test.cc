@@ -17,12 +17,10 @@
 /// All rights reserved.  See `copyright.h` for copyright notice and
 /// limitation of liability and disclaimer of warranty provisions.
 
-
 #include ".network.hh"
 #include "post.hh"
 #include "machine/interrupt.hh"
 #include "threads/system.hh"
-
 
 /// Test out message delivery, by doing the following:
 ///
@@ -32,8 +30,7 @@
 /// 4. Wait for an acknowledgement from the other machine to our original
 ///    message.
 void
-MailTest(int farAddr)
-{
+MailTest(int farAddr) {
     PacketHeader outPktHdr, inPktHdr;
     MailHeader   outMailHdr, inMailHdr;
     const char *data = "Hello there!";
@@ -53,8 +50,7 @@ MailTest(int farAddr)
 
     // Wait for the first message from the other machine.
     postOffice->Receive(0, &inPktHdr, &inMailHdr, buffer);
-    printf("Got \"%s\" from %d, box %d\n",
-           buffer, inPktHdr.from, inMailHdr.from);
+    printf("Got \"%s\" from %d, box %d\n", buffer, inPktHdr.from, inMailHdr.from);
     fflush(stdout);
 
     // Send acknowledgement to the other machine (using “reply to” mailbox
@@ -66,8 +62,7 @@ MailTest(int farAddr)
 
     // Wait for the ack from the other machine to the first message we sent.
     postOffice->Receive(1, &inPktHdr, &inMailHdr, buffer);
-    printf("Got \"%s\" from %d, box %d\n",
-           buffer, inPktHdr.from, inMailHdr.from);
+    printf("Got \"%s\" from %d, box %d\n", buffer, inPktHdr.from, inMailHdr.from);
     fflush(stdout);
 
     // Then we are done!

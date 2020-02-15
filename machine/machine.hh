@@ -20,12 +20,10 @@
 #ifndef NACHOS_MACHINE_MACHINE__HH
 #define NACHOS_MACHINE_MACHINE__HH
 
-
 #include ".exception_type.hh"
 #include "mmu.hh"
 #include ".single_stepper.hh"
 #include "lib/utility.hh"
-
 
 // User program CPU state.  The full set of MIPS registers, plus a few
 // more because we need to be able to start/stop a user program between
@@ -133,6 +131,5 @@ private:
 
     ExceptionHandler handlers[NUM_EXCEPTION_TYPES];  ///< Exception handlers.
 };
-
 
 #endif

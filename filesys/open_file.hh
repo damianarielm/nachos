@@ -19,9 +19,7 @@
 #ifndef NACHOS_FILESYS_OPENFILE__HH
 #define NACHOS_FILESYS_OPENFILE__HH
 
-
 #include "lib/utility.hh"
-
 
 #ifdef FILESYS_STUB  // Temporarily implement calls to Nachos file system as
                      // calls to UNIX!  See definitions listed under `#else`.
@@ -29,52 +27,52 @@ class OpenFile {
 public:
 
     /// Open the file.
-    OpenFile(int f)
-    {
+    OpenFile(int f) {
         file = f;
         currentOffset = 0;
     }
 
     /// Close the file.
-    ~OpenFile()
-    {
+    ~OpenFile() {
         Close(file);
     }
 
-    int ReadAt(char *into, unsigned numBytes, unsigned position)
-    {
-        ASSERT(into != nullptr);
-        ASSERT(numBytes > 0);
+    int ReadAt(char *into, unsigned numBytes, unsigned position) {
+        ASSERT(into);
+        ASSERT(numBytes);
+
         Lseek(file, position, 0);
         return ReadPartial(file, into, numBytes);
     }
-    int WriteAt(const char *from, unsigned numBytes, unsigned position)
-    {
-        ASSERT(from != nullptr);
-        ASSERT(numBytes > 0);
+
+    int WriteAt(const char *from, unsigned numBytes, unsigned position) {
+        ASSERT(from);
+        ASSERT(numBytes);
+
         Lseek(file, position, 0);
         WriteFile(file, from, numBytes);
         return numBytes;
     }
-    int Read(char *into, unsigned numBytes)
-    {
-        ASSERT(into != nullptr);
-        ASSERT(numBytes > 0);
+
+    int Read(char *into, unsigned numBytes) {
+        ASSERT(into);
+        ASSERT(numBytes);
+
         int numRead = ReadAt(into, numBytes, currentOffset);
         currentOffset += numRead;
         return numRead;
     }
-    int Write(const char *from, unsigned numBytes)
-    {
-        ASSERT(from != nullptr);
-        ASSERT(numBytes > 0);
+
+    int Write(const char *from, unsigned numBytes) {
+        ASSERT(from);
+        ASSERT(numBytes);
+
         int numWritten = WriteAt(from, numBytes, currentOffset);
         currentOffset += numWritten;
         return numWritten;
     }
 
-    unsigned Length() const
-    {
+    unsigned Length() const {
         Lseek(file, 0, 2);
         return Tell(file);
     }
@@ -120,6 +118,5 @@ public:
 };
 
 #endif
-
 
 #endif

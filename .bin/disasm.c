@@ -5,7 +5,6 @@
 /// All rights reserved.  See `copyright.h` for copyright notice and
 /// limitation of liability and disclaimer of warranty provisions.
 
-
 #include "copyright.h"
 #include "int.h"
 
@@ -17,11 +16,9 @@
 #include <stdio.h>
 #include <string.h>
 
-
 static FILE   *fp;
 static LDFILE *ldPtr;
-static SCNHDR textHeader, rdataHeader, dataHeader,
-              sdataHeader, sbssHeader, bssHeader;
+static SCNHDR textHeader, rdataHeader, dataHeader, sdataHeader, sbssHeader, bssHeader;
 
 static char filename[1000] = "a.out";  // Default a.out file.
 static char self[256];                 // Name of invoking program.
@@ -33,8 +30,7 @@ static unsigned NROWS = 64, LINESIZE = 4;
 static unsigned pc;
 
 void
-main(int argc, char *argv[])
-{
+main(int argc, char *argv[]) {
     char *fakeargv[3];
 
     strncpy(self, argv[0], sizeof self);
@@ -45,16 +41,15 @@ main(int argc, char *argv[])
             switch (*s) {}
     }
 
-    if (argc >= 2)
-        strncpy(filename, argv[1], sizeof filename);
+    if (argc >= 2) strncpy(filename, argv[1], sizeof filename);
     fp = fopen(filename, "r");
-    if (fp == NULL) {
+    if (!fp) {
         fprintf(stderr, "%s: Could not open '%s'\n", self, filename);
         exit(0);
     }
     fclose(fp);
     LoadProgram(filename);
-    if (argv[1] == NULL) {
+    if (!argv[1]) {
         fakeargv[1] = "a.out";
         fakeargv[2] = NULL;
         argv = fakeargv;
@@ -66,8 +61,7 @@ main(int argc, char *argv[])
 #define LOADSECTION(head)  LoadSection(&head);
 
 static void
-LoadSection(SCNHDR *hd)
-{
+LoadSection(SCNHDR *hd) {
     unsigned pc;
     if (hd->s_scnptr != 0) {
         //printf("loading %s\n", hd->s_name);
@@ -84,16 +78,14 @@ LoadSection(SCNHDR *hd)
 }
 
 static void
-LoadProgram(char *filename)
-{
+LoadProgram(char *filename) {
     ldptr = ldopen(filename, NULL);
-    if (ldptr == NULL) {
+    if (!ldptr) {
         fprintf(stderr, "%s: Load read error on %s\n", self, filename);
         exit(0);
     }
     if (TYPE(ldptr) != 0x162) {
-        fprintf(stderr,
-                "big-endian object file (little-endian interp)\n");
+        fprintf(stderr, "big-endian object file (little-endian interp)\n");
         exit(0);
     }
 
@@ -132,8 +124,7 @@ LoadProgram(char *filename)
 }
 
 static void
-Disasm(unsigned startpc, int argc, char *argv[])
-{
+Disasm(unsigned startpc, int argc, char *argv[]) {
     pc = memoffset;
     for (unsigned i = 0; i < textHeader.s_size; i += 4) {
         Dis1(pc);
@@ -142,8 +133,7 @@ Disasm(unsigned startpc, int argc, char *argv[])
 }
 
 static void
-Dis1(int xpc)
-{
+Dis1(int xpc) {
     unsigned instruction;
 
     instruction = Fetch(pc);

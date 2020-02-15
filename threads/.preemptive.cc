@@ -5,7 +5,6 @@
 /// is hereby granted, provided that the above copyright notice appear in all
 /// copies of this software.
 
-
 #include ".preemptive.hh"
 
 // Access to global objects: `currentThread`, `interrupt`...
@@ -16,7 +15,6 @@
 #include <sys/ptrace.h>
 #include <sys/wait.h>
 #include <sys/user.h>
-
 
 static void ContextSwitch();
 static void MonitorProcess(int childPid, unsigned long timeSliceLength);
@@ -29,13 +27,11 @@ static bool inContextSwitch = false;
 /// * `timeSliceLength` means how many machine instructions will last the
 ///   time slice for every kernel thread.
 void
-PreemptiveScheduler::SetUp(unsigned long timeSliceLength)
-{
+PreemptiveScheduler::SetUp(unsigned long timeSliceLength) {
     int childPid = fork();
     switch (childPid) {
         case -1:
-            DEBUG('p',
-                  "Preemptive scheduler: unable to launch child process\n");
+            DEBUG('p', "Preemptive scheduler: unable to launch child process.\n");
             ASSERT(false);
             break;
 
@@ -52,30 +48,27 @@ PreemptiveScheduler::SetUp(unsigned long timeSliceLength)
 }
 
 void
-LetMeBeMonitored()
-{
+LetMeBeMonitored() {
     // Allow the parent process to ptrace me.
     ptrace(PTRACE_TRACEME, 0, nullptr, nullptr);
 
-    DEBUG ('p', "Preemptive scheduler: child process will be ptraced\n");
+    DEBUG ('p', "Preemptive scheduler: child process will be ptraced.\n");
 
     // Raise a signal to bring back control to the parent.
     raise(SIGUSR1);
 }
 
 void
-MonitorProcess(int childPid, unsigned long timeSliceLength)
-{
+MonitorProcess(int childPid, unsigned long timeSliceLength) {
     // Machine instruction counter.
     long long instructionCounter = 1;
 
     while (true) {
-
         // Wait for child process.
         int wait_val;
         wait(&wait_val);
         if (WIFEXITED(wait_val)) {
-            DEBUG('p', "Preemptive scheduler: child process terminated\n");
+            DEBUG('p', "Preemptive scheduler: child process terminated.\n");
             break;
         }
 
@@ -83,15 +76,14 @@ MonitorProcess(int childPid, unsigned long timeSliceLength)
         instructionCounter++;
 
         // From time to time, insert machine code to force a context switch.
-        if (instructionCounter % timeSliceLength == 0)
-        {
+        if (instructionCounter % timeSliceLength == 0) {
             // Get child value of `inContextSwitch`.
             long incs = ptrace(PTRACE_PEEKDATA, childPid,
                                (long) &inContextSwitch, nullptr);
 
             if (incs == 0) {
                 DEBUG('p', "Preemptive scheduler: "
-                           "forcing a context switch at instruction %lld\n",
+                           "forcing a context switch at instruction %lld.\n",
                       instructionCounter);
 
                 struct user_regs_struct regs;
@@ -123,7 +115,7 @@ MonitorProcess(int childPid, unsigned long timeSliceLength)
         ptrace(PTRACE_SINGLESTEP, childPid, nullptr, nullptr);
     }
 
-    DEBUG('p', "Preemptive scheduler: Finished\n");
+    DEBUG('p', "Preemptive scheduler: Finished.\n");
     exit(0);
 }
 
@@ -133,8 +125,7 @@ MonitorProcess(int childPid, unsigned long timeSliceLength)
 /// This call is made asynchronously from the parent process, using `ptrace`
 /// features.
 static void
-ContextSwitch(void)
-{
+ContextSwitch(void) {
     // Prevent register loss: save all registers.
 #ifdef HOST_i386
     __asm__ ("pushal");

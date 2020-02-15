@@ -38,14 +38,12 @@
 #ifndef NACHOS_THREADS_THREAD__HH
 #define NACHOS_THREADS_THREAD__HH
 
-
 #include "lib/utility.hh"
 
 #ifdef USER_PROGRAM
 #include "machine/machine.hh"
 #include "userprog/address_space.hh"
 #endif
-
 
 /// CPU register state to be saved on context switch.
 ///
@@ -59,7 +57,6 @@ const unsigned MACHINE_STATE_SIZE = 17;
 ///
 /// WATCH OUT IF THIS IS NOT BIG ENOUGH!!!!!
 const unsigned STACK_SIZE = 4 * 1024;
-
 
 /// Thread state.
 enum ThreadStatus {
@@ -176,6 +173,5 @@ extern "C" {
     // Stop running `oldThread` and start running `newThread`.
     void SWITCH(Thread *oldThread, Thread *newThread);
 }
-
 
 #endif

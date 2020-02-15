@@ -1,9 +1,7 @@
 #include "syscall.h"
 
-
 int
-main(void)
-{
+main(void) {
     SpaceId    newProc;
     OpenFileId input  = CONSOLE_INPUT;
     OpenFileId output = CONSOLE_OUTPUT;
@@ -13,12 +11,11 @@ main(void)
     prompt[0] = '-';
     prompt[1] = '-';
 
-    while (1)
-    {
+    while (1) {
         Write(prompt, 2, output);
         i = 0;
-        do
-            Read(&buffer[i], 1, input);
+
+        do Read(&buffer[i], 1, input);
         while (buffer[i++] != '\n');
 
         buffer[--i] = '\0';

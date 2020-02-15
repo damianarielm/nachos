@@ -2,31 +2,26 @@
 /// All rights reserved.  See `copyright.h` for copyright notice and
 /// limitation of liability and disclaimer of warranty provisions.
 
-
 #include ".debugger_command_manager.hh"
 #include "lib/utility.hh"
 
 #include <string.h>
-
 
 typedef DebuggerCommandManager DCM;
 
 static const char SEPARATOR[] = " ";
 
 const char *
-DCM::FetchArg(char **args)
-{
+DCM::FetchArg(char **args) {
     return strtok_r(nullptr, SEPARATOR, args);
 }
 
 bool
-DCM::AddCommand(const char *name, CommandFunc f, void *extra)
-{
-    ASSERT(name != nullptr);
-    ASSERT(f != nullptr);
+DCM::AddCommand(const char *name, CommandFunc f, void *extra) {
+    ASSERT(name);
+    ASSERT(f);
 
-    if (count >= CAPACITY)
-        return false;
+    if (count >= CAPACITY) return false;
 
     Command c = { name, f, extra };
     commands[count++] = c;
@@ -34,27 +29,24 @@ DCM::AddCommand(const char *name, CommandFunc f, void *extra)
 }
 
 void
-DCM::SetEmpty(EmptyFunc f)
-{
+DCM::SetEmpty(EmptyFunc f) {
     empty = f;
 }
 
 void
-DCM::SetUnknown(UnknownFunc f)
-{
+DCM::SetUnknown(UnknownFunc f) {
     unknown = f;
 }
 
 DCM::RunResult
-DCM::Run(char *line)
-{
+DCM::Run(char *line) {
     // Extract the command name from the line.
     char *saved;
     const char *name = strtok_r(line, SEPARATOR, &saved);
 
     // If the line is empty...
-    if (name == nullptr) {
-        ASSERT(empty != nullptr);
+    if (!name) {
+        ASSERT(empty);
         return (*empty)();
     }
 
@@ -65,6 +57,6 @@ DCM::Run(char *line)
     }
 
     // If this is reached, then the command is unknown...
-    ASSERT(unknown != nullptr);
+    ASSERT(unknown);
     return (*unknown)(name);
 }

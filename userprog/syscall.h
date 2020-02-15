@@ -13,7 +13,6 @@
 #ifndef NACHOS_USERPROG_SYSCALL__H
 #define NACHOS_USERPROG_SYSCALL__H
 
-
 /// System call codes.
 ///
 /// Used by the stubs to tell the kernel which system call is being asked
@@ -32,7 +31,6 @@
 #define SC_READ    14
 #define SC_WRITE   15
 
-
 #ifndef IN_ASM
 
 /// The system call interface.  These are the operations the Nachos kernel
@@ -46,7 +44,6 @@
 
 /// Stop Nachos, and print out performance stats.
 void Halt();
-
 
 /// Address space control operations: `Exit`, `Exec`, and `Join`.
 
@@ -65,7 +62,6 @@ SpaceId Exec(char *name);
 /// Return the exit status.
 int Join(SpaceId id);
 
-
 /// User-level thread operations: `Fork` and `Yield`.  To allow multiple
 /// threads to run within a user program.
 
@@ -76,7 +72,6 @@ void Fork(void (*func)(void));
 /// Yield the CPU to another runnable thread, whether in this address space
 /// or not.
 void Yield();
-
 
 /// File system operations: `Create`, `Open`, `Read`, `Write`, `Close`.
 ///
@@ -122,8 +117,6 @@ int Read(char *buffer, int size, OpenFileId id);
 /// Close the file, we are done reading and writing to it.
 void Close(OpenFileId id);
 
-
 #endif
-
 
 #endif

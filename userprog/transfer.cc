@@ -2,13 +2,10 @@
 #include "lib/utility.hh"
 #include "threads/system.hh"
 
-
-bool ReadStringFromUser(int userAddress, char *outString,
-                        unsigned maxByteCount)
-{
+bool ReadStringFromUser(int userAddress, char *outString, unsigned maxByteCount) {
     ASSERT(userAddress != 0);
-    ASSERT(outString != nullptr);
-    ASSERT(maxByteCount != 0);
+    ASSERT(outString);
+    ASSERT(maxByteCount);
 
     unsigned count = 0;
     do {

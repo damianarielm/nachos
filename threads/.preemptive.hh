@@ -12,7 +12,6 @@
 #ifndef NACHOS_THREADS_PREEMPTIVE__HH
 #define NACHOS_THREADS_PREEMPTIVE__HH
 
-
 class PreemptiveScheduler {
 public:
 
@@ -29,6 +28,5 @@ public:
     void SetUp(unsigned long timeSliceLength);
 
 };
-
 
 #endif

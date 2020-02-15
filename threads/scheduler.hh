@@ -10,10 +10,8 @@
 #ifndef NACHOS_THREADS_SCHEDULER__HH
 #define NACHOS_THREADS_SCHEDULER__HH
 
-
 #include "thread.hh"
 #include "lib/list.hh"
-
 
 /// The following class defines the scheduler/dispatcher abstraction --
 /// the data structures and operations needed to keep track of which
@@ -45,6 +43,5 @@ private:
     List<Thread*> *readyList;
 
 };
-
 
 #endif

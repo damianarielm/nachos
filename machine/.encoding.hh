@@ -10,7 +10,6 @@
 #ifndef NACHOS_MACHINE_ENCODING__HH
 #define NACHOS_MACHINE_ENCODING__HH
 
-
 /// OpCode values.
 ///
 /// The names are straight from the MIPS manual except for the following
@@ -95,8 +94,7 @@ enum {
 
 template<typename T>
 inline T
-IndexToAddr(T x)
-{
+IndexToAddr(T x) {
     return x << 2;
 }
 
@@ -128,7 +126,6 @@ extern const OpInfo OP_TABLE[];
 /// into the `opCode` field of a `MemWord`.
 extern const int SPECIAL_TABLE[];
 
-
 /// Stuff to help print out each instruction, for debugging.
 
 enum RegType {
@@ -145,6 +142,5 @@ struct OpString {
 };
 
 extern const struct OpString OP_STRINGS[];
-
 
 #endif

@@ -8,9 +8,7 @@
 #ifndef NACHOS_BIN_COFF__H
 #define NACHOS_BIN_COFF__H
 
-
 #include <stdint.h>
-
 
 #define COFF_MIPSELMAGIC  0x0162
 
@@ -67,6 +65,5 @@ typedef struct coffReloc {
                                  // is a section number.
 
 } coffReloc;
-
 
 #endif

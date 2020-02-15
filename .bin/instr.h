@@ -6,7 +6,6 @@
 #ifndef NACHOS_BIN_INSTR__H
 #define NACHOS_BIN_INSTR__H
 
-
 // Instruction formats
 
 #define rd(i)     (((i) >> 11) & 0x1F)
@@ -19,8 +18,6 @@
 #define top4(i)   ((i) & (~((1 << 28) - 1)))
 #define off16(i)  (immed(i) << 2)
 
-#define extend(i, hibitmask)  \
-    (((i) & (hibitmask)) ? ((i) | -(hibitmask)) : (i))
-
+#define extend(i, hibitmask)  \ (((i) & (hibitmask)) ? ((i) | -(hibitmask)) : (i))
 
 #endif

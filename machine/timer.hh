@@ -20,9 +20,7 @@
 #ifndef NACHOS_MACHINE_TIMER__HH
 #define NACHOS_MACHINE_TIMER__HH
 
-
 #include "lib/utility.hh"
-
 
 /// The following class defines a hardware timer.
 class Timer {
@@ -48,6 +46,5 @@ private:
     void *arg;  ///< Argument to pass to interrupt handler.
 
 };
-
 
 #endif

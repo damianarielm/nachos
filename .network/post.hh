@@ -22,14 +22,11 @@
 /// All rights reserved.  See `copyright.h` for copyright notice and
 /// limitation of liability and disclaimer of warranty provisions.
 
-
 #ifndef NACHOS_NETWORK_POST__HH
 #define NACHOS_NETWORK_POST__HH
 
-
 #include ".network.hh"
 #include "threads/synch_list.hh"
-
 
 /// Mailbox address -- uniquely identifies a mailbox on a given machine.
 ///
@@ -167,6 +164,5 @@ private:
     Lock *sendLock;
 
 };
-
 
 #endif

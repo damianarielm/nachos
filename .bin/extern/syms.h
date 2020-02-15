@@ -113,7 +113,6 @@
 #define scInit         22  /* .init section symbol */
 #define scMax          32
 
-
 /*
  *   Symbol Types
  */
@@ -192,7 +191,6 @@
 #define otMax     6  /* KEEP UP TO DATE */
 #endif
 
-
 /*
  * This (part of the) file contains the definition of the Third Eye Symbol
  * Table.
@@ -218,7 +216,6 @@
  * "rgPd"  array whose domain is "0..ipdMax-1" and RanGe is PDR.
  * "rgFd"  array whose domain is "0..ifdMax-1" and RanGe is FDR.
  */
-
 
 /* 
  * Symbolic Header (HDR) structure.
@@ -311,7 +308,6 @@ typedef struct fdr {
 #define ifdTemp  0
 #define ilnNil   -1
 
-
 /*
  * Procedure Descriptor
  *
@@ -378,8 +374,6 @@ typedef long LINER, *pLINER;
 #define cbLINER   sizeof (LINER)
 #define ilineNil  -1
 
-
-
 /*
  * The Symbol Structure (GFW, to those who Know!)
  */
@@ -398,7 +392,6 @@ typedef struct {
 #define indexNil  0xfffff
 #define issNil    -1
 #define issNull    0
-
 
 /* The following converts a memory resident string to an iss.
  * This hack is recognized in SbFIss, in sym.c of the debugger.
@@ -419,7 +412,6 @@ typedef struct {
     } EXTR, *pEXTR;
 #define extNil  ((pEXTR) 0)
 #define cbEXTR  sizeof (EXTR)
-
 
 /* AUXILLARY TYPE INFORMATION */
 
@@ -466,8 +458,6 @@ typedef struct {
 #define cbDNR  sizeof (DNR)
 #define dnNil  ((pDNR) 0)
 
-
-
 /*
  * Auxillary information occurs only if needed.
  * It ALWAYS occurs in this order when present.
@@ -506,7 +496,6 @@ typedef union {
 #define cbAUXU   sizeof (AUXU)
 #define auxNil   ((pAUXU) 0)
 #define iauxNil  -1
-
 
 /*
  * Optimization symbols
@@ -552,7 +541,6 @@ typedef long FIT, *pFIT;
 #define cbFIT   sizeof (FIT)
 #define ifiNil  -1
 #define fiNil   ((pFIT) 0)
-
 
 /* Dense numbers
  *

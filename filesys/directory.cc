@@ -19,30 +19,26 @@
 /// All rights reserved.  See `copyright.h` for copyright notice and
 /// limitation of liability and disclaimer of warranty provisions.
 
-
 #include "directory.hh"
 #include "directory_entry.hh"
 #include "file_header.hh"
 #include "lib/utility.hh"
-
 
 /// Initialize a directory; initially, the directory is completely empty.  If
 /// the disk is being formatted, an empty directory is all we need, but
 /// otherwise, we need to call FetchFrom in order to initialize it from disk.
 ///
 /// * `size` is the number of entries in the directory.
-Directory::Directory(unsigned size)
-{
-    ASSERT(size > 0);
+Directory::Directory(unsigned size) {
+    ASSERT(size);
+
     raw.table = new DirectoryEntry [size];
     raw.tableSize = size;
-    for (unsigned i = 0; i < raw.tableSize; i++)
-        raw.table[i].inUse = false;
+    for (unsigned i = 0; i < raw.tableSize; i++) raw.table[i].inUse = false;
 }
 
 /// De-allocate directory data structure.
-Directory::~Directory()
-{
+Directory::~Directory() {
     delete [] raw.table;
 }
 
@@ -50,22 +46,20 @@ Directory::~Directory()
 ///
 /// * `file` is file containing the directory contents.
 void
-Directory::FetchFrom(OpenFile *file)
-{
-    ASSERT(file != nullptr);
-    file->ReadAt((char *) raw.table,
-                 raw.tableSize * sizeof (DirectoryEntry), 0);
+Directory::FetchFrom(OpenFile *file) {
+    ASSERT(file);
+
+    file->ReadAt((char *) raw.table, raw.tableSize * sizeof (DirectoryEntry), 0);
 }
 
 /// Write any modifications to the directory back to disk.
 ///
 /// * `file` is a file to contain the new directory contents.
 void
-Directory::WriteBack(OpenFile *file)
-{
-    ASSERT(file != nullptr);
-    file->WriteAt((char *) raw.table,
-                  raw.tableSize * sizeof (DirectoryEntry), 0);
+Directory::WriteBack(OpenFile *file) {
+    ASSERT(file);
+
+    file->WriteAt((char *) raw.table, raw.tableSize * sizeof (DirectoryEntry), 0);
 }
 
 /// Look up file name in directory, and return its location in the table of
@@ -73,14 +67,13 @@ Directory::WriteBack(OpenFile *file)
 ///
 /// * `name` is the file name to look up.
 int
-Directory::FindIndex(const char *name)
-{
-    ASSERT(name != nullptr);
+Directory::FindIndex(const char *name) {
+    ASSERT(name);
 
     for (unsigned i = 0; i < raw.tableSize; i++)
-        if (raw.table[i].inUse
-              && !strncmp(raw.table[i].name, name, FILE_NAME_MAX_LEN))
+        if (raw.table[i].inUse && !strncmp(raw.table[i].name, name, FILE_NAME_MAX_LEN))
             return i;
+
     return -1;  // name not in directory
 }
 
@@ -90,13 +83,12 @@ Directory::FindIndex(const char *name)
 ///
 /// * `name` is the file name to look up.
 int
-Directory::Find(const char *name)
-{
-    ASSERT(name != nullptr);
+Directory::Find(const char *name) {
+    ASSERT(name);
 
     int i = FindIndex(name);
-    if (i != -1)
-        return raw.table[i].sector;
+    if (i != -1) return raw.table[i].sector;
+
     return -1;
 }
 
@@ -107,12 +99,10 @@ Directory::Find(const char *name)
 /// * `name` is the name of the file being added.
 /// * `newSector` is the disk sector containing the added file's header.
 bool
-Directory::Add(const char *name, int newSector)
-{
-    ASSERT(name != nullptr);
+Directory::Add(const char *name, int newSector) {
+    ASSERT(name);
 
-    if (FindIndex(name) != -1)
-        return false;
+    if (FindIndex(name) != -1) return false;
 
     for (unsigned i = 0; i < raw.tableSize; i++)
         if (!raw.table[i].inUse) {
@@ -121,6 +111,7 @@ Directory::Add(const char *name, int newSector)
             raw.table[i].sector = newSector;
             return true;
         }
+
     return false;  // no space.  Fix when we have extensible files.
 }
 
@@ -129,21 +120,19 @@ Directory::Add(const char *name, int newSector)
 ///
 /// * `name` is the file name to be removed.
 bool
-Directory::Remove(const char *name)
-{
-    ASSERT(name != nullptr);
+Directory::Remove(const char *name) {
+    ASSERT(name);
 
     int i = FindIndex(name);
-    if (i == -1)
-        return false;  // name not in directory
+    if (i == -1) return false;  // name not in directory
     raw.table[i].inUse = false;
+
     return true;
 }
 
 /// List all the file names in the directory.
 void
-Directory::List() const
-{
+Directory::List() const {
     for (unsigned i = 0; i < raw.tableSize; i++)
         if (raw.table[i].inUse)
             printf("%s\n", raw.table[i].name);
@@ -152,8 +141,7 @@ Directory::List() const
 /// List all the file names in the directory, their `FileHeader` locations,
 /// and the contents of each file.  For debugging.
 void
-Directory::Print() const
-{
+Directory::Print() const {
     FileHeader *hdr = new FileHeader;
 
     printf("Directory contents:\n");
@@ -167,11 +155,11 @@ Directory::Print() const
             hdr->Print();
         }
     printf("\n");
+
     delete hdr;
 }
 
 const RawDirectory *
-Directory::GetRaw() const
-{
+Directory::GetRaw() const {
     return &raw;
 }

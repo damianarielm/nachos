@@ -7,9 +7,7 @@
 #ifndef NACHOS_LIB_TABLE__HH
 #define NACHOS_LIB_TABLE__HH
 
-
 #include "list.hh"
-
 
 template <class T>
 class Table {
@@ -42,18 +40,15 @@ private:
     List<int> freed;
 };
 
-
 template <class T>
-Table<T>::Table()
-{
+Table<T>::Table() {
     current = 0;
 }
 
 
 template <class T>
 int
-Table<T>::Add(T item)
-{
+Table<T>::Add(T item) {
     int i;
 
     if (!freed.IsEmpty()) {
@@ -71,21 +66,17 @@ Table<T>::Add(T item)
 
 template <class T>
 T
-Table<T>::Get(int i) const
-{
+Table<T>::Get(int i) const {
     ASSERT(i >= 0);
 
-    if (freed.Has(i) || i >= current) {
-        return T();
-    }
+    if (freed.Has(i) || i >= current) return T();
 
     return data[i];
 }
 
 template <class T>
 bool
-Table<T>::HasKey(int i) const
-{
+Table<T>::HasKey(int i) const {
     ASSERT(i >= 0);
 
     return !(freed.Has(i) || i >= current);
@@ -93,20 +84,16 @@ Table<T>::HasKey(int i) const
 
 template <class T>
 bool
-Table<T>::IsEmpty() const
-{
+Table<T>::IsEmpty() const {
     return current == 0;
 }
 
 template <class T>
 T
-Table<T>::Remove(int i)
-{
+Table<T>::Remove(int i) {
     ASSERT(i >= 0);
 
-    if (!HasKey(i)) {
-        return T();
-    }
+    if (!HasKey(i)) return T();
 
     if (i == current - 1) {
         current--;
@@ -118,8 +105,8 @@ Table<T>::Remove(int i)
     } else {
         freed.SortedInsert(i, i);
     }
+
     return data[i];
 }
-
 
 #endif

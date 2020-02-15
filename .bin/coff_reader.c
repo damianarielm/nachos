@@ -3,19 +3,16 @@
 /// All rights reserved.  See `copyright.h` for copyright notice and
 /// limitation of liability and disclaimer of warranty provisions.
 
-
 #include "coff_reader.h"
 #include <assert.h>
 #include <stdlib.h>
-
 
 /// Routines for converting words and short words to and from the simulated
 /// machine's format of little endian.  These end up being NOPs when the host
 /// machine is little endian.
 
 static uint32_t
-WordToHost(uint32_t word)
-{
+WordToHost(uint32_t word) {
 #ifdef HOST_IS_BIG_ENDIAN
     uint32_t result;
     result  = (word >> 24) & 0x000000ff;
@@ -29,8 +26,7 @@ WordToHost(uint32_t word)
 }
 
 static uint16_t
-ShortToHost(uint16_t shortword)
-{
+ShortToHost(uint16_t shortword) {
 #if HOST_IS_BIG_ENDIAN
      uint16_t result;
      result  = (shortword << 8) & 0xff00;
@@ -41,41 +37,34 @@ ShortToHost(uint16_t shortword)
 #endif
 }
 
-#define FAIL(rv, s)         \
-    {                       \
-        if (error != NULL)  \
-            *error = (s);   \
-        return (rv);        \
+#define FAIL(rv, s)               \
+    {                             \
+        if (error) *error = (s);  \
+        return (rv);              \
     }
 
 bool
-CoffReaderLoad(coffReaderData *d, FILE *f, char **error)
-{
-    assert(f != NULL);
-    assert(d != NULL);
+CoffReaderLoad(coffReaderData *d, FILE *f, char **error) {
+    assert(f);
+    assert(d);
 
     // Read in the file header and check the magic number.
     coffFileHeader *fh = &d->fileH;
-    if (fread(fh, sizeof *fh, 1, f) != 1)
-        FAIL(false, "File is too short");
+    if (fread(fh, sizeof *fh, 1, f) != 1) FAIL(false, "File is too short");
     fh->magic = ShortToHost(fh->magic);
     fh->nSections = ShortToHost(fh->nSections);
-    if (fh->magic != COFF_MIPSELMAGIC)
-        FAIL(false, "File is not a MIPSEL COFF file");
+    if (fh->magic != COFF_MIPSELMAGIC) FAIL(false, "File is not a MIPSEL COFF file");
 
     // Read in the optional header and check the magic number.
     coffOptHeader *oh = &d->optH;
-    if (fread(oh, sizeof *oh, 1, f) != 1)
-        FAIL(false, "File is too short");
+    if (fread(oh, sizeof *oh, 1, f) != 1) FAIL(false, "File is too short");
     oh->magic = ShortToHost(oh->magic);
-    if (oh->magic != COFF_OMAGIC)
-        FAIL(false, "File is not an OMAGIC file");
+    if (oh->magic != COFF_OMAGIC) FAIL(false, "File is not an OMAGIC file");
 
     /// Read in the section headers.
     unsigned nsh = fh->nSections;
     d->sections = malloc(nsh * sizeof *d->sections);
-    if (d->sections == NULL)
-        FAIL(false, "Could not allocate memory");
+    if (!(d->sections)) FAIL(false, "Could not allocate memory");
     if (fread((char *) d->sections, nsh * sizeof *d->sections, 1, f) != 1)
         FAIL(false, "File is too short");
 
@@ -91,21 +80,18 @@ CoffReaderLoad(coffReaderData *d, FILE *f, char **error)
 }
 
 void
-CoffReaderUnload(coffReaderData *d)
-{
-    assert(d != NULL);
-    assert(d->sections != NULL);
-      // Avoid unloading from an empty structure.
+CoffReaderUnload(coffReaderData *d) {
+    assert(d);
+    assert(d->sections); // Avoid unloading from an empty structure.
 
     free(d->sections);
     d->sections = NULL;
 }
 
 coffSectionHeader *
-CoffReaderNextSection(coffReaderData *d)
-{
-    assert(d != NULL);
-    assert(d->sections != NULL);
+CoffReaderNextSection(coffReaderData *d) {
+    assert(d);
+    assert(d->sections);
     assert(d->current <= d->fileH.nSections);
 
     if (d->current == d->fileH.nSections) {

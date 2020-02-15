@@ -35,9 +35,7 @@
 #ifndef NACHOS_MACHINE_INTERRUPT__HH
 #define NACHOS_MACHINE_INTERRUPT__HH
 
-
 #include "lib/list.hh"
-
 
 /// Interrupts can be disabled (`INT_OFF`) or enabled (`INT_ON`).
 enum IntStatus {
@@ -78,8 +76,7 @@ class PendingInterrupt {
 public:
 
     /// initialize an interrupt that will occur in the future.
-    PendingInterrupt(VoidFunctionPtr func, void *param,
-                     unsigned time, IntType kind);
+    PendingInterrupt(VoidFunctionPtr func, void *param, unsigned time, IntType kind);
 
     VoidFunctionPtr handler;  ///< The function (in the hardware device
                               ///< emulator) to call when the interrupt
@@ -130,7 +127,6 @@ public:
     // Print interrupt state.
     void DumpState();
 
-
     /// NOTE: the following are internal to the hardware simulation code.
     /// DO NOT call these directly.  I should make them “private”,
     /// but they need to be public since they are called by the
@@ -139,8 +135,7 @@ public:
     /// Schedule an interrupt to occur at time ``when''.
     ///
     /// This is called by the hardware device simulators.
-    void Schedule(VoidFunctionPtr handler, void *arg,
-                  unsigned when, IntType type);
+    void Schedule(VoidFunctionPtr handler, void *arg, unsigned when, IntType type);
 
     /// Advance simulated time.
     void OneTick();
@@ -160,8 +155,7 @@ private:
     bool CheckIfDue(bool advanceClock);
 
     /// SetLevel, without advancing the simulated time.
-    void ChangeLevel(IntStatus old,
-                     IntStatus now);
+    void ChangeLevel(IntStatus old, IntStatus now);
 
 #ifdef DFS_TICKS_FIX
     /// Restart total ticks and the pending interrupt list.
@@ -169,6 +163,5 @@ private:
 #endif
 
 };
-
 
 #endif

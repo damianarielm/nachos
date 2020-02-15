@@ -6,9 +6,7 @@
 #ifndef NACHOS_MACHINE_INSTRUCTION__HH
 #define NACHOS_MACHINE_INSTRUCTION__HH
 
-
 #include ".encoding.hh"
-
 
 /// The following class defines an instruction, represented in both:
 /// * undecoded binary form;
@@ -34,6 +32,5 @@ public:
     int extra;  ///< Immediate or target or shamt field or offset.
                 ///< Immediates are sign-extended.
 };
-
 
 #endif

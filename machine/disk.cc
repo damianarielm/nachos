@@ -13,24 +13,21 @@
 /// All rights reserved.  See `copyright.h` for copyright notice and
 /// limitation of liability and disclaimer of warranty provisions.
 
-
 #include "disk.hh"
 #include "threads/system.hh"
-
 
 /// We put this at the front of the UNIX file representing the
 /// disk, to make it less likely we will accidentally treat a useful file
 /// as a disk (which would probably trash the file's contents).
 static const unsigned MAGIC_NUMBER = 0x456789AB;
 static const unsigned MAGIC_SIZE = sizeof (int);
-
 static const unsigned DISK_SIZE = MAGIC_SIZE + NUM_SECTORS * SECTOR_SIZE;
 
 /// dummy procedure because we cannot take a pointer of a member function
 static void
-DiskDone(void *arg)
-{
-    ASSERT(arg != nullptr);
+DiskDone(void *arg) {
+    ASSERT(arg);
+
     ((Disk *) arg)->HandleInterrupt();
 }
 
@@ -42,15 +39,14 @@ DiskDone(void *arg)
 /// * `callWhenDone` is an interrupt handler to be called when disk
 ///   read/write request completes.
 /// * `callArg` is an argument to pass the interrupt handler.
-Disk::Disk(const char *name, VoidFunctionPtr callWhenDone, void *callArg)
-{
-    ASSERT(name != nullptr);
-    ASSERT(callWhenDone != nullptr);
+Disk::Disk(const char *name, VoidFunctionPtr callWhenDone, void *callArg) {
+    DEBUG('d', "Initializing the disk, 0x%X 0x%X.\n", callWhenDone, callArg);
+    ASSERT(name);
+    ASSERT(callWhenDone);
 
     int magicNum;
     int tmp = 0;
 
-    DEBUG('d', "Initializing the disk, 0x%X 0x%X\n", callWhenDone, callArg);
     handler    = callWhenDone;
     handlerArg = callArg;
     lastSector = 0;
@@ -63,8 +59,7 @@ Disk::Disk(const char *name, VoidFunctionPtr callWhenDone, void *callArg)
     } else {            // File does not exist, create it.
         fileno = OpenForWrite(name);
         magicNum = MAGIC_NUMBER;
-        WriteFile(fileno, (char *) &magicNum, MAGIC_SIZE);
-          // Write magic number.
+        WriteFile(fileno, (char *) &magicNum, MAGIC_SIZE); // Write magic number.
 
         // Need to write at end of file, so that reads will not return EOF.
         Lseek(fileno, DISK_SIZE - sizeof (int), 0);
@@ -74,25 +69,23 @@ Disk::Disk(const char *name, VoidFunctionPtr callWhenDone, void *callArg)
 }
 
 /// Clean up disk simulation, by closing the UNIX file representing the disk.
-Disk::~Disk()
-{
+Disk::~Disk() {
     Close(fileno);
 }
 
 /// Dump the data in a disk read/write request, for debugging.
 static void
-PrintSector(bool writing, unsigned sector, const char *data)
-{
-    ASSERT(data != nullptr);
+PrintSector(bool writing, unsigned sector, const char *data) {
+    ASSERT(data);
 
     int *p = (int *) data;
 
-    if (writing)
-        printf("Writing sector: %u\n", sector);
-    else
-        printf("Reading sector: %u\n", sector);
+    if (writing) printf("Writing sector: %u.\n", sector);
+    else printf("Reading sector: %u.\n", sector);
+
     for (unsigned i = 0; i < SECTOR_SIZE / sizeof (int); i++)
         printf("%X ", p[i]);
+
     printf("\n");
 }
 
@@ -111,20 +104,17 @@ PrintSector(bool writing, unsigned sector, const char *data)
 /// * `data` are the bytes to be written, the buffer to hold the incoming
 ///   bytes.
 void
-Disk::ReadRequest(unsigned sectorNumber, char *data)
-{
-    ASSERT(data != nullptr);
-
-    int ticks = ComputeLatency(sectorNumber, false);
-
+Disk::ReadRequest(unsigned sectorNumber, char *data) {
+    DEBUG('d', "Reading from sector %u.\n", sectorNumber);
+    ASSERT(data);
     ASSERT(!active);  // only one request at a time
     ASSERT(sectorNumber >= 0 && sectorNumber < NUM_SECTORS);
 
-    DEBUG('d', "Reading from sector %u\n", sectorNumber);
+    int ticks = ComputeLatency(sectorNumber, false);
+
     Lseek(fileno, SECTOR_SIZE * sectorNumber + MAGIC_SIZE, 0);
     Read(fileno, data, SECTOR_SIZE);
-    if (debug.IsEnabled('d'))
-        PrintSector(false, sectorNumber, data);
+    if (debug.IsEnabled('d')) PrintSector(false, sectorNumber, data);
 
     active = true;
     UpdateLast(sectorNumber);
@@ -133,20 +123,17 @@ Disk::ReadRequest(unsigned sectorNumber, char *data)
 }
 
 void
-Disk::WriteRequest(unsigned sectorNumber, const char *data)
-{
-    ASSERT(data != nullptr);
-
-    int ticks = ComputeLatency(sectorNumber, true);
-
+Disk::WriteRequest(unsigned sectorNumber, const char *data) {
+    DEBUG('d', "Writing to sector %u.\n", sectorNumber);
+    ASSERT(data);
     ASSERT(!active);
     ASSERT(sectorNumber >= 0 && sectorNumber < NUM_SECTORS);
 
-    DEBUG('d', "Writing to sector %u\n", sectorNumber);
+    int ticks = ComputeLatency(sectorNumber, true);
+
     Lseek(fileno, SECTOR_SIZE * sectorNumber + MAGIC_SIZE, 0);
     WriteFile(fileno, data, SECTOR_SIZE);
-    if (debug.IsEnabled('d'))
-        PrintSector(true, sectorNumber, data);
+    if (debug.IsEnabled('d')) PrintSector(true, sectorNumber, data);
 
     active = true;
     UpdateLast(sectorNumber);
@@ -157,15 +144,13 @@ Disk::WriteRequest(unsigned sectorNumber, const char *data)
 /// Called when it is time to invoke the disk interrupt handler, to tell the
 /// Nachos kernel that the disk request is done.
 void
-Disk::HandleInterrupt()
-{
+Disk::HandleInterrupt() {
     active = false;
     (*handler)(handlerArg);
 }
 
 static inline unsigned
-Diff(unsigned a, unsigned b)
-{
+Diff(unsigned a, unsigned b) {
     return a > b ? a - b : b - a;
 }
 
@@ -177,28 +162,26 @@ Diff(unsigned a, unsigned b)
 /// Disk seeks at one track per `SEEK_TIME` ticks (cf. `stats.hh`) and
 /// rotates at one sector per `ROTATION_TIME` ticks.
 unsigned
-Disk::TimeToSeek(unsigned newSector, unsigned *rotation)
-{
-    ASSERT(rotation != nullptr);
+Disk::TimeToSeek(unsigned newSector, unsigned *rotation) {
+    ASSERT(rotation);
 
     unsigned newTrack = newSector / SECTORS_PER_TRACK;
     unsigned oldTrack = lastSector / SECTORS_PER_TRACK;
-    unsigned seek = Diff(newTrack, oldTrack) * SEEK_TIME;
-      // How long will seek take?
+    unsigned seek = Diff(newTrack, oldTrack) * SEEK_TIME; // How long will seek take?
     unsigned over = (stats->totalTicks + seek) % ROTATION_TIME;
       // Will we be in the middle of a sector when we finish the seek?
 
     *rotation = 0;
     if (over > 0)  // If so, need to round up to next full sector.
        *rotation = ROTATION_TIME - over;
+
     return seek;
 }
 
 /// Return number of sectors of rotational delay between target sector `to`
 /// and current sector position `from`.
 unsigned
-Disk::ModuloDiff(unsigned to, unsigned from)
-{
+Disk::ModuloDiff(unsigned to, unsigned from) {
     unsigned toOffset   = to % SECTORS_PER_TRACK;
     unsigned fromOffset = from % SECTORS_PER_TRACK;
 
@@ -222,41 +205,35 @@ Disk::ModuloDiff(unsigned to, unsigned from)
 /// requests to the current track to be satisfied more quickly.  The contents
 /// of the track buffer are discarded after every seek to a new track.
 int
-Disk::ComputeLatency(unsigned newSector, bool writing)
-{
+Disk::ComputeLatency(unsigned newSector, bool writing) {
     unsigned rotation;
     unsigned seek      = TimeToSeek(newSector, &rotation);
     unsigned timeAfter = stats->totalTicks + seek + rotation;
 
-#ifndef NOTRACKBUF  // Turn this on if you do not want the track buffer
-                    // stuff.
+#ifndef NOTRACKBUF  // Turn this on if you do not want the track buffer stuff.
     // Check if track buffer applies.
     if (!writing && seek == 0
         && (timeAfter - bufferInit) / ROTATION_TIME
            > ModuloDiff(newSector, bufferInit / ROTATION_TIME)) {
-        DEBUG('d', "Request latency = %u\n", ROTATION_TIME);
-        return ROTATION_TIME;
-          // Time to transfer sector from the track buffer.
+        DEBUG('d', "Request latency = %u.\n", ROTATION_TIME);
+        return ROTATION_TIME; // Time to transfer sector from the track buffer.
     }
 #endif
 
-    rotation += ModuloDiff(newSector, timeAfter / ROTATION_TIME)
-                * ROTATION_TIME;
+    rotation += ModuloDiff(newSector, timeAfter / ROTATION_TIME) * ROTATION_TIME;
 
-    DEBUG('d', "Request latency = %u\n", seek + rotation + ROTATION_TIME);
+    DEBUG('d', "Request latency = %u.\n", seek + rotation + ROTATION_TIME);
     return seek + rotation + ROTATION_TIME;
 }
 
 /// Keep track of the most recently requested sector.  So we can know what is
 /// in the track buffer.
 void
-Disk::UpdateLast(unsigned newSector)
-{
+Disk::UpdateLast(unsigned newSector) {
     unsigned rotate;
     unsigned seek = TimeToSeek(newSector, &rotate);
 
-    if (seek != 0)
-        bufferInit = stats->totalTicks + seek + rotate;
+    if (seek != 0) bufferInit = stats->totalTicks + seek + rotate;
     lastSector = newSector;
-    DEBUG('d', "Updating last sector = %u, %u\n", lastSector, bufferInit);
+    DEBUG('d', "Updating last sector = %u, %u.\n", lastSector, bufferInit);
 }

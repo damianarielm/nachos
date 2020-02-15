@@ -8,11 +8,9 @@
 #ifndef NACHOS_MACHINE_MMU__HH
 #define NACHOS_MACHINE_MMU__HH
 
-
 #include ".exception_type.hh"
 #include "disk.hh"
 #include "translation_entry.hh"
-
 
 /// Definitions related to the size, and format of user memory.
 
@@ -22,7 +20,6 @@ const unsigned PAGE_SIZE = SECTOR_SIZE;  ///< Set the page size equal to the
 const unsigned NUM_PHYS_PAGES = 32;
 const unsigned MEMORY_SIZE = NUM_PHYS_PAGES * PAGE_SIZE;
 const unsigned TLB_SIZE = 4;  ///< if there is a TLB, make it small.
-
 
 /// This class simulates an MMU (memory management unit) that can use either
 /// page tables or a TLB.
@@ -48,8 +45,8 @@ public:
     /// are in terms of these data structures, along with the already
     /// declared methods.
 
-    char *mainMemory;  ///< Physical memory to store user program,
-                       ///< code and data, while executing.
+    /// Physical memory to store user program, code and data, while executing.
+    char *mainMemory;
 
     /// NOTE: the hardware translation of virtual addresses in the user
     /// program to physical addresses (relative to the beginning of
@@ -70,8 +67,8 @@ public:
     /// *read-only*, although the contents of the TLB are free to be modified
     /// by the kernel software.
 
-    TranslationEntry *tlb;  ///< This pointer should be considered
-                            ///< “read-only” to Nachos kernel code.
+    /// This pointer should be considered “read-only” to Nachos kernel code.
+    TranslationEntry *tlb;
 
     TranslationEntry *pageTable;
     unsigned pageTableSize;
@@ -79,8 +76,7 @@ public:
 private:
 
     /// Retrieve a page entry either from a page table or the TLB.
-    ExceptionType RetrievePageEntry(unsigned vpn,
-                                    TranslationEntry **entry) const;
+    ExceptionType RetrievePageEntry(unsigned vpn, TranslationEntry **entry) const;
 
     /// Translate an address, and check for alignment.
     ///
@@ -90,6 +86,5 @@ private:
     ExceptionType Translate(unsigned virtAddr, unsigned *physAddr,
                             unsigned size, bool writing);
 };
-
 
 #endif

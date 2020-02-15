@@ -35,9 +35,7 @@
 #ifndef NACHOS_FILESYS_FILESYSTEM__HH
 #define NACHOS_FILESYS_FILESYSTEM__HH
 
-
 #include "open_file.hh"
-
 
 #ifdef FILESYS_STUB  // Temporarily implement file system calls as calls to
                      // UNIX, until the real file system implementation is
@@ -49,30 +47,28 @@ public:
 
     ~FileSystem() {}
 
-    bool Create(const char *name, unsigned initialSize)
-    {
-        ASSERT(name != nullptr);
+    bool Create(const char *name, unsigned initialSize) {
+        ASSERT(name);
 
         int fileDescriptor = OpenForWrite(name);
-        if (fileDescriptor == -1)
-            return false;
+        if (fileDescriptor == -1) return false;
         Close(fileDescriptor);
+
         return true;
     }
 
-    OpenFile *Open(const char *name)
-    {
-        ASSERT(name != nullptr);
+    OpenFile *Open(const char *name) {
+        ASSERT(name);
 
         int fileDescriptor = OpenForReadWrite(name, false);
-        if (fileDescriptor == -1)
-            return nullptr;
+        if (fileDescriptor == -1) return nullptr;
+
         return new OpenFile(fileDescriptor);
     }
 
-    bool Remove(const char *name)
-    {
-        ASSERT(name != nullptr);
+    bool Remove(const char *name) {
+        ASSERT(name);
+
         return Unlink(name) == 0;
     }
 
@@ -117,6 +113,5 @@ private:
 };
 
 #endif
-
 
 #endif

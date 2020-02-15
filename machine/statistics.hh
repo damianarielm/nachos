@@ -10,7 +10,6 @@
 #ifndef NACHOS_MACHINE_STATS__HH
 #define NACHOS_MACHINE_STATS__HH
 
-
 /// The following class defines the statistics that are to be kept about
 /// Nachos behavior -- how much time (ticks) elapsed, how many user
 /// instructions executed, etc.
@@ -74,20 +73,12 @@ public:
 /// kernel measured by the number of calls to enable interrupts, these time
 /// constants are none too exact.
 
-const unsigned USER_TICK     = 1;
-  ///< Advance for each user-level instruction.
-const unsigned SYSTEM_TICK   = 10;
-  ///< Advance each time interrupts are enabled.
-const unsigned ROTATION_TIME = 500;
-  ///< Time disk takes to rotate one sector.
-const unsigned SEEK_TIME     = 500;
-  ///< Time disk takes to seek past one track.
-const unsigned CONSOLE_TIME  = 100;
-  ///< Time to read or write one character.
-const unsigned NETWORK_TIME  = 100;
-  ///< Time to send or receive one packet.
-const unsigned TIMER_TICKS   = 100;
-  ///< (Average) time between timer interrupts.
-
+const unsigned USER_TICK     = 1;   ///< Advance for each user-level instruction.
+const unsigned SYSTEM_TICK   = 10;  ///< Advance each time interrupts are enabled.
+const unsigned ROTATION_TIME = 500; ///< Time disk takes to rotate one sector.
+const unsigned SEEK_TIME     = 500; ///< Time disk takes to seek past one track.
+const unsigned CONSOLE_TIME  = 100; ///< Time to read or write one character.
+const unsigned NETWORK_TIME  = 100; ///< Time to send or receive one packet.
+const unsigned TIMER_TICKS   = 100; ///< (Average) time between timer interrupts.
 
 #endif

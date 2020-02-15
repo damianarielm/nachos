@@ -5,9 +5,7 @@
 /// Ideally, we could read the matrices off of the file system, and store the
 /// result back to the file system!
 
-
 #include "syscall.h"
-
 
 /// Sum total of the arrays does not fit in physical memory.
 #define DIM  20
@@ -17,8 +15,7 @@ static int B[DIM][DIM];
 static int C[DIM][DIM];
 
 int
-main(void)
-{
+main(void) {
     int i, j, k;
 
     // First initialize the matrices.

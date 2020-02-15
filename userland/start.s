@@ -4,10 +4,8 @@
 /// what we need for a user program here, namely `__start` and the system
 /// calls.
 
-
 #define IN_ASM
 #include "syscall.h"
-
 
         .text
         .align  2

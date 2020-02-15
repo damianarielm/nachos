@@ -18,9 +18,7 @@
 #ifndef NACHOS_MACHINE_DISK__HH
 #define NACHOS_MACHINE_DISK__HH
 
-
 #include "lib/utility.hh"
-
 
 /// The following class defines a physical disk I/O device.
 ///
@@ -100,6 +98,5 @@ private:
 
     void UpdateLast(unsigned newSector);
 };
-
 
 #endif

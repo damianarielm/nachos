@@ -62,11 +62,9 @@
 /// All rights reserved.  See `copyright.h` for copyright notice and
 /// limitation of liability and disclaimer of warranty provisions.
 
-
 #include ".copyright.h"
 #include "lib/utility.hh"
 #include "system.hh"
-
 
 // External functions used by this file.
 
@@ -79,8 +77,7 @@ void ConsoleTest(const char *in, const char *out);
 void MailTest(int networkID);
 
 static inline void
-PrintVersion()
-{
+PrintVersion() {
     printf("%s\n%s", VERSION, COPYRIGHT);
 }
 
@@ -98,12 +95,11 @@ PrintVersion()
 ///   Example:
 ///       nachos -d +  ->  argv = {"nachos", "-d", "+"}
 int
-main(int argc, char **argv)
-{
+main(int argc, char **argv) {
     int argCount;  // The number of arguments for a particular command.
 
     Initialize(argc, argv);
-    DEBUG('t', "Entering main\n");
+    DEBUG('t', "Entering main.\n");
 
     for (argc--, argv++; argc > 0; argc -= argCount, argv += argCount) {
         argCount = 1;

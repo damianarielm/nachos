@@ -5,13 +5,11 @@
 #ifndef NACHOS_USERPROG_DEBUGGER_COMMAND_MANAGER__HH
 #define NACHOS_USERPROG_DEBUGGER_COMMAND_MANAGER__HH
 
-
 class DebuggerCommandManager {
 public:
     enum RunResult {
         RUN_RESULT_STAY,
-          ///< Stay in the debugger, do not advance execution of the user
-          ///< process.
+          ///< Stay in the debugger, do not advance execution of the user process.
         RUN_RESULT_STEP,
           ///< Advance execution while keeping the debugger working.
         RUN_RESULT_NORMALIZE,
@@ -45,6 +43,5 @@ private:
     EmptyFunc empty;
     UnknownFunc unknown;
 };
-
 
 #endif

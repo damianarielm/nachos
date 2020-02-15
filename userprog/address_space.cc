@@ -15,20 +15,17 @@
 /// All rights reserved.  See `copyright.h` for copyright notice and
 /// limitation of liability and disclaimer of warranty provisions.
 
-
 #include "address_space.hh"
 #include ".bin/noff.h"
 #include "machine/.endianness.hh"
 #include "threads/system.hh"
 
-
 /// Do little endian to big endian conversion on the bytes in the object file
 /// header, in case the file was generated on a little endian machine, and we
 /// are re now running on a big endian machine.
 static void
-SwapHeader(noffHeader *noffH)
-{
-    ASSERT(noffH != nullptr);
+SwapHeader(noffHeader *noffH) {
+    ASSERT(noffH);
 
     noffH->noffMagic              = WordToHost(noffH->noffMagic);
     noffH->code.size              = WordToHost(noffH->code.size);
@@ -38,8 +35,7 @@ SwapHeader(noffHeader *noffH)
     noffH->initData.virtualAddr   = WordToHost(noffH->initData.virtualAddr);
     noffH->initData.inFileAddr    = WordToHost(noffH->initData.inFileAddr);
     noffH->uninitData.size        = WordToHost(noffH->uninitData.size);
-    noffH->uninitData.virtualAddr =
-      WordToHost(noffH->uninitData.virtualAddr);
+    noffH->uninitData.virtualAddr = WordToHost(noffH->uninitData.virtualAddr);
     noffH->uninitData.inFileAddr  = WordToHost(noffH->uninitData.inFileAddr);
 }
 
@@ -56,14 +52,12 @@ SwapHeader(noffHeader *noffH)
 ///
 /// * `executable` is the file containing the object code to load into
 ///   memory.
-AddressSpace::AddressSpace(OpenFile *executable)
-{
-    ASSERT(executable != nullptr);
+AddressSpace::AddressSpace(OpenFile *executable) {
+    ASSERT(executable);
 
     noffHeader noffH;
     executable->ReadAt((char *) &noffH, sizeof noffH, 0);
-    if (noffH.noffMagic != NOFF_MAGIC &&
-          WordToHost(noffH.noffMagic) == NOFF_MAGIC)
+    if (noffH.noffMagic != NOFF_MAGIC && WordToHost(noffH.noffMagic) == NOFF_MAGIC)
         SwapHeader(&noffH);
     ASSERT(noffH.noffMagic == NOFF_MAGIC);
 
@@ -75,15 +69,11 @@ AddressSpace::AddressSpace(OpenFile *executable)
     numPages = DivRoundUp(size, PAGE_SIZE);
     size = numPages * PAGE_SIZE;
 
+    DEBUG('a', "Initializing address space, num pages %u, size %u.\n", numPages, size);
     ASSERT(numPages <= NUM_PHYS_PAGES);
-      // Check we are not trying to run anything too big -- at least until we
-      // have virtual memory.
-
-    DEBUG('a', "Initializing address space, num pages %u, size %u\n",
-          numPages, size);
+      // Check we are not trying to run anything too big -- at least until we have virtual memory.
 
     // First, set up the translation.
-
     pageTable = new TranslationEntry[numPages];
     for (unsigned i = 0; i < numPages; i++) {
         pageTable[i].virtualPage  = i;
@@ -105,25 +95,23 @@ AddressSpace::AddressSpace(OpenFile *executable)
 
     // Then, copy in the code and data segments into memory.
     if (noffH.code.size > 0) {
-        DEBUG('a', "Initializing code segment, at 0x%X, size %u\n",
+        DEBUG('a', "Initializing code segment, at 0x%X, size %u.\n",
               noffH.code.virtualAddr, noffH.code.size);
         executable->ReadAt(&(mainMemory[noffH.code.virtualAddr]),
                            noffH.code.size, noffH.code.inFileAddr);
     }
     if (noffH.initData.size > 0) {
-        DEBUG('a', "Initializing data segment, at 0x%X, size %u\n",
+        DEBUG('a', "Initializing data segment, at 0x%X, size %u.\n",
               noffH.initData.virtualAddr, noffH.initData.size);
         executable->ReadAt(&(mainMemory[noffH.initData.virtualAddr]),
           noffH.initData.size, noffH.initData.inFileAddr);
     }
-
 }
 
 /// Deallocate an address space.
 ///
 /// Nothing for now!
-AddressSpace::~AddressSpace()
-{
+AddressSpace::~AddressSpace() {
     delete [] pageTable;
 }
 
@@ -134,10 +122,8 @@ AddressSpace::~AddressSpace()
 /// into the `currentThread->userRegisters` when this thread is context
 /// switched out.
 void
-AddressSpace::InitRegisters()
-{
-    for (unsigned i = 0; i < NUM_TOTAL_REGS; i++)
-        machine->WriteRegister(i, 0);
+AddressSpace::InitRegisters() {
+    for (unsigned i = 0; i < NUM_TOTAL_REGS; i++) machine->WriteRegister(i, 0);
 
     // Initial program counter -- must be location of `Start`.
     machine->WriteRegister(PC_REG, 0);
@@ -150,8 +136,8 @@ AddressSpace::InitRegisters()
     // allocated the stack; but subtract off a bit, to make sure we do not
     // accidentally reference off the end!
     machine->WriteRegister(STACK_REG, numPages * PAGE_SIZE - 16);
-    DEBUG('a', "Initializing stack register to %u\n",
-          numPages * PAGE_SIZE - 16);
+
+    DEBUG('a', "Initializing stack register to %u.\n", numPages * PAGE_SIZE - 16);
 }
 
 /// On a context switch, save any machine state, specific to this address
@@ -167,8 +153,7 @@ AddressSpace::SaveState()
 ///
 /// For now, tell the machine where to find the page table.
 void
-AddressSpace::RestoreState()
-{
+AddressSpace::RestoreState() {
     machine->GetMMU()->pageTable     = pageTable;
     machine->GetMMU()->pageTableSize = numPages;
 }

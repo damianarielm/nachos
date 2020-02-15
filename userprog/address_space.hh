@@ -13,13 +13,10 @@
 #ifndef NACHOS_USERPROG_ADDRESSSPACE__HH
 #define NACHOS_USERPROG_ADDRESSSPACE__HH
 
-
 #include "filesys/file_system.hh"
 #include "machine/translation_entry.hh"
 
-
 const unsigned USER_STACK_SIZE = 1024;  ///< Increase this as necessary!
-
 
 class AddressSpace {
 public:
@@ -50,6 +47,5 @@ private:
     unsigned numPages;
 
 };
-
 
 #endif

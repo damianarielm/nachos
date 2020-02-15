@@ -5,11 +5,9 @@
 #ifndef NACHOS_BIN_COFF_SECTION__H
 #define NACHOS_BIN_COFF_SECTION__H
 
-
 #include "coff.h"
 #include <stdbool.h>
 #include <stdio.h>
-
 
 typedef coffSectionHeader CoffSection;
 
@@ -26,6 +24,5 @@ size_t CoffSectionSize(const CoffSection *sh);
 void CoffSectionPrint(const CoffSection *sh);
 
 char *CoffSectionRead(const CoffSection *sh, FILE *f, char **error);
-
 
 #endif

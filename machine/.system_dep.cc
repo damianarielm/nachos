@@ -23,7 +23,6 @@
 /// All rights reserved.  See `copyright.h` for copyright notice and
 /// limitation of liability and disclaimer of warranty provisions.
 
-
 #include "interrupt.hh"
 #include "threads/system.hh"
 
@@ -54,7 +53,6 @@ extern "C" {
 
 }
 
-
 ///     Check open file or open socket to see if there are any
 ///     characters that can be read immediately.  If so, read them
 ///     in, and return TRUE.
@@ -69,8 +67,7 @@ extern "C" {
 ///
 ///     "fd" -- the file descriptor of the file to be polled
 bool
-PollFile(int fd)
-{
+PollFile(int fd) {
     int            rfd = (1 << fd), wfd = 0, xfd = 0, retVal;
     struct timeval pollTime;
 
@@ -100,11 +97,12 @@ PollFile(int fd)
 ///
 /// * `name` is the file name.
 int
-OpenForWrite(const char *name)
-{
-    ASSERT(name != nullptr);
+OpenForWrite(const char *name) {
+    ASSERT(name);
+
     int fd = open(name, O_RDWR | O_CREAT | O_TRUNC, 0666);
     ASSERT(fd >= 0);
+
     return fd;
 }
 
@@ -114,11 +112,12 @@ OpenForWrite(const char *name)
 ///
 /// * `name` is the file name.
 int
-OpenForReadWrite(const char *name, bool crashOnError)
-{
-    ASSERT(name != nullptr);
+OpenForReadWrite(const char *name, bool crashOnError) {
+    ASSERT(name);
+
     int fd = open(name, O_RDWR, 0);
     ASSERT(!crashOnError || fd >= 0);
+
     return fd;
 }
 
@@ -126,32 +125,31 @@ OpenForReadWrite(const char *name, bool crashOnError)
 ///
 /// Abort if read fails.
 void
-Read(int fd, char *buffer, size_t nBytes)
-{
-    ASSERT(buffer != nullptr);
+Read(int fd, char *buffer, size_t nBytes) {
+    ASSERT(buffer);
     ASSERT(nBytes > 0);
+
     ssize_t retVal = read(fd, buffer, nBytes);
     ASSERT(retVal > 0 && retVal == (ssize_t) nBytes);
 }
 
 /// Read characters from an open file, returning as many as are available.
 int
-ReadPartial(int fd, char *buffer, size_t nBytes)
-{
-    ASSERT(buffer != nullptr);
+ReadPartial(int fd, char *buffer, size_t nBytes) {
+    ASSERT(buffer);
     ASSERT(nBytes > 0);
+
     return read(fd, buffer, nBytes);
 }
-
 
 /// Write characters to an open file.
 ///
 /// Abort if write fails.
 void
-WriteFile(int fd, const char *buffer, size_t nBytes)
-{
-    ASSERT(buffer != nullptr);
+WriteFile(int fd, const char *buffer, size_t nBytes) {
+    ASSERT(buffer);
     ASSERT(nBytes > 0);
+
     ssize_t retVal = write(fd, buffer, nBytes);
     ASSERT(retVal > 0 && retVal == (ssize_t) nBytes);
 }
@@ -160,16 +158,14 @@ WriteFile(int fd, const char *buffer, size_t nBytes)
 ///
 /// Abort on error.
 void
-Lseek(int fd, int offset, int whence)
-{
+Lseek(int fd, int offset, int whence) {
     int retVal = lseek(fd, offset, whence);
     ASSERT(retVal >= 0);
 }
 
 /// Report the current location within an open file.
 int
-Tell(int fd)
-{
+Tell(int fd) {
 #if defined(HOST_i386) || defined(HOST_LINUX)
     // 386BSD does not have the `tell` system call.
     return lseek(fd, 0, SEEK_CUR);
@@ -182,17 +178,17 @@ Tell(int fd)
 ///
 /// Abort on error.
 void
-Close(int fd)
-{
+Close(int fd) {
     int retVal = close(fd);
+
     ASSERT(retVal >= 0);
 }
 
 /// Delete a file.
 bool
-Unlink(const char *name)
-{
-    ASSERT(name != nullptr);
+Unlink(const char *name) {
+    ASSERT(name);
+
     return unlink(name);
 }
 
@@ -201,8 +197,7 @@ Unlink(const char *name)
 /// For now, just open a datagram port where other Nachos (simulating
 /// workstations on a network) can send messages to this Nachos.
 int
-OpenSocket()
-{
+OpenSocket() {
     int sockID;
 
     sockID = socket(AF_UNIX, SOCK_DGRAM, 0);
@@ -213,17 +208,15 @@ OpenSocket()
 
 /// Close the IPC connection.
 void
-CloseSocket(int sockID)
-{
+CloseSocket(int sockID) {
     close(sockID);
 }
 
 /// Initialize a UNIX socket address -- magical!
 static void
-InitSocketName(struct sockaddr_un *uname, const char *name)
-{
-    ASSERT(uname != nullptr);
-    ASSERT(name != nullptr);
+InitSocketName(struct sockaddr_un *uname, const char *name) {
+    ASSERT(uname);
+    ASSERT(name);
 
     uname->sun_family = AF_UNIX;
     strncpy(uname->sun_path, name, sizeof uname->sun_path);
@@ -232,9 +225,8 @@ InitSocketName(struct sockaddr_un *uname, const char *name)
 /// Give a UNIX file name to the IPC port, so other instances of Nachos can
 /// locate the port.
 void
-AssignNameToSocket(const char *socketName, int sockID)
-{
-    ASSERT(socketName != nullptr);
+AssignNameToSocket(const char *socketName, int sockID) {
+    ASSERT(socketName);
 
     struct sockaddr_un uName;
     int                retVal;
@@ -243,22 +235,22 @@ AssignNameToSocket(const char *socketName, int sockID)
 
     InitSocketName(&uName, socketName);
     retVal = bind(sockID, (struct sockaddr *) &uName, sizeof uName);
+
+    DEBUG('n', "Created socket %s.\n", socketName);
     ASSERT(retVal >= 0);
-    DEBUG('n', "Created socket %s\n", socketName);
 }
 
 /// Delete the UNIX file name we assigned to our IPC port, on cleanup.
 void
-DeAssignNameToSocket(const char *socketName)
-{
-    ASSERT(socketName != nullptr);
+DeAssignNameToSocket(const char *socketName) {
+    ASSERT(socketName);
+
     unlink(socketName);
 }
 
 /// Return true if there are any messages waiting to arrive on the IPC port.
 bool
-PollSocket(int sockID)
-{
+PollSocket(int sockID) {
     return PollFile(sockID);  // On UNIX, socket ID's are just file ID's.
 }
 
@@ -266,9 +258,8 @@ PollSocket(int sockID)
 ///
 /// Abort on error.
 void
-ReadFromSocket(int sockID, char *buffer, size_t packetSize)
-{
-    ASSERT(buffer != nullptr);
+ReadFromSocket(int sockID, char *buffer, size_t packetSize) {
+    ASSERT(buffer);
     ASSERT(packetSize > 0);
 
     ssize_t retVal;
@@ -292,12 +283,10 @@ ReadFromSocket(int sockID, char *buffer, size_t packetSize)
 ///
 /// Abort on error.
 void
-SendToSocket(int sockID, const char *buffer,
-             size_t packetSize, const char *toName)
-{
-    ASSERT(buffer != nullptr);
+SendToSocket(int sockID, const char *buffer, size_t packetSize, const char *toName) {
+    ASSERT(buffer);
     ASSERT(packetSize > 0);
-    ASSERT(toName != nullptr);
+    ASSERT(toName);
 
     struct sockaddr_un uName;
     ssize_t            retVal;
@@ -318,11 +307,10 @@ SendToSocket(int sockID, const char *buffer,
 /// Arrange that `func` will be called when the user aborts (e.g., by hitting
 /// ctl-C).
 void
-CallOnUserAbort(VoidNoArgFunctionPtr func)
-{
+CallOnUserAbort(VoidNoArgFunctionPtr func) {
     typedef void (*SignalHandler)(int);
 
-    ASSERT(func != nullptr);
+    ASSERT(func);
     signal(SIGINT, (SignalHandler) func);
 }
 
@@ -330,8 +318,7 @@ CallOnUserAbort(VoidNoArgFunctionPtr func)
 /// give the user time to start up another invocation of Nachos in a
 /// different UNIX shell.
 void
-Delay(unsigned seconds)
-{
+Delay(unsigned seconds) {
     sleep(seconds);
 }
 
@@ -340,15 +327,13 @@ Delay(unsigned seconds)
 /// We use the now obsolete `srand` and `rand` because they are more
 /// portable!
 void
-RandomInit(unsigned seed)
-{
+RandomInit(unsigned seed) {
     srand(seed);
 }
 
 /// Return a pseudo-random number.
 int
-Random()
-{
+Random() {
     return rand();
 }
 
@@ -361,8 +346,7 @@ Random()
 ///
 /// * `size` -- amount of useful space needed (in bytes).
 char *
-AllocBoundedArray(unsigned size)
-{
+AllocBoundedArray(unsigned size) {
     int   pgSize = getpagesize();
     char *ptr    = new char [pgSize * 2 + size];
 
@@ -378,10 +362,9 @@ AllocBoundedArray(unsigned size)
 /// * `ptr` is the array to be deallocated.
 /// * `size` is the amount of useful space in the array (in bytes).
 void
-DeallocBoundedArray(const char *ptr, unsigned size)
-{
-    ASSERT(ptr != nullptr);
-    ASSERT(size > 0);
+DeallocBoundedArray(const char *ptr, unsigned size) {
+    ASSERT(ptr);
+    ASSERT(size);
 
     int pgSize = getpagesize();
 

@@ -20,7 +20,6 @@
 /// All rights reserved.  See `copyright.h` for copyright notice and
 /// limitation of liability and disclaimer of warranty provisions.
 
-
 #define FUSE_USE_VERSION 26
 #include <fuse.h>
 #include <unistd.h>
@@ -29,7 +28,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 
 #ifndef NACHOS
 #error "The `NACHOS` macro is not defined.  Compile with `make`."
@@ -40,8 +38,7 @@
 #define MAX_NACHOS_PR_LENGTH  (sizeof NACHOS_PR + MAX_PATH_LENGTH + 2)
 
 static int
-do_getattr(const char *path, struct stat *st)
-{
+do_getattr(const char *path, struct stat *st) {
     fprintf(stderr, "[getattr] %s\n", path);
 
     time_t t = time(NULL);
@@ -50,7 +47,7 @@ do_getattr(const char *path, struct stat *st)
     st->st_gid = getgid();
     st->st_atime = t;
     st->st_mtime = t;
-    if (strcmp(path, "/") == 0) {
+    if (!strcmp(path, "/")) {
         st->st_mode = S_IFDIR | 0755;
         st->st_nlink = 2;
     } else {
@@ -64,19 +61,17 @@ do_getattr(const char *path, struct stat *st)
 
 static int
 do_readdir(const char *path, void *buffer, fuse_fill_dir_t fill,
-           off_t offset, struct fuse_file_info *fi)
-{
+           off_t offset, struct fuse_file_info *fi) {
     fprintf(stderr, "[readdir] %s\n", path);
 
     (*fill)(buffer, ".", NULL, 0);
     (*fill)(buffer, "..", NULL, 0);
 
-    if (strcmp(path, "/") != 0)
-        return 0;
+    if (strcmp(path, "/")) return 0;
 
     // Invoke Nachos.
     FILE *f = popen(NACHOS_LS, "r");
-    if (f == NULL) {
+    if (!f) {
         perror(NACHOS);
         exit(1);
     }
@@ -98,23 +93,18 @@ do_readdir(const char *path, void *buffer, fuse_fill_dir_t fill,
     }
 
     fclose(f);
-    if (line != NULL)
-        free(line);
+    if (line) free(line);
     return 0;
 }
 
 static int
 do_read(const char *path, char *buffer, size_t size, off_t offset,
-        struct fuse_file_info *fi)
-{
-    fprintf(stderr, "[read] %s\n"
-                    "    size: %zu, start: %zu\n",
-            path, size, offset);
+        struct fuse_file_info *fi) {
+    fprintf(stderr, "[read] %s\n    size: %zu, start: %zu\n", path, size, offset);
 
     // Prepare command string for invoking Nachos.
     char command[MAX_NACHOS_PR_LENGTH];
-    int rv = snprintf(command, MAX_NACHOS_PR_LENGTH,
-                      "%s %s", NACHOS_PR, path + 1);
+    int rv = snprintf(command, MAX_NACHOS_PR_LENGTH, "%s %s", NACHOS_PR, path + 1);
       // Discard leading slash in path, because Nachos does not like it.
     if (rv < 0 || rv >= MAX_NACHOS_PR_LENGTH) {
         perror(path);
@@ -123,7 +113,7 @@ do_read(const char *path, char *buffer, size_t size, off_t offset,
 
     // Invoke Nachos.
     FILE *f = popen(command, "r");
-    if (f == NULL) {
+    if (!f) {
         perror(NACHOS);
         exit(1);
     }
@@ -138,13 +128,11 @@ do_read(const char *path, char *buffer, size_t size, off_t offset,
             // follow.
             break;
         memcpy(buffer + i, line, n);
-        if (n > size)
-            break;
+        if (n > size) break;
     }
 
     fclose(f);
-    if (line != NULL)
-        free(line);
+    if (line) free(line);
     return i;
 }
 
@@ -155,7 +143,6 @@ static const struct fuse_operations OPERATIONS = {
 };
 
 int
-main(int argc, char *argv[])
-{
+main(int argc, char *argv[]) {
     return fuse_main(argc, argv, &OPERATIONS, NULL);
 }

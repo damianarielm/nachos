@@ -17,9 +17,7 @@
 #ifndef NACHOS_MACHINE_TRANSLATIONENTRY__HH
 #define NACHOS_MACHINE_TRANSLATIONENTRY__HH
 
-
 #include "lib/utility.hh"
-
 
 /// The following class defines an entry in a translation table -- either
 /// in a page table or a TLB.
@@ -55,6 +53,5 @@ public:
     bool dirty;
 
 };
-
 
 #endif

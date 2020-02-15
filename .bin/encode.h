@@ -6,7 +6,6 @@
 #ifndef NACHOS_BIN_ENCODE__H
 #define NACHOS_BIN_ENCODE__H
 
-
 // Normal opcodes.
 
 #define I_SPECIAL  000
@@ -104,6 +103,5 @@
 // Whole instructions.
 
 #define I_NOP      000
-
 
 #endif

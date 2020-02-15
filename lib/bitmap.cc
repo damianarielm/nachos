@@ -6,28 +6,23 @@
 /// All rights reserved.  See `copyright.h` for copyright notice and
 /// limitation of liability and disclaimer of warranty provisions.
 
-
 #include "bitmap.hh"
-
 
 /// Initialize a bitmap with `nitems` bits, so that every bit is clear.  It
 /// can be added somewhere on a list.
 ///
 /// * `nitems` is the number of bits in the bitmap.
-Bitmap::Bitmap(unsigned nitems)
-{
-    ASSERT(nitems > 0);
+Bitmap::Bitmap(unsigned nitems) {
+    ASSERT(nitems);
 
     numBits  = nitems;
     numWords = DivRoundUp(numBits, BITS_IN_WORD);
     map      = new unsigned [numWords];
-    for (unsigned i = 0; i < numBits; i++)
-        Clear(i);
+    for (unsigned i = 0; i < numBits; i++) Clear(i);
 }
 
 /// De-allocate a bitmap.
-Bitmap::~Bitmap()
-{
+Bitmap::~Bitmap() {
     delete [] map;
 }
 
@@ -35,9 +30,9 @@ Bitmap::~Bitmap()
 ///
 /// * `which` is the number of the bit to be set.
 void
-Bitmap::Mark(unsigned which)
-{
+Bitmap::Mark(unsigned which) {
     ASSERT(which < numBits);
+
     map[which / BITS_IN_WORD] |= 1 << which % BITS_IN_WORD;
 }
 
@@ -45,9 +40,9 @@ Bitmap::Mark(unsigned which)
 ///
 /// * `which` is the number of the bit to be cleared.
 void
-Bitmap::Clear(unsigned which)
-{
+Bitmap::Clear(unsigned which) {
     ASSERT(which < numBits);
+
     map[which / BITS_IN_WORD] &= ~(1 << which % BITS_IN_WORD);
 }
 
@@ -55,9 +50,9 @@ Bitmap::Clear(unsigned which)
 ///
 /// * `which` is the number of the bit to be tested.
 bool
-Bitmap::Test(unsigned which) const
-{
+Bitmap::Test(unsigned which) const {
     ASSERT(which < numBits);
+
     return map[which / BITS_IN_WORD] & 1 << which % BITS_IN_WORD;
 }
 
@@ -66,26 +61,26 @@ Bitmap::Test(unsigned which) const
 ///
 /// If no bits are clear, return -1.
 int
-Bitmap::Find()
-{
+Bitmap::Find() {
     for (unsigned i = 0; i < numBits; i++)
         if (!Test(i)) {
             Mark(i);
             return i;
         }
+
     return -1;
 }
 
 /// Return the number of clear bits in the bitmap.  (In other words, how many
 /// bits are unallocated?)
 unsigned
-Bitmap::CountClear() const
-{
+Bitmap::CountClear() const {
     unsigned count = 0;
 
     for (unsigned i = 0; i < numBits; i++)
         if (!Test(i))
             count++;
+
     return count;
 }
 
@@ -94,12 +89,12 @@ Bitmap::CountClear() const
 /// Could be done in a number of ways, but we just print the indexes of all
 /// the bits that are set in the bitmap.
 void
-Bitmap::Print() const
-{
+Bitmap::Print() const {
     printf("Bitmap set:\n");
     for (unsigned i = 0; i < numBits; i++)
         if (Test(i))
             printf("%u ", i);
+
     printf("\n");
 }
 
@@ -111,7 +106,8 @@ Bitmap::Print() const
 void
 Bitmap::FetchFrom(OpenFile *file)
 {
-    ASSERT(file != nullptr);
+    ASSERT(file);
+
     file->ReadAt((char *) map, numWords * sizeof (unsigned), 0);
 }
 
@@ -121,8 +117,8 @@ Bitmap::FetchFrom(OpenFile *file)
 ///
 /// * `file` is the place to write the bitmap to.
 void
-Bitmap::WriteBack(OpenFile *file) const
-{
-    ASSERT(file != nullptr);
+Bitmap::WriteBack(OpenFile *file) const {
+    ASSERT(file);
+
     file->WriteAt((char *) map, numWords * sizeof (unsigned), 0);
 }

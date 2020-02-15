@@ -8,10 +8,8 @@
 #ifndef NACHOS_FILESYS_SYNCHDISK__HH
 #define NACHOS_FILESYS_SYNCHDISK__HH
 
-
 #include "machine/disk.hh"
 #include "threads/synch.hh"
-
 
 /// The following class defines a "synchronous" disk abstraction.
 ///
@@ -44,12 +42,9 @@ public:
     void RequestDone();
 
 private:
-    Disk *disk;  ///< Raw disk device.
-    Semaphore *semaphore;  ///< To synchronize requesting thread with the
-                           ///< interrupt handler.
-    Lock *lock;  ///< Only one read/write request can be sent to the disk at
-                 ///< a time.
+    Disk *disk;            ///< Raw disk device.
+    Semaphore *semaphore;  ///< To synchronize requesting thread with the interrupt handler.
+    Lock *lock; ///< Only one read/write request can be sent to the disk at a time.
 };
-
 
 #endif

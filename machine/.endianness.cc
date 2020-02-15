@@ -2,13 +2,10 @@
 /// machine's format of little endian.  These end up being NOPs when the host
 /// machine is also little endian (DEC and Intel).
 
-
 #include ".endianness.hh"
 
-
 unsigned
-WordToHost(unsigned word)
-{
+WordToHost(unsigned word) {
 #ifdef HOST_IS_BIG_ENDIAN
      unsigned long result;
      result  = word >> 24 & 0x000000FF;
@@ -22,8 +19,7 @@ WordToHost(unsigned word)
 }
 
 unsigned short
-ShortToHost(unsigned short shortword)
-{
+ShortToHost(unsigned short shortword) {
 #ifdef HOST_IS_BIG_ENDIAN
      unsigned short result;
      result  = shortword << 8 & 0xFF00;
@@ -35,13 +31,11 @@ ShortToHost(unsigned short shortword)
 }
 
 unsigned
-WordToMachine(unsigned word)
-{
+WordToMachine(unsigned word) {
     return WordToHost(word);
 }
 
 unsigned short
-ShortToMachine(unsigned short shortword)
-{
+ShortToMachine(unsigned short shortword) {
     return ShortToHost(shortword);
 }

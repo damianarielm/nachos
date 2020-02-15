@@ -14,10 +14,8 @@
 #ifndef NACHOS_FILESYS_DIRECTORY__HH
 #define NACHOS_FILESYS_DIRECTORY__HH
 
-
 #include "raw_directory.hh"
 #include "open_file.hh"
-
 
 /// The following class defines a UNIX-like “directory”.  Each entry in the
 /// directory describes a file, and where to find it on disk.
@@ -71,6 +69,5 @@ private:
     /// Find the index into the directory table corresponding to `name`.
     int FindIndex(const char *name);
 };
-
 
 #endif

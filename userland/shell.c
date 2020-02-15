@@ -1,6 +1,5 @@
 #include "syscall.h"
 
-
 #define MAX_LINE_SIZE  60
 #define MAX_ARG_COUNT  32
 #define ARG_SEPARATOR  ' '
@@ -8,8 +7,7 @@
 #define NULL  ((void *) 0)
 
 static inline unsigned
-strlen(const char *s)
-{
+strlen(const char *s) {
     // TO DO: how to make sure that `s` is not `NULL`?
 
     unsigned i;
@@ -18,15 +16,13 @@ strlen(const char *s)
 }
 
 static inline void
-WritePrompt(OpenFileId output)
-{
+WritePrompt(OpenFileId output) {
     static const char PROMPT[] = "--> ";
     Write(PROMPT, sizeof PROMPT - 1, output);
 }
 
 static inline void
-WriteError(const char *description, OpenFileId output)
-{
+WriteError(const char *description, OpenFileId output) {
     // TO DO: how to make sure that `description` is not `NULL`?
 
     static const char PREFIX[] = "Error: ";
@@ -38,8 +34,7 @@ WriteError(const char *description, OpenFileId output)
 }
 
 static unsigned
-ReadLine(char *buffer, unsigned size, OpenFileId input)
-{
+ReadLine(char *buffer, unsigned size, OpenFileId input) {
     // TO DO: how to make sure that `buffer` is not `NULL`?
 
     unsigned i;
@@ -56,8 +51,7 @@ ReadLine(char *buffer, unsigned size, OpenFileId input)
 }
 
 static int
-PrepareArguments(char *line, char **argv, unsigned argvSize)
-{
+PrepareArguments(char *line, char **argv, unsigned argvSize) {
     // TO DO: how to make sure that `line` and `argv` are not `NULL`?, and
     //        for `argvSize`, what precondition should be fulfilled?
     //
@@ -96,8 +90,7 @@ PrepareArguments(char *line, char **argv, unsigned argvSize)
 }
 
 int
-main(void)
-{
+main(void) {
     const OpenFileId INPUT  = CONSOLE_INPUT;
     const OpenFileId OUTPUT = CONSOLE_OUTPUT;
     char             line[MAX_LINE_SIZE];

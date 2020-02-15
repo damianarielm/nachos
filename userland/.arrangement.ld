@@ -1,7 +1,6 @@
 OUTPUT_FORMAT("ecoff-littlemips")
 ENTRY(__start)
-SECTIONS
-{
+SECTIONS {
     .text 0 : {
         *(.init)
         *(.text)
