@@ -62,7 +62,7 @@ typedef void (*VoidNoArgFunctionPtr)();
 /// Global object for debug output.
 extern Debug debug;
 
-#define DEBUG       (debug.Print)
+#define DEBUG(...)  (debug.Print)(__LINE__, __FILE__, __VA_ARGS__)
 #define DEBUG_CONT  (debug.PrintCont)
 
 /// If `condition` is false, print a message and dump core.

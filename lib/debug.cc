@@ -14,6 +14,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 Debug::Debug() {
     flags = "";
@@ -38,11 +39,14 @@ Debug::SetFlags(const char *new_flags) {
 }
 
 void
-Debug::Print(char flag, const char *format, ...) const {
+Debug::Print(unsigned line, const char* file, char flag, const char *format, ...) const {
     ASSERT(format);
 
     if (!IsEnabled(flag)) return;
 
+    if (!IsEnabled('+') && IsEnabled('e')) usleep(100000);
+    if (!IsEnabled('+') && IsEnabled('E')) getchar();
+    if (IsEnabled('n')) fprintf(stderr, "\n%s:%u\n", file, line);
     fprintf(stderr, "[%c] ", flag);
 
     va_list ap;

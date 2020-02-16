@@ -6,6 +6,9 @@
 /// pre-defined debugging flags are:
 ///
 /// * `+` -- turn on all debug messages.
+/// * `n` -- display number lines and file names.
+/// * `e` -- sleeps between messages.
+/// * `E` -- press a key between messages.
 /// * `t` -- thread system.
 /// * `s` -- semaphores
 /// * `i` -- interrupt emulation.
@@ -55,7 +58,7 @@ public:
     /// Like `printf`, only with an extra argument on the front.
     ///
     /// Put a flag prefix along with the message.
-    void Print(char flag, const char *format, ...) const;
+    void Print(unsigned line, const char* file, char flag, const char *format, ...) const;
 
     /// Same as `Print` but avoid printing the flag prefix.
     ///
