@@ -74,8 +74,8 @@ extern Debug debug;
 #define ASSERT(condition)                                                 \
     if (!(condition)) {                                                   \
         fprintf(stderr, "\nAssertion failed!\n"                           \
-                        "\tExpression: `%s`\n"                            \
-                        "\tLocation: file `%s`, line %u\n",               \
+                        "Expression: `%s`\n"                              \
+                        "Location: file `%s`, line %u\n\n",               \
                 #condition, __FILE__, __LINE__);                          \
         fflush(stderr);                                                   \
         abort();                                                          \

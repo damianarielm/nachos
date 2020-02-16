@@ -29,6 +29,8 @@ main(void) {
                 A[j + 1] = tmp;
             }
 
+    Write("Sorting finished.\n", 18, CONSOLE_OUTPUT);
+
     // And then we're done -- should be 0!
     Exit(A[0]);
 }

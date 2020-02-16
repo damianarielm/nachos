@@ -33,13 +33,19 @@
 /// * `fileSize` is the bit map of free disk sectors.
 bool
 FileHeader::Allocate(Bitmap *freeMap, unsigned fileSize) {
+    DEBUG('f', "Trying to allocate %u bytes... ", fileSize);
     ASSERT(freeMap);
 
     raw.numBytes = fileSize;
     raw.numSectors = DivRoundUp(fileSize, SECTOR_SIZE);
-    if (freeMap->CountClear() < raw.numSectors) return false;  // Not enough space.
+    if (freeMap->CountClear() < raw.numSectors) {
+        DEBUG_CONT('f', "Failed. Space left: %u bytes.\n",
+                freeMap->CountClear() * SECTOR_SIZE);
+        return false;  // Not enough space.
+    }
 
     for (unsigned i = 0; i < raw.numSectors; i++) raw.dataSectors[i] = freeMap->Find();
+    DEBUG_CONT('f', "Succeed.\n");
 
     return true;
 }
@@ -49,6 +55,7 @@ FileHeader::Allocate(Bitmap *freeMap, unsigned fileSize) {
 /// * `freeMap` is the bit map of free disk sectors.
 void
 FileHeader::Deallocate(Bitmap *freeMap) {
+    DEBUG('f', "Deallocating %u bytes.\n", raw.numBytes);
     ASSERT(freeMap);
 
     for (unsigned i = 0; i < raw.numSectors; i++) {
@@ -96,16 +103,14 @@ void
 FileHeader::Print() {
     char *data = new char [SECTOR_SIZE];
 
-    printf("FileHeader contents.\n"
-           "    Size: %u bytes\n"
-           "    Block numbers: ",
-           raw.numBytes);
-
+    printf("Size: %u bytes.\nBlock numbers: ", raw.numBytes);
     for (unsigned i = 0; i < raw.numSectors; i++) printf("%u ", raw.dataSectors[i]);
+    printf("\n");
 
-    printf("\n    Contents:\n");
     for (unsigned i = 0, k = 0; i < raw.numSectors; i++) {
         synchDisk->ReadSector(raw.dataSectors[i], data);
+
+        printf("[%u] ", raw.dataSectors[i]);
         for (unsigned j = 0; j < SECTOR_SIZE && k < raw.numBytes; j++, k++) {
             if ('\040' <= data[j] && data[j] <= '\176')  // isprint(data[j])
                 printf("%c", data[j]);

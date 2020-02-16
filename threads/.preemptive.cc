@@ -31,7 +31,7 @@ PreemptiveScheduler::SetUp(unsigned long timeSliceLength) {
     int childPid = fork();
     switch (childPid) {
         case -1:
-            DEBUG('p', "Preemptive scheduler: unable to launch child process.\n");
+            DEBUG('r', "Preemptive scheduler: unable to launch child process.\n");
             ASSERT(false);
             break;
 
@@ -52,7 +52,7 @@ LetMeBeMonitored() {
     // Allow the parent process to ptrace me.
     ptrace(PTRACE_TRACEME, 0, nullptr, nullptr);
 
-    DEBUG ('p', "Preemptive scheduler: child process will be ptraced.\n");
+    DEBUG ('r', "Preemptive scheduler: child process will be ptraced.\n");
 
     // Raise a signal to bring back control to the parent.
     raise(SIGUSR1);
@@ -68,7 +68,7 @@ MonitorProcess(int childPid, unsigned long timeSliceLength) {
         int wait_val;
         wait(&wait_val);
         if (WIFEXITED(wait_val)) {
-            DEBUG('p', "Preemptive scheduler: child process terminated.\n");
+            DEBUG('r', "Preemptive scheduler: child process terminated.\n");
             break;
         }
 
@@ -82,7 +82,7 @@ MonitorProcess(int childPid, unsigned long timeSliceLength) {
                                (long) &inContextSwitch, nullptr);
 
             if (incs == 0) {
-                DEBUG('p', "Preemptive scheduler: "
+                DEBUG('r', "Preemptive scheduler: "
                            "forcing a context switch at instruction %lld.\n",
                       instructionCounter);
 
@@ -115,7 +115,7 @@ MonitorProcess(int childPid, unsigned long timeSliceLength) {
         ptrace(PTRACE_SINGLESTEP, childPid, nullptr, nullptr);
     }
 
-    DEBUG('p', "Preemptive scheduler: Finished.\n");
+    DEBUG('r', "Preemptive scheduler: Finished.\n");
     exit(0);
 }
 

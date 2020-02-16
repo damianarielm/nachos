@@ -74,27 +74,27 @@ SyscallHandler(ExceptionType _et) {
 
     switch (scid) {
         case SC_HALT:
-            DEBUG('a', "Shutdown, initiated by user program.\n");
+            DEBUG('y', "Shutdown, initiated by user program.\n");
             interrupt->Halt();
             break;
 
         case SC_CREATE: {
             int filenameAddr = machine->ReadRegister(4);
             if (filenameAddr == 0)
-                DEBUG('a', "Error: address to filename string is null.\n");
+                DEBUG('y', "Error: address to filename string is null.\n");
 
             char filename[FILE_NAME_MAX_LEN + 1];
             if (!ReadStringFromUser(filenameAddr, filename, sizeof filename))
-                DEBUG('a', "Error: filename string too long (maximum is %u bytes).\n",
+                DEBUG('y', "Error: filename string too long (maximum is %u bytes).\n",
                       FILE_NAME_MAX_LEN);
 
-            DEBUG('a', "Open requested for file `%s`.\n", filename);
+            DEBUG('y', "Open requested for file `%s`.\n", filename);
             break;
         }
 
         case SC_CLOSE: {
             int fid = machine->ReadRegister(4);
-            DEBUG('a', "Close requested for id %u.\n", fid);
+            DEBUG('y', "Close requested for id %u.\n", fid);
             break;
         }
 

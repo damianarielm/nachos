@@ -73,6 +73,8 @@ public:
     TranslationEntry *pageTable;
     unsigned pageTableSize;
 
+    void PrintTLB() const;
+
 private:
 
     /// Retrieve a page entry either from a page table or the TLB.

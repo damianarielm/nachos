@@ -12,9 +12,16 @@
 
 int
 main(void) {
+    Write("Creating file test.txt.\n", 24, CONSOLE_OUTPUT);
     Create("test.txt");
+
+    Write("Opening file test.txt.\n", 23, CONSOLE_OUTPUT);
     OpenFileId o = Open("test.txt");
+
+    Write("Writing `Hello world` to file test.txt.\n", 40, CONSOLE_OUTPUT);
     Write("Hello world.\n", 13, o);
+
+    Write("Closing file test.txt.\n", 23, CONSOLE_OUTPUT);
     Close(o);
     // Not reached.
 }

@@ -24,7 +24,7 @@ SaveArgs(int address) {
     // Return null as error.
     if (i == MAX_ARG_COUNT && val != 0) return nullptr;
 
-    DEBUG('e', "Saving %u command line arguments from parent process.\n", i);
+    DEBUG('y', "Saving %u command line arguments from parent process.\n", i);
 
     // Allocate an array of `i` pointers. We know that `i` will always be at least 1.
     char **ret = new char * [i];
@@ -41,7 +41,7 @@ SaveArgs(int address) {
 
 void
 WriteArgs(char **args) {
-    DEBUG('e', "Writing command line arguments into child process.\n");
+    DEBUG('y', "Writing command line arguments into child process.\n");
     ASSERT(args);
 
     // Start writing the arguments where the current SP points.

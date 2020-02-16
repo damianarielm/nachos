@@ -158,11 +158,16 @@ void
 PerformanceTest() {
     printf("Starting file system performance test:\n");
     stats->Print();
+
+    printf("\nStarting write test.\n");
     FileWrite();
+
+    printf("\nStarting read test.\n");
     FileRead();
+    printf("\n");
+
     if (!fileSystem->Remove(FILE_NAME)) {
         printf("Perf test: unable to remove %s.\n", FILE_NAME);
         return;
     }
-    stats->Print();
 }

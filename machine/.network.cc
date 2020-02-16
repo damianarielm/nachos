@@ -86,7 +86,7 @@ Network::CheckPktAvail() {
     memcpy(inbox, buffer + sizeof (PacketHeader), inHdr.length);
     delete [] buffer;
 
-    DEBUG('n', "Network received packet from %d, length %u...\n",
+    DEBUG('k', "Network received packet from %d, length %u...\n",
           (int) inHdr.from, inHdr.length);
     stats->numPacketsRecvd++;
 
@@ -115,14 +115,14 @@ Network::Send(PacketHeader hdr, const char *data) {
 
     snprintf(toName, sizeof toName, "SOCKET_%u", (unsigned) hdr.to);
 
-    DEBUG('n', "Sending to addr %u, %u bytes... ", hdr.to, hdr.length);
+    DEBUG('k', "Sending to addr %u, %u bytes... ", hdr.to, hdr.length);
     ASSERT(!sendBusy && hdr.length > 0
            && hdr.length <= MAX_PACKET_SIZE && hdr.from == ident);
 
     interrupt->Schedule(NetworkSendDone, this, NETWORK_TIME, NETWORK_SEND_INT);
 
     if (Random() % 100 >= chanceToWork * 100) { // Emulate a lost packet.
-        DEBUG('n', "oops, lost it!\n");
+        DEBUG('k', "oops, lost it!\n");
         return;
     }
 

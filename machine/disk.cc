@@ -40,7 +40,7 @@ DiskDone(void *arg) {
 ///   read/write request completes.
 /// * `callArg` is an argument to pass the interrupt handler.
 Disk::Disk(const char *name, VoidFunctionPtr callWhenDone, void *callArg) {
-    DEBUG('d', "Initializing the disk, 0x%X 0x%X.\n", callWhenDone, callArg);
+    DEBUG('d', "Initializing the disk.\n");
     ASSERT(name);
     ASSERT(callWhenDone);
 
@@ -75,16 +75,13 @@ Disk::~Disk() {
 
 /// Dump the data in a disk read/write request, for debugging.
 static void
-PrintSector(bool writing, unsigned sector, const char *data) {
+PrintSector(unsigned sector, const char *data) {
     ASSERT(data);
 
     int *p = (int *) data;
 
-    if (writing) printf("Writing sector: %u.\n", sector);
-    else printf("Reading sector: %u.\n", sector);
-
     for (unsigned i = 0; i < SECTOR_SIZE / sizeof (int); i++)
-        printf("%X ", p[i]);
+        DEBUG_CONT('d', "%X ", p[i]);
 
     printf("\n");
 }
@@ -114,7 +111,7 @@ Disk::ReadRequest(unsigned sectorNumber, char *data) {
 
     Lseek(fileno, SECTOR_SIZE * sectorNumber + MAGIC_SIZE, 0);
     Read(fileno, data, SECTOR_SIZE);
-    if (debug.IsEnabled('d')) PrintSector(false, sectorNumber, data);
+    if (debug.IsEnabled('d')) PrintSector(sectorNumber, data);
 
     active = true;
     UpdateLast(sectorNumber);
@@ -133,7 +130,7 @@ Disk::WriteRequest(unsigned sectorNumber, const char *data) {
 
     Lseek(fileno, SECTOR_SIZE * sectorNumber + MAGIC_SIZE, 0);
     WriteFile(fileno, data, SECTOR_SIZE);
-    if (debug.IsEnabled('d')) PrintSector(true, sectorNumber, data);
+    if (debug.IsEnabled('d')) PrintSector(sectorNumber, data);
 
     active = true;
     UpdateLast(sectorNumber);

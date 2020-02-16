@@ -90,7 +90,7 @@ MailBox::Put(PacketHeader pktHdr, MailHeader mailHdr, const char *data) {
 /// * `data` is the address to put: payload message data.
 void
 MailBox::Get(PacketHeader *pktHdr, MailHeader *mailHdr, char *data) {
-    DEBUG('n', "Waiting for mail in mailbox.\n");
+    DEBUG('k', "Waiting for mail in mailbox.\n");
     ASSERT(pktHdr);
     ASSERT(mailHdr);
     ASSERT(data);

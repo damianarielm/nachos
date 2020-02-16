@@ -90,7 +90,6 @@ Bitmap::CountClear() const {
 /// the bits that are set in the bitmap.
 void
 Bitmap::Print() const {
-    printf("Bitmap set:\n");
     for (unsigned i = 0; i < numBits; i++)
         if (Test(i))
             printf("%u ", i);

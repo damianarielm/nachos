@@ -103,7 +103,7 @@ MMU::ReadMem(unsigned addr, unsigned size, int *value) {
 /// * `value` is the data to be written.
 ExceptionType
 MMU::WriteMem(unsigned addr, unsigned size, int value) {
-    DEBUG('a', "Writing VA 0x%X, size %u, value 0x%X.\n", addr, size, value);
+    DEBUG('a', "Writing VA 0x%X, size %u, value %d.\n", addr, size, value);
 
     unsigned physicalAddress;
     ExceptionType e = Translate(addr, &physicalAddress, size, true);
@@ -189,7 +189,7 @@ MMU::Translate(unsigned virtAddr, unsigned *physAddr, unsigned size, bool writin
 
     // Check for alignment errors.
     if ((size == 4 && virtAddr & 0x3) || (size == 2 && virtAddr & 0x1)) {
-        DEBUG_CONT('a', "alignment problem at %u, size %u!\n", virtAddr, size);
+        DEBUG_CONT('a', "alignment problem at 0x%X, size %u!\n", virtAddr, size);
         return ADDRESS_ERROR_EXCEPTION;
     }
 
@@ -204,7 +204,7 @@ MMU::Translate(unsigned virtAddr, unsigned *physAddr, unsigned size, bool writin
 
     if (entry->readOnly && writing) {  // Trying to write to a read-only
                                        // page.
-        DEBUG_CONT('a', "%u mapped read-only!\n", virtAddr);
+        DEBUG_CONT('a', "0x%X mapped read-only!\n", virtAddr);
         return READ_ONLY_EXCEPTION;
     }
 
@@ -217,13 +217,27 @@ MMU::Translate(unsigned virtAddr, unsigned *physAddr, unsigned size, bool writin
         return BUS_ERROR_EXCEPTION;
     }
 
-    // Set the `use` and `dirty` flags.
-    entry->use = true;
-    if (writing) entry->dirty = true;
-
     *physAddr = pageFrame * PAGE_SIZE + offset;
 
     DEBUG_CONT('a', "physical address 0x%X.\n", *physAddr);
     ASSERT(*physAddr >= 0 && *physAddr + size <= MEMORY_SIZE);
+
+    // Set the `use` and `dirty` flags.
+    entry->use = true;
+    if (writing) {
+        DEBUG('a', "Marking virtual page %u as dirty.\n", vpn);
+        entry->dirty = true;
+    }
+
     return NO_EXCEPTION;
+}
+
+void
+MMU::PrintTLB() const {
+    printf("TLB Content:\n");
+    for (unsigned i = 0; i < TLB_SIZE; i++)
+        if (tlb[i].valid)
+            printf("[%u] VPN: %d, Frame: %d, Valid: %d, RO: %d, Use: %d, Dirty: %d.\n",
+                    i, tlb[i].virtualPage, tlb[i].physicalPage, tlb[i].valid,
+                    tlb[i].readOnly, tlb[i].use, tlb[i].dirty);
 }

@@ -37,7 +37,7 @@ SimpleThread(void *name_) {
 /// calling `SimpleThread` ourselves.
 void
 ThreadTest() {
-    DEBUG('t', "Entering thread test.\n");
+    DEBUG('t', "Starting thread test.\n");
 
     char *name = new char [64];
     strncpy(name, "2nd", 64);

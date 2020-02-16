@@ -134,29 +134,31 @@ Directory::Remove(const char *name) {
 void
 Directory::List() const {
     for (unsigned i = 0; i < raw.tableSize; i++)
-        if (raw.table[i].inUse)
-            printf("%s\n", raw.table[i].name);
+        if (raw.table[i].inUse) {
+            FileHeader* hdr = new FileHeader;
+
+            hdr->FetchFrom(raw.table[i].sector);
+            printf("%s\t\t(%u bytes).\n", raw.table[i].name, hdr->FileLength());
+
+            delete hdr;
+        }
 }
 
 /// List all the file names in the directory, their `FileHeader` locations,
 /// and the contents of each file.  For debugging.
 void
 Directory::Print() const {
-    FileHeader *hdr = new FileHeader;
-
-    printf("Directory contents:\n");
     for (unsigned i = 0; i < raw.tableSize; i++)
         if (raw.table[i].inUse) {
-            printf("\nDirectory entry.\n"
-                   "    Name: %s\n"
-                   "    Sector: %u\n",
+            printf("--------------------------------------------------------------\n");
+            printf("Directory entry: `%s`. Header in sector %u.\n",
                    raw.table[i].name, raw.table[i].sector);
+
+            FileHeader *hdr = new FileHeader;
             hdr->FetchFrom(raw.table[i].sector);
             hdr->Print();
+            delete hdr;
         }
-    printf("\n");
-
-    delete hdr;
 }
 
 const RawDirectory *

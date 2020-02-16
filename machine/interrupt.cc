@@ -226,7 +226,7 @@ Interrupt::RestartTicks() {
     while ((i = oldPending->SortedPop((int *) &oldWhen)) != nullptr) {
         unsigned newWhen = oldWhen - stats->totalTicks;
         pending->SortedInsert(i, newWhen);
-        DEBUG('x', "Interrupt at time %u re-scheduled at new time %u.\n",
+        DEBUG('i', "Interrupt at time %u re-scheduled at new time %u.\n",
               oldWhen, newWhen);
     }
 
@@ -258,7 +258,7 @@ Interrupt::Schedule(VoidFunctionPtr handler, void *arg,
 
 #ifdef DFS_TICKS_FIX
     if (UINT_MAX - stats->totalTicks < fromNow) {
-        DEBUG('x', "WARNING: total tick count is too large and will be reset.\n");
+        DEBUG('i', "WARNING: total tick count is too large and will be reset.\n");
         RestartTicks();
     }
 #else
@@ -360,7 +360,7 @@ Interrupt::DumpState() {
     if (pending->IsEmpty())
         DEBUG_CONT('i', "No pending interrupts.\n");
     else {
-        DEBUG_CONT('i', printf("Pending interrupts:\n");
+        DEBUG_CONT('i', "Pending interrupts:\n");
         pending->Apply(PrintPending);
     }
 }

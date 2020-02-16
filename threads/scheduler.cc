@@ -50,6 +50,7 @@ Scheduler::ReadyToRun(Thread *thread) {
 /// Side effect: thread is removed from the ready list.
 Thread *
 Scheduler::FindNextToRun() {
+    if (debug.IsEnabled('t')) Print();
     return readyList->Pop();
 }
 
@@ -126,6 +127,7 @@ ThreadPrint(Thread *t) {
 
 void
 Scheduler::Print() {
-    printf("Ready list contents:\n");
+    printf("Ready list contents: ");
     readyList->Apply(ThreadPrint);
+    printf("\n");
 }

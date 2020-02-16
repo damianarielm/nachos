@@ -7,13 +7,15 @@
 ///
 /// * `+` -- turn on all debug messages.
 /// * `t` -- thread system.
-/// * `s` -- semaphores, locks, and conditions.
+/// * `s` -- semaphores
 /// * `i` -- interrupt emulation.
 /// * `m` -- machine emulation (requires *USER_PROGRAM*).
 /// * `d` -- disk emulation (requires *FILESYS*).
 /// * `f` -- file system (requires *FILESYS*).
 /// * `a` -- address spaces (requires *USER_PROGRAM*).
-/// * `n` -- network emulation (requires *NETWORK*).
+/// * `k` -- network emulation (requires *NETWORK*).
+/// * `y` -- system calls.
+/// * `r` -- preemptive multitasking.
 ///
 /// Copyright (c) 1992-1993 The Regents of the University of California.
 ///               2016-2018 Docentes de la Universidad Nacional de Rosario.

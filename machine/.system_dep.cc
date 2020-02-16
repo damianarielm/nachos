@@ -236,7 +236,7 @@ AssignNameToSocket(const char *socketName, int sockID) {
     InitSocketName(&uName, socketName);
     retVal = bind(sockID, (struct sockaddr *) &uName, sizeof uName);
 
-    DEBUG('n', "Created socket %s.\n", socketName);
+    DEBUG('k', "Created socket %s.\n", socketName);
     ASSERT(retVal >= 0);
 }
 

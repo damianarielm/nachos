@@ -78,15 +78,8 @@ Thread::~Thread() {
 /// * `arg` is a single argument to be passed to the procedure.
 void
 Thread::Fork(VoidFunctionPtr func, void *arg) {
+    DEBUG('t', "Forking thread `%s`.\n", name);
     ASSERT(func);
-
-#ifdef HOST_x86_64
-    DEBUG('t', "Forking thread `%s` with func = 0x%lX, arg = %ld.\n",
-          name, (HostMemoryAddress) func, arg);
-#else
-    DEBUG('t', "Forking thread `%s` with func = 0x%X, arg = %d.\n",
-          name, (HostMemoryAddress) func, arg);
-#endif
 
     StackAllocate(func, arg);
 
@@ -126,7 +119,7 @@ Thread::GetName() const {
 
 void
 Thread::Print() const {
-    printf("%s, ", name);
+    printf("%s ", name);
 }
 
 /// Called by `ThreadRoot` when a thread is done executing the forked
