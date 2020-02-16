@@ -50,7 +50,7 @@ Scheduler::ReadyToRun(Thread *thread) {
 /// Side effect: thread is removed from the ready list.
 Thread *
 Scheduler::FindNextToRun() {
-    if (debug.IsEnabled('t')) Print();
+    if (debug.IsEnabled('T')) Print();
     return readyList->Pop();
 }
 

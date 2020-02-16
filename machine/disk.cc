@@ -111,7 +111,7 @@ Disk::ReadRequest(unsigned sectorNumber, char *data) {
 
     Lseek(fileno, SECTOR_SIZE * sectorNumber + MAGIC_SIZE, 0);
     Read(fileno, data, SECTOR_SIZE);
-    if (debug.IsEnabled('d')) PrintSector(sectorNumber, data);
+    if (debug.IsEnabled('D')) PrintSector(sectorNumber, data);
 
     active = true;
     UpdateLast(sectorNumber);
@@ -130,7 +130,7 @@ Disk::WriteRequest(unsigned sectorNumber, const char *data) {
 
     Lseek(fileno, SECTOR_SIZE * sectorNumber + MAGIC_SIZE, 0);
     WriteFile(fileno, data, SECTOR_SIZE);
-    if (debug.IsEnabled('d')) PrintSector(sectorNumber, data);
+    if (debug.IsEnabled('D')) PrintSector(sectorNumber, data);
 
     active = true;
     UpdateLast(sectorNumber);
@@ -212,14 +212,14 @@ Disk::ComputeLatency(unsigned newSector, bool writing) {
     if (!writing && seek == 0
         && (timeAfter - bufferInit) / ROTATION_TIME
            > ModuloDiff(newSector, bufferInit / ROTATION_TIME)) {
-        DEBUG('d', "Request latency = %u.\n", ROTATION_TIME);
+        DEBUG('D', "Request latency = %u.\n", ROTATION_TIME);
         return ROTATION_TIME; // Time to transfer sector from the track buffer.
     }
 #endif
 
     rotation += ModuloDiff(newSector, timeAfter / ROTATION_TIME) * ROTATION_TIME;
 
-    DEBUG('d', "Request latency = %u.\n", seek + rotation + ROTATION_TIME);
+    DEBUG('D', "Request latency = %u.\n", seek + rotation + ROTATION_TIME);
     return seek + rotation + ROTATION_TIME;
 }
 
@@ -232,5 +232,5 @@ Disk::UpdateLast(unsigned newSector) {
 
     if (seek != 0) bufferInit = stats->totalTicks + seek + rotate;
     lastSector = newSector;
-    DEBUG('d', "Updating last sector = %u, %u.\n", lastSector, bufferInit);
+    DEBUG('D', "Updating last sector = %u, %u.\n", lastSector, bufferInit);
 }

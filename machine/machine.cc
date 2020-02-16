@@ -63,6 +63,7 @@ Machine::GetMMU() {
 int
 Machine::ReadRegister(unsigned num) const {
     ASSERT(num < NUM_TOTAL_REGS);
+    DEBUG('M', "Reading register %u, value %d\n", num, registers[num]);
 
     return registers[num];
 }
@@ -70,7 +71,7 @@ Machine::ReadRegister(unsigned num) const {
 void
 Machine::WriteRegister(unsigned num, int value) {
     ASSERT(num < NUM_TOTAL_REGS);
-    //DEBUG('m', "WriteRegister %u, value %d\n", num, value);
+    DEBUG('M', "Writing register %u, value %d\n", num, value);
 
     // Register 0 never changes its value: it is always 0.
     if (num != 0) registers[num] = value;

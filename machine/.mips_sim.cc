@@ -59,11 +59,11 @@ Machine::FetchInstruction(Instruction *instr) {
         const struct OpString *str = &OP_STRINGS[instr->opCode];
 
         ASSERT(instr->opCode <= MAX_OPCODE);
-        DEBUG('m', "At PC = 0x%X: ", registers[PC_REG]);
-        DEBUG_CONT('m', str->string, instr->RegFromType(str->args[0]),
+        DEBUG('M', "At PC = 0x%X: ", registers[PC_REG]);
+        DEBUG_CONT('M', str->string, instr->RegFromType(str->args[0]),
                         instr->RegFromType(str->args[1]),
                         instr->RegFromType(str->args[2]));
-        DEBUG_CONT('m', "\n");
+        DEBUG_CONT('M', "\n");
     }
 
     return true;

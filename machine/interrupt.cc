@@ -140,7 +140,7 @@ Interrupt::OneTick() {
         stats->totalTicks += USER_TICK;
         stats->userTicks += USER_TICK;
     }
-    DEBUG('i', "== Tick %u ==\n", stats->totalTicks);
+    DEBUG('I', "== Tick %u ==\n", stats->totalTicks);
 
     // Check any pending interrupts are now ready to fire.
     ChangeLevel(INT_ON, INT_OFF);  // First, turn off interrupts (interrupt
@@ -355,12 +355,12 @@ PrintPending(PendingInterrupt *pend) {
 /// are scheduled to occur in the future.
 void
 Interrupt::DumpState() {
-    DEBUG('i', "Time: %u, interrupts %s.\n", stats->totalTicks, INT_LEVEL_NAMES[level]);
+    DEBUG('I', "Time: %u, interrupts %s.\n", stats->totalTicks, INT_LEVEL_NAMES[level]);
 
     if (pending->IsEmpty())
-        DEBUG_CONT('i', "No pending interrupts.\n");
+        DEBUG_CONT('I', "No pending interrupts.\n");
     else {
-        DEBUG_CONT('i', "Pending interrupts:\n");
+        DEBUG_CONT('I', "Pending interrupts:\n");
         pending->Apply(PrintPending);
     }
 }
