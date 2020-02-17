@@ -40,6 +40,9 @@ PROGRAM = nachos
 THREAD_HDR = ../threads/.copyright.h   \
              ../threads/scheduler.hh   \
              ../threads/synch.hh       \
+             ../threads/semaphore.hh   \
+             ../threads/lock.hh        \
+             ../threads/condition.hh   \
              ../threads/synch_list.hh  \
              ../threads/system.hh      \
              ../threads/thread.hh      \
@@ -54,7 +57,9 @@ THREAD_HDR = ../threads/.copyright.h   \
 
 THREAD_SRC = ../threads/main.cc        \
              ../threads/scheduler.cc   \
-             ../threads/synch.cc       \
+             ../threads/semaphore.cc   \
+             ../threads/lock.cc        \
+             ../threads/condition.cc   \
              ../threads/system.cc      \
              ../threads/.switch.S      \
              ../threads/thread.cc      \
@@ -69,7 +74,9 @@ THREAD_SRC = ../threads/main.cc        \
 
 THREAD_OBJ = main.o        \
              scheduler.o   \
-             synch.o       \
+             semaphore.o   \
+             lock.o        \
+             condition.o   \
              system.o      \
              thread.o      \
              debug.o       \
