@@ -151,7 +151,7 @@ Directory::Print() const {
     for (unsigned i = 0; i < raw.tableSize; i++)
         if (raw.table[i].inUse) {
             printf("--------------------------------------------------------------\n");
-            printf("Directory entry: `%s`. Header in sector %u.\n",
+            printf("Directory entry: %s. Header in sector %u.\n",
                    raw.table[i].name, raw.table[i].sector);
 
             FileHeader *hdr = new FileHeader;

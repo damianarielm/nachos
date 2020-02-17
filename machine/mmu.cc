@@ -88,7 +88,7 @@ MMU::ReadMem(unsigned addr, unsigned size, int *value) {
             ASSERT(false);
     }
 
-    DEBUG('A', "\tValue read: %8.8X.\n", *value);
+    DEBUG('A', "\tValue read: %X.\n", *value);
     return NO_EXCEPTION;
 }
 
@@ -138,11 +138,11 @@ MMU::RetrievePageEntry(unsigned vpn, TranslationEntry **entry) const {
         // Use a page table; `vpn` is an index in the table.
 
         if (vpn >= pageTableSize) {
-            DEBUG_CONT('A', "virtual page # %u too large for page table size %u!\n",
+            DEBUG_CONT_ERROR('A', "virtual page # %u too large for page table size %u!\n",
                        vpn, pageTableSize);
             return ADDRESS_ERROR_EXCEPTION;
         } else if (!pageTable[vpn].valid) {
-            DEBUG_CONT('A', "virtual page # %u too large for page table size %u!\n",
+            DEBUG_CONT_ERROR('A', "virtual page # %u too large for page table size %u!\n",
                        vpn, pageTableSize);
             return PAGE_FAULT_EXCEPTION;
         }
@@ -160,7 +160,7 @@ MMU::RetrievePageEntry(unsigned vpn, TranslationEntry **entry) const {
             }
 
         // Not found.
-        DEBUG_CONT('A', "no valid TLB entry found for this virtual page!\n");
+        DEBUG_CONT_ERROR('A', "no valid TLB entry found for this virtual page!\n");
         return PAGE_FAULT_EXCEPTION;  // Really, this is a TLB fault, the
                                       // page may be in memory, but not in
                                       // the TLB.
@@ -189,7 +189,7 @@ MMU::Translate(unsigned virtAddr, unsigned *physAddr, unsigned size, bool writin
 
     // Check for alignment errors.
     if ((size == 4 && virtAddr & 0x3) || (size == 2 && virtAddr & 0x1)) {
-        DEBUG_CONT('A', "alignment problem at 0x%X, size %u!\n", virtAddr, size);
+        DEBUG_CONT_ERROR('A', "alignment problem at 0x%X, size %u!\n", virtAddr, size);
         return ADDRESS_ERROR_EXCEPTION;
     }
 
@@ -204,7 +204,7 @@ MMU::Translate(unsigned virtAddr, unsigned *physAddr, unsigned size, bool writin
 
     if (entry->readOnly && writing) {  // Trying to write to a read-only
                                        // page.
-        DEBUG_CONT('A', "0x%X mapped read-only!\n", virtAddr);
+        DEBUG_CONT_ERROR('A', "0x%X mapped read-only!\n", virtAddr);
         return READ_ONLY_EXCEPTION;
     }
 
@@ -213,7 +213,7 @@ MMU::Translate(unsigned virtAddr, unsigned *physAddr, unsigned size, bool writin
     // If the `pageFrame` is too big, there is something really wrong!  An
     // invalid translation was loaded into the page table or TLB.
     if (pageFrame >= NUM_PHYS_PAGES) {
-        DEBUG_CONT('A', "frame %u > %u!\n", pageFrame, NUM_PHYS_PAGES);
+        DEBUG_CONT_ERROR('A', "frame %u > %u!\n", pageFrame, NUM_PHYS_PAGES);
         return BUS_ERROR_EXCEPTION;
     }
 

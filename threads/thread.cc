@@ -53,7 +53,7 @@ Thread::Thread(const char *threadName) {
 /// did not allocate it -- we got it automatically as part of starting up
 /// Nachos.
 Thread::~Thread() {
-    DEBUG('t', "Deleting thread `%s`.\n", name);
+    DEBUG('t', "Deleting thread %s.\n", name);
     ASSERT(this != currentThread);
 
     if (stack)
@@ -78,7 +78,7 @@ Thread::~Thread() {
 /// * `arg` is a single argument to be passed to the procedure.
 void
 Thread::Fork(VoidFunctionPtr func, void *arg) {
-    DEBUG('t', "Forking thread `%s`.\n", name);
+    DEBUG('t', "Forking thread %s.\n", name);
     ASSERT(func);
 
     StackAllocate(func, arg);
@@ -119,7 +119,7 @@ Thread::GetName() const {
 
 void
 Thread::Print() const {
-    printf("%s ", name);
+    printf(BOLD "%s " DISABLE_BOLD, name);
 }
 
 /// Called by `ThreadRoot` when a thread is done executing the forked
@@ -135,7 +135,7 @@ Thread::Print() const {
 /// setting `threadToBeDestroyed`, and going to sleep.
 void
 Thread::Finish() {
-    DEBUG('t', "Finishing thread `%s`.\n", GetName());
+    DEBUG('t', "Finishing thread %s.\n", GetName());
     ASSERT(this == currentThread);
 
     interrupt->SetLevel(INT_OFF);
@@ -161,7 +161,7 @@ Thread::Finish() {
 /// Similar to `Thread::Sleep`, but a little different.
 void
 Thread::Yield() {
-    DEBUG('t', "Yielding thread `%s`.\n", GetName());
+    DEBUG('t', "Yielding thread %s.\n", GetName());
     ASSERT(this == currentThread);
 
     IntStatus oldLevel = interrupt->SetLevel(INT_OFF);
@@ -191,7 +191,7 @@ Thread::Yield() {
 /// between pulling the first thread off the ready list, and switching to it.
 void
 Thread::Sleep() {
-    DEBUG('t', "Sleeping thread `%s`.\n", GetName());
+    DEBUG('t', "Sleeping thread %s.\n", GetName());
     ASSERT(this == currentThread);
     ASSERT(interrupt->GetLevel() == INT_OFF);
 

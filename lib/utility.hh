@@ -10,6 +10,7 @@
 #ifndef NACHOS_LIB_UTILITY__HH
 #define NACHOS_LIB_UTILITY__HH
 
+#include "colors.hh"
 #include "debug.hh"
 
 /// Miscellaneous useful routines.
@@ -61,9 +62,14 @@ typedef void (*VoidNoArgFunctionPtr)();
 
 /// Global object for debug output.
 extern Debug debug;
+extern void PrintByte(char byte);
 
-#define DEBUG(...)  (debug.Print)(__LINE__, __FILE__, __VA_ARGS__)
-#define DEBUG_CONT  (debug.PrintCont)
+#define DEBUG_ERROR(...)      (debug.Print)(true, __LINE__, __FILE__, __VA_ARGS__)
+#define DEBUG_CONT_ERROR(...) (debug.PrintCont)(true, __VA_ARGS__)
+#define DEBUG(...)            (debug.Print)(false, __LINE__, __FILE__, __VA_ARGS__)
+#define DEBUG_CONT(...)       (debug.PrintCont)(false, __VA_ARGS__)
+
+#define ERROR(string) UNDERLINE string DISABLE_UNDERLINE
 
 /// If `condition` is false, print a message and dump core.
 ///
@@ -71,14 +77,15 @@ extern Debug debug;
 ///
 /// NOTE: needs to be a `#define`, to be able to print the location where the
 /// error occurred.
-#define ASSERT(condition)                                                 \
-    if (!(condition)) {                                                   \
-        fprintf(stderr, "\nAssertion failed!\n"                           \
-                        "Expression: `%s`\n"                              \
-                        "Location: file `%s`, line %u\n\n",               \
-                #condition, __FILE__, __LINE__);                          \
-        fflush(stderr);                                                   \
-        abort();                                                          \
+#define ASSERT(condition)                                                \
+    if (!(condition)) {                                                  \
+        fprintf(stderr, ERROR("\nAssertion failed!\n")                   \
+                        "Expression: " BOLD "%s" DISABLE_BOLD".\n"       \
+                        "Location: file " BOLD "%s" DISABLE_BOLD" line " \
+                        BOLD "%u" DISABLE_BOLD".\n\n",                   \
+                        #condition, __FILE__, __LINE__);                 \
+        fflush(stderr);                                                  \
+        abort();                                                         \
     }
 
 #endif

@@ -25,10 +25,10 @@ SimpleThread(void *name_) {
     // behave incorrectly, because printf execution may cause race
     // conditions.
     for (unsigned num = 0; num < 10; num++) {
-        printf("*** Thread `%s` is running: iteration %u.\n", name, num);
+        printf("*** Thread %s is running: iteration %u.\n", name, num);
         currentThread->Yield();
     }
-    printf("!!! Thread `%s` has finished.\n", name);
+    printf("!!! Thread %s has finished.\n", name);
 }
 
 /// Set up a ping-pong between several threads.

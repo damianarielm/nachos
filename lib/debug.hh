@@ -58,16 +58,21 @@ public:
     /// Like `printf`, only with an extra argument on the front.
     ///
     /// Put a flag prefix along with the message.
-    void Print(unsigned line, const char* file, char flag, const char *format, ...) const;
+    void Print(bool error, unsigned line, const char* file, char flag,
+            const char *format, ...) const;
 
     /// Same as `Print` but avoid printing the flag prefix.
     ///
     /// Useful for splitting a call for a `Print` line into multiple calls.
-    void PrintCont(char flag, const char *format, ...) const;
+    void PrintCont(bool error, char flag, const char *format, ...) const;
 
 private:
     /// String that controls which debug messages are printed.
     const char *flags;
+
+    /// Custom color for each flag.
+    void Color(char flag) const;
+
 };
 
 #endif

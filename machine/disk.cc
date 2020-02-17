@@ -81,7 +81,7 @@ PrintSector(unsigned sector, const char *data) {
     int *p = (int *) data;
 
     for (unsigned i = 0; i < SECTOR_SIZE / sizeof (int); i++)
-        DEBUG_CONT('d', "%X ", p[i]);
+        PrintByte(p[i]);
 
     printf("\n");
 }

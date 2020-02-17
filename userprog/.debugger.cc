@@ -102,24 +102,24 @@ static DCM::RunResult
 CommandDump(char **args, void *extra) {
     const char *path = DCM::FetchArg(args);
     if (!path) {
-        fprintf(stderr, "ERROR: missing argument.\n");
+        fprintf(stderr, ERROR("Error: missing argument.\n"));
         return DCM::RUN_RESULT_STAY;
     }
 
     FILE *f = fopen(path, "w");
     if (!f) {
-        fprintf(stderr, "ERROR: file `%s` could not be opened.\n", path);
+        fprintf(stderr, ERROR("Error: file %s could not be opened.\n"), path);
         return DCM::RUN_RESULT_STAY;
     }
 
     int rv = fwrite(machine->GetMMU()->mainMemory, 1, MEMORY_SIZE, f);
     if (rv != MEMORY_SIZE) {
-        fprintf(stderr, "ERROR: write to file `%s` did not succeed.\n", path);
+        fprintf(stderr, ERROR("Error: write to file %s did not succeed.\n"), path);
         return DCM::RUN_RESULT_STAY;
     }
 
     fclose(f);
-    printf("Main memory dumped into file `%s`.\n", path);
+    printf("Main memory dumped into file %s.\n", path);
     return DCM::RUN_RESULT_STAY;
 }
 
@@ -180,13 +180,13 @@ CommandPrint(char **args, void *extra) {
             else printf("Exception on memory read: %u\n", e);
         } else if (strcmp(end, "@p") == 0) {
             if (address >= MEMORY_SIZE) {
-                fprintf(stderr, "ERROR: address %u is too big.\n", address);
+                fprintf(stderr, ERROR("Error: address %u is too big.\n"), address);
                 return DCM::RUN_RESULT_STAY;
             }
 
             PrintChar(machine->GetMMU()->mainMemory[address]);
         } else {
-            fprintf(stderr, "ERROR: argument `%s` is not an address.\n", arg);
+            fprintf(stderr, ERROR("Error: argument %s is not an address.\n"), arg);
             return DCM::RUN_RESULT_STAY;
         }
     }
@@ -204,7 +204,7 @@ static DCM::RunResult
 CommandSetFlags(char **args, void *extra) {
     const char *flags = DCM::FetchArg(args);
     if (!flags) {
-        fprintf(stderr, "ERROR: missing argument.\n");
+        fprintf(stderr, ERROR("Error: missing argument.\n"));
         return DCM::RUN_RESULT_STAY;
     }
 
@@ -226,14 +226,14 @@ CommandTick(char **args, void *runUntilTime_) {
 
     const char *num_s = DCM::FetchArg(args);
     if (!num_s) {
-        fprintf(stderr, "ERROR: missing argument.\n");
+        fprintf(stderr, ERROR("Error: missing argument.\n"));
         return DCM::RUN_RESULT_STAY;
     }
 
     char *end;
     unsigned num = strtoul(num_s, &end, 10);
     if (*end != '\0') {
-        fprintf(stderr, "ERROR: argument `%s` is not an integer number.\n", num_s);
+        fprintf(stderr, ERROR("Error: argument %s is not an integer number.\n"), num_s);
         return DCM::RUN_RESULT_STAY;
     }
 
@@ -249,7 +249,7 @@ HandleEmpty() {
 
 static DCM::RunResult
 HandleUnknown(const char *name) {
-    fprintf(stderr, "ERROR: `%s` is not a valid command.\n", name);
+    fprintf(stderr, ERROR("Error: %s is not a valid command.\n"), name);
     return CommandHelp(nullptr, nullptr);
 }
 

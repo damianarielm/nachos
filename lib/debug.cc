@@ -38,11 +38,30 @@ Debug::SetFlags(const char *new_flags) {
     flags = new_flags;
 }
 
+void Bold(const char *org, char* dst) {
+    for (unsigned i = 0; i < strlen(org); i++) {
+        if (org[i] != '%') {
+            dst[strlen(dst)] = org[i];
+        } else {
+            dst = strcat(dst, BOLD "%");
+            dst[strlen(dst)] = org[++i];
+            dst = strcat(dst, DISABLE_BOLD);
+        }
+    }
+}
+
 void
-Debug::Print(unsigned line, const char* file, char flag, const char *format, ...) const {
+Debug::Print(bool error, unsigned line, const char* file, char flag,
+        const char *format, ...) const {
     ASSERT(format);
 
     if (!IsEnabled(flag)) return;
+    if (error) fprintf(stderr, UNDERLINE);
+    Color(flag);
+
+    char* buffer = new char[256]();
+    Bold(format, buffer);
+    format = buffer;
 
     if (!IsEnabled('+') && IsEnabled('e')) usleep(100000);
     if (!IsEnabled('+') && IsEnabled('E')) getchar();
@@ -55,14 +74,22 @@ Debug::Print(unsigned line, const char* file, char flag, const char *format, ...
     vfprintf(stderr, format, ap);
     va_end(ap);
 
+    fprintf(stderr, RESET);
     fflush(stderr);
+    delete [] buffer;
 }
 
 void
-Debug::PrintCont(char flag, const char *format, ...) const {
+Debug::PrintCont(bool error, char flag, const char *format, ...) const {
     ASSERT(format);
 
     if (!IsEnabled(flag)) return;
+    if (error) fprintf(stderr, UNDERLINE);
+    Color(flag);
+
+    char* buffer = new char[256]();
+    Bold(format, buffer);
+    format = buffer;
 
     va_list ap;
     // You will get an unused variable message here -- ignore it.
@@ -70,5 +97,18 @@ Debug::PrintCont(char flag, const char *format, ...) const {
     vfprintf(stderr, format, ap);
     va_end(ap);
 
+    fprintf(stderr, RESET);
     fflush(stderr);
+    delete [] buffer;
+}
+
+void
+Debug::Color(char flag) const {
+    fprintf(stderr, YELLOW);
+    if (flag == 't' || flag == 'T') fprintf(stderr, CYAN);
+    if (flag == 's' || flag == 'S') fprintf(stderr, YELLOW);
+    if (flag == 'i' || flag == 'I') fprintf(stderr, BRIGHT_YELLOW);
+    if (flag == 'd' || flag == 'D') fprintf(stderr, GREEN);
+    if (flag == 'f' || flag == 'F') fprintf(stderr, BRIGHT_BLUE);
+    if (flag == 'a' || flag == 'A') fprintf(stderr, MAGENTA);
 }

@@ -39,7 +39,7 @@ FileHeader::Allocate(Bitmap *freeMap, unsigned fileSize) {
     raw.numBytes = fileSize;
     raw.numSectors = DivRoundUp(fileSize, SECTOR_SIZE);
     if (freeMap->CountClear() < raw.numSectors) {
-        DEBUG_CONT('f', "Failed. Space left: %u bytes.\n",
+        DEBUG_CONT_ERROR('f', "Failed. Space left: %u bytes.\n",
                 freeMap->CountClear() * SECTOR_SIZE);
         return false;  // Not enough space.
     }
@@ -110,13 +110,9 @@ FileHeader::Print() {
     for (unsigned i = 0, k = 0; i < raw.numSectors; i++) {
         synchDisk->ReadSector(raw.dataSectors[i], data);
 
-        printf("[%u] ", raw.dataSectors[i]);
-        for (unsigned j = 0; j < SECTOR_SIZE && k < raw.numBytes; j++, k++) {
-            if ('\040' <= data[j] && data[j] <= '\176')  // isprint(data[j])
-                printf("%c", data[j]);
-            else
-                printf("\\%X", (unsigned char) data[j]);
-        }
+        printf(YELLOW "[%u] " RESET, raw.dataSectors[i]);
+        for (unsigned j = 0; j < SECTOR_SIZE && k < raw.numBytes; j++, k++)
+            PrintByte(data[j]);
         printf("\n");
     }
 

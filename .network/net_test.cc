@@ -50,7 +50,7 @@ MailTest(int farAddr) {
 
     // Wait for the first message from the other machine.
     postOffice->Receive(0, &inPktHdr, &inMailHdr, buffer);
-    printf("Got \"%s\" from %d, box %d\n", buffer, inPktHdr.from, inMailHdr.from);
+    printf("Got %s from %d, box %d\n", buffer, inPktHdr.from, inMailHdr.from);
     fflush(stdout);
 
     // Send acknowledgement to the other machine (using “reply to” mailbox
@@ -62,7 +62,7 @@ MailTest(int farAddr) {
 
     // Wait for the ack from the other machine to the first message we sent.
     postOffice->Receive(1, &inPktHdr, &inMailHdr, buffer);
-    printf("Got \"%s\" from %d, box %d\n", buffer, inPktHdr.from, inMailHdr.from);
+    printf("Got %s from %d, box %d\n", buffer, inPktHdr.from, inMailHdr.from);
     fflush(stdout);
 
     // Then we are done!

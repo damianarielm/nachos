@@ -179,23 +179,23 @@ FileSystem::Create(const char *name, unsigned initialSize) {
     directory->FetchFrom(directoryFile);
 
     if (directory->Find(name) != -1) {
-        DEBUG('f', "The file `%s` already exists.\n", name);
+        DEBUG_ERROR('f', "The file %s already exists.\n", name);
         success = false;  // File is already in directory.
     } else {
         freeMap = new Bitmap(NUM_SECTORS);
         freeMap->FetchFrom(freeMapFile);
         sector = freeMap->Find();  // Find a sector to hold the file header.
         if (sector == -1) {
-            DEBUG('f', "No free space for the header of `%s`. Free space: %u bytes.\n",
+            DEBUG_ERROR('f', "No free space for the header of %s. Free space: %u bytes.\n",
                     name, freeMap->CountClear() * SECTOR_SIZE);
             success = false;  // No free block for file header.
         } else if (!directory->Add(name, sector)) {
-            DEBUG('f', "No enough space in the current directory.\n");
+            DEBUG_ERROR('f', "No enough space in the current directory.\n");
             success = false;  // No space in directory.
         } else {
             header = new FileHeader;
             if (!header->Allocate(freeMap, initialSize)) {
-                DEBUG('f', "No free space for file `%s`. Free space: %u bytes.\n",
+                DEBUG_ERROR('f', "No free space for file %s. Free space: %u bytes.\n",
                     name, freeMap->CountClear() * SECTOR_SIZE);
                 success = false;  // No space on disk for data.
             } else {
@@ -262,7 +262,7 @@ FileSystem::Remove(const char *name) {
     directory->FetchFrom(directoryFile);
     sector = directory->Find(name);
     if (sector == -1) {
-       DEBUG('f', "File `%s` not found.\n", name);
+       DEBUG_ERROR('f', "File %s not found.\n", name);
 
        delete directory;
        return false;  // file not found
@@ -302,7 +302,7 @@ AddToShadowBitmap(unsigned sector, Bitmap *map) {
     ASSERT(map);
 
     if (map->Test(sector)) {
-        DEBUG('f', "Sector %u was already marked.\n", sector);
+        DEBUG_ERROR('f', "Sector %u was already marked.\n", sector);
         return false;
     }
 
@@ -374,7 +374,7 @@ CheckDirectory(const RawDirectory *rd, Bitmap *shadowMap) {
 
         if (e->inUse) {
             if (strlen(e->name) > FILE_NAME_MAX_LEN) {
-                DEBUG('f', "Filename too long.\n");
+                DEBUG_ERROR('f', "Filename too long.\n");
                 error = true;
             }
 
@@ -382,16 +382,16 @@ CheckDirectory(const RawDirectory *rd, Bitmap *shadowMap) {
             DEBUG('f', "Checking for repeated names.  Name count: %u.\n", nameCount);
             bool repeated = false;
             for (unsigned j = 0; j < nameCount; j++) {
-                DEBUG('f', "Comparing \"%s\" and \"%s\".\n", knownNames[j], e->name);
+                DEBUG('f', "Comparing %s and %s.\n", knownNames[j], e->name);
                 if (strcmp(knownNames[j], e->name) == 0) {
-                    DEBUG('f', "Repeated filename.\n");
+                    DEBUG_ERROR('f', "Repeated filename.\n");
                     repeated = true;
                     error = true;
                 }
             }
             if (!repeated) {
                 knownNames[nameCount] = e->name;
-                DEBUG('f', "Added `%s` at %u.\n", e->name, nameCount);
+                DEBUG('f', "Added %s at %u.\n", e->name, nameCount);
                 nameCount++;
             }
 
@@ -456,7 +456,7 @@ FileSystem::Check() {
     delete shadowMap;
     delete freeMap;
 
-    DEBUG('f', error ? "Filesystem check succeeded.\n" : "Filesystem check failed.\n");
+    DEBUG('f', error ? "Filesystem check succeeded.\n" : ERROR("Filesystem check failed.\n"));
 
     return !error;
 }

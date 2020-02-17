@@ -81,14 +81,14 @@ SyscallHandler(ExceptionType _et) {
         case SC_CREATE: {
             int filenameAddr = machine->ReadRegister(4);
             if (filenameAddr == 0)
-                DEBUG('y', "Error: address to filename string is null.\n");
+                DEBUG_ERROR('y', "Error: address to filename string is null.\n");
 
             char filename[FILE_NAME_MAX_LEN + 1];
             if (!ReadStringFromUser(filenameAddr, filename, sizeof filename))
-                DEBUG('y', "Error: filename string too long (maximum is %u bytes).\n",
+                DEBUG_ERROR('y', "Error: filename string too long (maximum is %u bytes).\n",
                       FILE_NAME_MAX_LEN);
 
-            DEBUG('y', "Open requested for file `%s`.\n", filename);
+            DEBUG('y', "Open requested for file %s.\n", filename);
             break;
         }
 
