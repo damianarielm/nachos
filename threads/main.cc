@@ -24,6 +24,7 @@
 ///   `utility.hh`).
 /// * `-p`  -- enables preemptive multitasking for kernel threads.
 /// * `-rs` -- causes `Yield` to occur at random (but repeatable) spots.
+/// * `-i`  -- prints information about the whole system.
 /// * `-z`  -- prints version and copyright information, and exits.
 ///
 /// *USER_PROGRAM* options
@@ -65,6 +66,8 @@
 #include ".copyright.h"
 #include "lib/utility.hh"
 #include "system.hh"
+#include "mmu.hh"
+#include "filesys/file_system.hh"
 
 // External functions used by this file.
 
@@ -79,6 +82,32 @@ void MailTest(int networkID);
 static inline void
 PrintVersion() {
     printf("%s\n%s", VERSION, COPYRIGHT);
+}
+
+static inline void
+PrintInfo() {
+    printf(ITALIC "DISK INFO\n" DISABLE_ITALIC);
+    printf("Sector size: " BOLD "%u" DISABLE_BOLD " bytes.\n", SECTOR_SIZE);
+    printf("Sector per track: " BOLD "%u" DISABLE_BOLD ".\n", SECTORS_PER_TRACK);
+    printf("Number of tracks: " BOLD "%u" DISABLE_BOLD ".\n", NUM_TRACKS);
+    printf("Number of sectors: " BOLD "%u" DISABLE_BOLD ".\n", NUM_SECTORS);
+    printf("Free sectors map size: " BOLD "%u" DISABLE_BOLD " bytes.\n", FREE_MAP_FILE_SIZE);
+    printf("Disk size: " BOLD "%u" DISABLE_BOLD " bytes.\n", NUM_SECTORS * SECTOR_SIZE);
+    printf("\n");
+    printf(ITALIC "HEADER INFO\n" DISABLE_ITALIC);
+    printf("Number of sectors: " BOLD "%u" DISABLE_BOLD ".\n", NUM_DIRECT);
+    printf("Max file size: " BOLD "%u" DISABLE_BOLD " bytes.\n", MAX_FILE_SIZE);
+    printf("File name max length: " BOLD "%u" DISABLE_BOLD ".\n", FILE_NAME_MAX_LEN);
+    printf("\n");
+    printf(ITALIC "DIRECTORY INFO\n" DISABLE_ITALIC);
+    printf("Max number of dir entries: " BOLD "%u" DISABLE_BOLD ".\n", NUM_DIR_ENTRIES);
+    printf("Directory file size: " BOLD "%u" DISABLE_BOLD " bytes.\n", DIRECTORY_FILE_SIZE);
+    printf("\n");
+    printf(ITALIC "MEMORY INFO\n" DISABLE_ITALIC);
+    printf("Page size: " BOLD "%u" DISABLE_BOLD " bytes.\n", PAGE_SIZE);
+    printf("Number of pages: " BOLD "%u" DISABLE_BOLD ".\n", NUM_PHYS_PAGES);
+    printf("TLB size: " BOLD "%u" DISABLE_BOLD ".\n", TLB_SIZE);
+    printf("Memory size: " BOLD "%u" DISABLE_BOLD " bytes.\n", MEMORY_SIZE);
 }
 
 /// Bootstrap the operating system kernel.
@@ -105,6 +134,10 @@ main(int argc, char **argv) {
         argCount = 1;
         if (!strcmp(*argv, "-z")) {          // Print version info and exit.
             PrintVersion();
+            return 0;
+        }
+        if (!strcmp(*argv, "-i")) {
+            PrintInfo();
             return 0;
         }
 #ifdef USER_PROGRAM

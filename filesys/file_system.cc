@@ -42,24 +42,6 @@
 /// limitation of liability and disclaimer of warranty provisions.
 
 #include "file_system.hh"
-#include "directory.hh"
-#include "directory_entry.hh"
-#include "file_header.hh"
-#include "lib/bitmap.hh"
-#include "machine/disk.hh"
-
-/// Sectors containing the file headers for the bitmap of free sectors, and
-/// the directory of files.  These file headers are placed in well-known
-/// sectors, so that they can be located on boot-up.
-static const unsigned FREE_MAP_SECTOR = 0;
-static const unsigned DIRECTORY_SECTOR = 1;
-
-/// Initial file sizes for the bitmap and directory; until the file system
-/// supports extensible files, the directory size sets the maximum number of
-/// files that can be loaded onto the disk.
-static const unsigned FREE_MAP_FILE_SIZE = NUM_SECTORS / BITS_IN_BYTE;
-static const unsigned NUM_DIR_ENTRIES = 10;
-static const unsigned DIRECTORY_FILE_SIZE = sizeof (DirectoryEntry) * NUM_DIR_ENTRIES;
 
 /// Initialize the file system.  If `format == true`, the disk has nothing on
 /// it, and we need to initialize the disk to contain an empty directory, and
