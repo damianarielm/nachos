@@ -20,25 +20,6 @@
 #include "machine/.endianness.hh"
 #include "threads/system.hh"
 
-/// Do little endian to big endian conversion on the bytes in the object file
-/// header, in case the file was generated on a little endian machine, and we
-/// are re now running on a big endian machine.
-static void
-SwapHeader(noffHeader *noffH) {
-    ASSERT(noffH);
-
-    noffH->noffMagic              = WordToHost(noffH->noffMagic);
-    noffH->code.size              = WordToHost(noffH->code.size);
-    noffH->code.virtualAddr       = WordToHost(noffH->code.virtualAddr);
-    noffH->code.inFileAddr        = WordToHost(noffH->code.inFileAddr);
-    noffH->initData.size          = WordToHost(noffH->initData.size);
-    noffH->initData.virtualAddr   = WordToHost(noffH->initData.virtualAddr);
-    noffH->initData.inFileAddr    = WordToHost(noffH->initData.inFileAddr);
-    noffH->uninitData.size        = WordToHost(noffH->uninitData.size);
-    noffH->uninitData.virtualAddr = WordToHost(noffH->uninitData.virtualAddr);
-    noffH->uninitData.inFileAddr  = WordToHost(noffH->uninitData.inFileAddr);
-}
-
 /// Create an address space to run a user program.
 ///
 /// Load the program from a file `executable`, and set everything up so that
@@ -55,16 +36,10 @@ SwapHeader(noffHeader *noffH) {
 AddressSpace::AddressSpace(OpenFile *executable) {
     ASSERT(executable);
 
-    noffHeader noffH;
-    executable->ReadAt((char *) &noffH, sizeof noffH, 0);
-    if (noffH.noffMagic != NOFF_MAGIC && WordToHost(noffH.noffMagic) == NOFF_MAGIC)
-        SwapHeader(&noffH);
-    ASSERT(noffH.noffMagic == NOFF_MAGIC);
+    InitSegments(); // Initialize segments metadata.
 
     // How big is address space?
-
-    unsigned size = noffH.code.size + noffH.initData.size
-                    + noffH.uninitData.size + USER_STACK_SIZE;
+    unsigned size = codeSize + initDataSize + uninitDataSize + USER_STACK_SIZE;
       // We need to increase the size to leave room for the stack.
     numPages = DivRoundUp(size, PAGE_SIZE);
     size = numPages * PAGE_SIZE;
@@ -94,17 +69,13 @@ AddressSpace::AddressSpace(OpenFile *executable) {
     memset(mainMemory, 0, size);
 
     // Then, copy in the code and data segments into memory.
-    if (noffH.code.size > 0) {
-        DEBUG('a', "Initializing code segment, at 0x%X, size %u.\n",
-              noffH.code.virtualAddr, noffH.code.size);
-        executable->ReadAt(&(mainMemory[noffH.code.virtualAddr]),
-                           noffH.code.size, noffH.code.inFileAddr);
+    if (codeSize > 0) {
+        DEBUG('a', "Initializing code segment, size %u\n", codeSize);
+        executable->ReadAt(&(mainMemory[codeVirtualAddr]), codeSize, codeInFileAddr);
     }
-    if (noffH.initData.size > 0) {
-        DEBUG('a', "Initializing data segment, at 0x%X, size %u.\n",
-              noffH.initData.virtualAddr, noffH.initData.size);
-        executable->ReadAt(&(mainMemory[noffH.initData.virtualAddr]),
-          noffH.initData.size, noffH.initData.inFileAddr);
+    if (initDataSize > 0) {
+        DEBUG('a', "Initializing data segment, size %u\n", initDataSize);
+        executable->ReadAt(&(mainMemory[initDataVirtualAddr]), initDataSize, initDataInFileAddr);
     }
 }
 

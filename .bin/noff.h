@@ -24,4 +24,18 @@ typedef struct noffHeader {
                              // zeroed before use.
 } noffHeader;
 
+#define InitSegments() noffHeader noffH;                                     \
+                       executable->ReadAt((char *) &noffH, sizeof noffH, 0); \
+                       if (noffH.noffMagic != NOFF_MAGIC &&                  \
+                           WordToHost(noffH.noffMagic) == NOFF_MAGIC)        \
+                               SwapHeader(&noffH);                           \
+                       ASSERT(noffH.noffMagic == NOFF_MAGIC);                \
+                       codeSize = noffH.code.size;                           \
+                       codeVirtualAddr = noffH.code.virtualAddr;             \
+                       codeInFileAddr = noffH.code.inFileAddr;               \
+                       initDataSize = noffH.initData.size;                   \
+                       initDataVirtualAddr = noffH.initData.virtualAddr;     \
+                       initDataInFileAddr = noffH.initData.inFileAddr;       \
+                       uninitDataSize = noffH.uninitData.size
+
 #endif

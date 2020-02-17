@@ -13,6 +13,7 @@
 #ifndef NACHOS_USERPROG_ADDRESSSPACE__HH
 #define NACHOS_USERPROG_ADDRESSSPACE__HH
 
+#include <stdint.h>
 #include "filesys/file_system.hh"
 #include "machine/translation_entry.hh"
 
@@ -45,6 +46,19 @@ private:
 
     /// Number of pages in the virtual address space.
     unsigned numPages;
+
+    // Code segment information.
+    uint32_t codeSize;        /// Size of the code segment.
+    uint32_t codeVirtualAddr; /// Location of segment in virtual address space.
+    uint32_t codeInFileAddr;  /// Position in the file where the code start.
+
+    /// Initialized data segment information.
+    uint32_t initDataSize;
+    uint32_t initDataVirtualAddr;
+    uint32_t initDataInFileAddr;
+
+    /// Uninitialized data segment information.
+    uint32_t uninitDataSize;
 
 };
 
