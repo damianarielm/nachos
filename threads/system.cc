@@ -95,7 +95,7 @@ Initialize(int argc, char **argv) {
     bool debugUserProg = false;  // Single step user program.
 #endif
 #ifdef FILESYS_NEEDED
-    bool format = false;  // Format disk.
+    unsigned format = false;  // Format disk.
 #endif
 #ifdef NETWORK
     double rely = 1;  // Network reliability.
@@ -134,7 +134,9 @@ Initialize(int argc, char **argv) {
 #endif
 #ifdef FILESYS_NEEDED
         if (!strcmp(*argv, "-f"))
-            format = true;
+            format = 1;
+        if (!strcmp(*argv, "-F"))
+            format = 2;
 #endif
 #ifdef NETWORK
         if (!strcmp(*argv, "-n")) {

@@ -101,7 +101,7 @@ public:
     ///
     /// If `format`, there is nothing on the disk, so initialize the
     /// directory and the bitmap of free blocks.
-    FileSystem(bool format);
+    FileSystem(unsigned format);
 
     ~FileSystem();
 

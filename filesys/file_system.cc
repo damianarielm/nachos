@@ -42,17 +42,18 @@
 /// limitation of liability and disclaimer of warranty provisions.
 
 #include "file_system.hh"
+#include "threads/system.hh"
 
 /// Initialize the file system.  If `format == true`, the disk has nothing on
 /// it, and we need to initialize the disk to contain an empty directory, and
 /// a bitmap of free sectors (with almost but not all of the sectors marked
 /// as free).
 ///
-/// If `format == false`, we just have to open the files representing the
+/// If `format == 0`, we just have to open the files representing the
 /// bitmap and the directory.
-///
-/// * `format` -- should we initialize the disk?
-FileSystem::FileSystem(bool format) {
+/// If `format == 1`, we initialize the disk?
+/// If `format == 2`, we fill the disk with zeros.
+FileSystem::FileSystem(unsigned format) {
     DEBUG('f', "Initializing the file system.\n");
 
     if (format) {
@@ -62,6 +63,15 @@ FileSystem::FileSystem(bool format) {
         FileHeader *dirHeader = new FileHeader;
 
         DEBUG('f', "Formatting the file system.\n");
+
+        if (format == 2) {
+            DEBUG('f', "Filling with zeros.\n");
+
+            char* zero = new char[SECTOR_SIZE]();
+            for (unsigned i = 0; i < NUM_SECTORS; i++)
+                synchDisk->WriteSector(i, zero);
+            delete zero;
+        }
 
         // First, allocate space for FileHeaders for the directory and bitmap
         // (make sure no one else grabs these!)

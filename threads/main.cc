@@ -38,6 +38,7 @@
 /// -----------------
 ///
 /// * `-f`  -- causes the physical disk to be formatted.
+/// * `-F`  -- fill the disk with zeros.
 /// * `-cp` -- copies a file from UNIX to Nachos.
 /// * `-pr` -- prints a Nachos file to standard output.
 /// * `-rm` -- removes a Nachos file from the file system.
