@@ -54,6 +54,9 @@ public:
     /// Take item off the front of the list.
     Item Pop();
 
+    /// Return the first item of the list without removing it.
+    Item Head();
+
     void Remove(Item item);
 
     /// Apply `func` to all elements in list.
@@ -72,6 +75,9 @@ public:
 
     /// Remove first item from list.
     Item SortedPop(int *keyPtr);
+
+    /// Returns the length of the list.
+    unsigned Length();
 
 private:
 
@@ -163,6 +169,15 @@ Item
 List<Item>::Pop() {
     // Same as `SortedPop`, but ignore the key.
     return SortedPop(nullptr);
+}
+
+/// Returns a pointer to the item on front of the list.
+template <class Item>
+Item
+List<Item>::Head() {
+    ASSERT(!IsEmpty());
+
+    return first->item;
 }
 
 template <class Item>
@@ -273,6 +288,18 @@ List<Item>::SortedPop(int *keyPtr) {
 
     delete element;
     return thing;
+}
+
+/// Returns the length of the list
+template <class Item>
+unsigned
+List<Item>::Length() {
+    unsigned length = 0;
+
+    for (ListNode* current = first; current; current = current->next)
+        length++;
+
+    return length;
 }
 
 #endif
