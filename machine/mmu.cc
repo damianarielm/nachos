@@ -153,7 +153,7 @@ MMU::RetrievePageEntry(unsigned vpn, TranslationEntry **entry) const {
         // Use the TLB.
 
         unsigned i;
-        for (entry = nullptr, i = 0; i < TLB_SIZE; i++)
+        for (i = 0; i < TLB_SIZE; i++)
             if (tlb[i].valid && tlb[i].virtualPage == vpn) {
                 *entry = &tlb[i];  // FOUND!
                 return NO_EXCEPTION;

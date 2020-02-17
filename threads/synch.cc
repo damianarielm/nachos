@@ -110,7 +110,9 @@ Lock::Release()
 
 bool
 Lock::IsHeldByCurrentThread() const
-{}
+{
+    return false; // TODO: complete...
+}
 
 Condition::Condition(const char *debugName, Lock *conditionLock)
 {}

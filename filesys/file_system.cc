@@ -167,6 +167,7 @@ FileSystem::~FileSystem() {
 bool
 FileSystem::Create(const char *name, unsigned initialSize) {
     ASSERT(name);
+    ASSERT(initialSize < MAX_FILE_SIZE);
     DEBUG('f', "Trying to create file %s, size %u.\n", name, initialSize);
 
     Directory  *directory;

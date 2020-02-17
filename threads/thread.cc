@@ -58,6 +58,11 @@ Thread::~Thread() {
 
     if (stack)
         DeallocBoundedArray((char *) stack, STACK_SIZE * sizeof *stack);
+
+#ifdef USER_PROGRAM
+    ASSERT(space);
+    delete space;
+#endif
 }
 
 /// Invoke `(*func)(arg)`, allowing caller and callee to execute

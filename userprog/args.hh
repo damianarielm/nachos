@@ -20,6 +20,7 @@
 char **SaveArgs(int address);
 
 /// Write command-line arguments into the stack memory of a user process.
+/// Returns the number of arguments.
 ///
 /// Considering two example arguments `hello` and `Nachos`, the resulting
 /// stack layout is as follows:
@@ -37,6 +38,6 @@ char **SaveArgs(int address);
 ///            -└───────────────────────┘
 ///
 /// * `args` is a kernel-space pointer to the start of an `argv`-like array.
-void WriteArgs(char **args);
+unsigned WriteArgs(char **args);
 
 #endif

@@ -69,7 +69,7 @@ FileHeader::Deallocate(Bitmap *freeMap) {
 /// * `sector` is the disk sector containing the file header.
 void
 FileHeader::FetchFrom(unsigned sector) {
-    synchDisk->ReadSector(sector, (char *) this);
+    synchDisk->ReadSector(sector, (char *) &raw);
 }
 
 /// Write the modified contents of the file header back to disk.
@@ -77,7 +77,7 @@ FileHeader::FetchFrom(unsigned sector) {
 /// * `sector` is the disk sector to contain the file header.
 void
 FileHeader::WriteBack(unsigned sector) {
-    synchDisk->WriteSector(sector, (char *) this);
+    synchDisk->WriteSector(sector, (char *) &raw);
 }
 
 /// Return which disk sector is storing a particular byte within the file.

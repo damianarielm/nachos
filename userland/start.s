@@ -89,6 +89,8 @@ Create:
         j       $31
         .end    Create
 
+        .globl  Remove
+        .ent    Remove
 Remove:
         addiu   $2, $0, SC_REMOVE
         syscall

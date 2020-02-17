@@ -16,6 +16,7 @@
 /// limitation of liability and disclaimer of warranty provisions.
 
 #include "file_system.hh"
+#include "raw_file_header.hh"
 #include "lib/utility.hh"
 #include "machine/disk.hh"
 #include "machine/statistics.hh"
@@ -101,14 +102,14 @@ Print(const char *name) {
 static const char FILE_NAME[] = "TestFile";
 static const char CONTENTS[] = "1234567890";
 static const unsigned CONTENT_SIZE = sizeof CONTENTS - 1;
-static const unsigned FILE_SIZE = CONTENT_SIZE * 5000;
+static const unsigned FILE_SIZE = MAX_FILE_SIZE - CONTENT_SIZE;
 
 static void
 FileWrite() {
     printf("Sequential write of %u byte file, in %u byte chunks.\n",
            FILE_SIZE, CONTENT_SIZE);
 
-    if (!fileSystem->Create(FILE_NAME, 0)) {
+    if (!fileSystem->Create(FILE_NAME, FILE_SIZE)) {
         fprintf(stderr, "Perf test: cannot create %s.\n", FILE_NAME);
         return;
     }
@@ -123,9 +124,13 @@ FileWrite() {
         int numBytes = openFile->Write(CONTENTS, CONTENT_SIZE);
         if (numBytes < 10) {
             fprintf(stderr, "Perf test: unable to write %s.\n", FILE_NAME);
-            break;
+
+            delete openFile;
+            return;
         }
     }
+
+    printf("Succeed.\n");
 
     delete openFile;
 }
@@ -146,9 +151,14 @@ FileRead() {
         int numBytes = openFile->Read(buffer, CONTENT_SIZE);
         if (numBytes < 10 || strncmp(buffer, CONTENTS, CONTENT_SIZE)) {
             printf("Perf test: unable to read %s.\n", FILE_NAME);
-            break;
+
+            delete openFile;
+            delete [] buffer;
+            return;
         }
     }
+
+    printf("Succeed.\n");
 
     delete [] buffer;
     delete openFile;

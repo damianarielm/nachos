@@ -3,7 +3,7 @@
 /// limitation of liability and disclaimer of warranty provisions.
 
 #include "transfer.hh"
-#include "machine/machine.h"
+#include "threads/system.hh"
 
 const unsigned MAX_ARG_COUNT  = 32;
 const unsigned MAX_ARG_LENGTH = 128;
@@ -39,7 +39,7 @@ SaveArgs(int address) {
     return ret;
 }
 
-void
+unsigned
 WriteArgs(char **args) {
     DEBUG('Y', "Writing command line arguments into child process.\n");
     ASSERT(args);
@@ -47,7 +47,7 @@ WriteArgs(char **args) {
     // Start writing the arguments where the current SP points.
     int args_address[MAX_ARG_COUNT];
     unsigned i;
-    int sp = machine->ReadRegister(StackReg);
+    int sp = machine->ReadRegister(STACK_REG);
     for (i = 0; i < MAX_ARG_COUNT; i++) {
         if (!args[i]) break;            // If the last was reached, terminate.
         sp -= strlen(args[i]) + 1;      // Decrease SP (leave one byte for \0).
@@ -67,6 +67,7 @@ WriteArgs(char **args) {
 
     sp -= 16;  // Make room for the “register saves”.
 
-    machine->WriteRegister(StackReg, sp);
+    machine->WriteRegister(STACK_REG, sp);
     delete args;  // Free the array.
+    return i;
 }
