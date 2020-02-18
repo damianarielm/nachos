@@ -12,37 +12,41 @@
 
 #include "system.hh"
 
-/// Loop 10 times, yielding the CPU to another ready thread each iteration.
-///
-/// * `name` points to a string with a thread name, just for debugging
-///   purposes.
+/// Loops yielding the CPU to another ready thread each iteration.
 void
-SimpleThread(void *name_) {
-    // Reinterpret arg `name` as a string.
-    char *name = (char *) name_;
-
+SimpleThread(void* args) {
     // If the lines dealing with interrupts are commented, the code will
     // behave incorrectly, because printf execution may cause race
     // conditions.
-    for (unsigned num = 0; num < 10; num++) {
-        printf("*** Thread %s is running: iteration %u.\n", name, num);
+    for (unsigned num = 0; num < * (unsigned*) args; num++) {
+        printf("*** Thread %s is running: iteration %u.\n",
+                currentThread->GetName(), num);
         currentThread->Yield();
     }
-    printf("!!! Thread %s has finished.\n", name);
+    printf("!!! Thread %s has finished.\n", currentThread->GetName());
 }
 
 /// Set up a ping-pong between several threads.
 ///
-/// Do it by launching ten threads which call `SimpleThread`, and finally
-/// calling `SimpleThread` ourselves.
+/// Do it by launching ten threads which call `SimpleThread`.
 void
 ThreadTest() {
-    DEBUG('t', "Starting thread test.\n");
+    char* name;
+    Thread* newThread;
+    unsigned* num = new unsigned;
 
-    char *name = new char [64];
-    strncpy(name, "2nd", 64);
-    Thread *newThread = new Thread(name);
-    newThread->Fork(SimpleThread, (void *) name);
+    printf("How many iterations: ");
+    scanf("%u", num);
 
-    SimpleThread((void *) "1st");
+    printf("Starting thread test.\n");
+
+    for (unsigned i = 0; i < 2; i++) {
+        name = new char [4];
+        sprintf(name, "%uº", i + 1);
+        newThread = new Thread(name);
+        printf("Starting thread %s.\n", name);
+        newThread->Fork(SimpleThread, num);
+    }
+
+    printf("End of thread test.\n");
 }
