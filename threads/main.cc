@@ -72,7 +72,7 @@
 
 // External functions used by this file.
 
-void ThreadTest();
+void Menu();
 void Copy(const char *unixFile, const char *nachosFile);
 void Print(const char *file);
 void PerformanceTest(void);
@@ -194,7 +194,7 @@ main(int argc, char **argv) {
     }
 
 #ifdef THREADS
-    ThreadTest();
+    Menu();
 #endif
 
     currentThread->Finish();
