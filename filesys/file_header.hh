@@ -32,6 +32,8 @@
 class FileHeader {
 public:
 
+    FileHeader(unsigned hdrSector, const char* fileName);
+
     /// Initialize a file header, including allocating space on disk for the
     /// file data.
     bool Allocate(Bitmap *bitMap, unsigned fileSize);
@@ -40,10 +42,10 @@ public:
     void Deallocate(Bitmap *bitMap);
 
     /// Initialize file header from disk.
-    void FetchFrom(unsigned sectorNumber);
+    void FetchFromDisk();
 
     /// Write modifications to file header back to disk.
-    void WriteBack(unsigned sectorNumber);
+    void WriteBack();
 
     /// Convert a byte offset into the file to the disk sector containing the
     /// byte.
@@ -61,7 +63,14 @@ public:
     /// system at a low level.
     const RawFileHeader *GetRaw() const;
 
+    /// Return the name of the file.
+    const char* GetName();
+
 private:
+    const char* name;
+
+    unsigned sector;
+
     RawFileHeader raw;
 };
 

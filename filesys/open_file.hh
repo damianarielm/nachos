@@ -89,7 +89,7 @@ class OpenFile {
 public:
 
     /// Open a file whose header is located at `sector` on the disk.
-    OpenFile(int sector);
+    OpenFile(int sector, const char* fileName);
 
     /// Close the file.
     ~OpenFile();

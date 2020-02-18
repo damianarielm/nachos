@@ -25,6 +25,12 @@
 #include "file_header.hh"
 #include "threads/system.hh"
 
+FileHeader::FileHeader(unsigned hdrSector, const char* fileName) {
+    sector = hdrSector;
+    name = fileName;
+    FetchFromDisk();
+}
+
 /// Initialize a fresh file header for a newly created file.  Allocate data
 /// blocks for the file out of the map of free disk blocks.  Return false if
 /// there are not enough free blocks to accomodate the new file.
@@ -33,7 +39,7 @@
 /// * `fileSize` is the bit map of free disk sectors.
 bool
 FileHeader::Allocate(Bitmap *freeMap, unsigned fileSize) {
-    DEBUG('f', "Trying to allocate %u bytes... ", fileSize);
+    DEBUG('f', "Trying to allocate %u bytes for file %s... ", fileSize, name);
     ASSERT(freeMap);
 
     raw.numBytes = fileSize;
@@ -55,7 +61,7 @@ FileHeader::Allocate(Bitmap *freeMap, unsigned fileSize) {
 /// * `freeMap` is the bit map of free disk sectors.
 void
 FileHeader::Deallocate(Bitmap *freeMap) {
-    DEBUG('f', "Deallocating %u bytes.\n", raw.numBytes);
+    DEBUG('f', "Deallocating %u bytes from file %s.\n", raw.numBytes, name);
     ASSERT(freeMap);
 
     for (unsigned i = 0; i < raw.numSectors; i++) {
@@ -68,7 +74,9 @@ FileHeader::Deallocate(Bitmap *freeMap) {
 ///
 /// * `sector` is the disk sector containing the file header.
 void
-FileHeader::FetchFrom(unsigned sector) {
+FileHeader::FetchFromDisk() {
+    DEBUG('F', "Reading header for %s from sector %u.\n", name, sector);
+
     synchDisk->ReadSector(sector, (char *) &raw);
 }
 
@@ -76,7 +84,9 @@ FileHeader::FetchFrom(unsigned sector) {
 ///
 /// * `sector` is the disk sector to contain the file header.
 void
-FileHeader::WriteBack(unsigned sector) {
+FileHeader::WriteBack() {
+    DEBUG('F', "Writing header of %s to sector %u.\n", name, sector);
+
     synchDisk->WriteSector(sector, (char *) &raw);
 }
 
@@ -122,4 +132,9 @@ FileHeader::Print() {
 const RawFileHeader *
 FileHeader::GetRaw() const {
     return &raw;
+}
+
+const char*
+FileHeader::GetName() {
+    return name;
 }

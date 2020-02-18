@@ -18,9 +18,8 @@
 /// memory while the file is open.
 ///
 /// * `sector` is the location on disk of the file header for this file.
-OpenFile::OpenFile(int sector) {
-    hdr = new FileHeader;
-    hdr->FetchFrom(sector);
+OpenFile::OpenFile(int sector, const char* fileName) {
+    hdr = new FileHeader(sector, fileName);
     seekPosition = 0;
 }
 
@@ -108,8 +107,8 @@ OpenFile::ReadAt(char *into, unsigned numBytes, unsigned position) {
     if (position >= fileLength) return 0;  // Check request.
     if (position + numBytes > fileLength) numBytes = fileLength - position;
 
-    DEBUG('F', "Reading %u bytes at %u, from file of length %u.\n",
-          numBytes, position, fileLength);
+    DEBUG('F', "Reading %u bytes at %u, from file %s.\n",
+            numBytes, position, hdr->GetName());
 
     firstSector = DivRoundDown(position, SECTOR_SIZE);
     lastSector = DivRoundDown(position + numBytes - 1, SECTOR_SIZE);
@@ -141,8 +140,8 @@ OpenFile::WriteAt(const char *from, unsigned numBytes, unsigned position) {
     if (position >= fileLength) return 0;  // Check request.
     if (position + numBytes > fileLength) numBytes = fileLength - position;
 
-    DEBUG('F', "Writing %u bytes at %u, from file of length %u.\n",
-          numBytes, position, fileLength);
+    DEBUG('F', "Writing %u bytes at %u, from file %s.\n",
+            numBytes, position, hdr->GetName());
 
     firstSector = DivRoundDown(position, SECTOR_SIZE);
     lastSector  = DivRoundDown(position + numBytes - 1, SECTOR_SIZE);

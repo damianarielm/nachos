@@ -135,9 +135,8 @@ void
 Directory::List() const {
     for (unsigned i = 0; i < raw.tableSize; i++)
         if (raw.table[i].inUse) {
-            FileHeader* hdr = new FileHeader;
+            FileHeader* hdr = new FileHeader(raw.table[i].sector, raw.table[i].name);
 
-            hdr->FetchFrom(raw.table[i].sector);
             printf("%s\t\t(%u bytes).\n", raw.table[i].name, hdr->FileLength());
 
             delete hdr;
@@ -154,8 +153,7 @@ Directory::Print() const {
             printf("Directory entry: %s. Header in sector %u.\n",
                    raw.table[i].name, raw.table[i].sector);
 
-            FileHeader *hdr = new FileHeader;
-            hdr->FetchFrom(raw.table[i].sector);
+            FileHeader* hdr = new FileHeader(raw.table[i].sector, raw.table[i].name);
             hdr->Print();
             delete hdr;
         }
