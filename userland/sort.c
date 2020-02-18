@@ -5,7 +5,7 @@
 /// Ideally, we could read the unsorted array off of the file system,
 /// and store the result back to the file system!
 
-#include "syscall.h"
+#include "stdio.h"
 
 #define DIM  1024
 
@@ -29,7 +29,7 @@ main(void) {
                 A[j + 1] = tmp;
             }
 
-    Write("Sorting finished.\n", 18, CONSOLE_OUTPUT);
+    print("Sorting finished.\n");
 
     // And then we're done -- should be 0!
     Exit(A[0]);

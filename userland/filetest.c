@@ -8,20 +8,20 @@
 /// procedure, but if you do this, you have to be careful to allocate a big
 /// enough stack to hold the automatics!
 
-#include "syscall.h"
+#include "stdio.h"
 
 int
 main(void) {
-    Write("Creating file test.txt.\n", 24, CONSOLE_OUTPUT);
+    print("Creating file test.txt.\n");
     Create("test.txt");
 
-    Write("Opening file test.txt.\n", 23, CONSOLE_OUTPUT);
+    print("Opening file test.txt.\n");
     OpenFileId o = Open("test.txt");
 
-    Write("Writing `Hello world` to file test.txt.\n", 40, CONSOLE_OUTPUT);
+    print("Writing `Hello world` to file test.txt.\n");
     Write("Hello world.\n", 13, o);
 
-    Write("Closing file test.txt.\n", 23, CONSOLE_OUTPUT);
+    print("Closing file test.txt.\n");
     Close(o);
     // Not reached.
 }

@@ -1,54 +1,11 @@
-#include "syscall.h"
+#include "stdio.h"
+#include "string.h"
 
 #define MAX_LINE_SIZE  60
 #define MAX_ARG_COUNT  32
 #define ARG_SEPARATOR  ' '
 
 #define NULL  ((void *) 0)
-
-static inline unsigned
-strlen(const char *s) {
-    // TO DO: how to make sure that `s` is not `NULL`?
-
-    unsigned i;
-    for (i = 0; s[i] != '\0'; i++);
-    return i;
-}
-
-static inline void
-WritePrompt(OpenFileId output) {
-    static const char PROMPT[] = "> ";
-    Write(PROMPT, sizeof PROMPT - 1, output);
-}
-
-static inline void
-WriteError(const char *description, OpenFileId output) {
-    // TO DO: how to make sure that `description` is not `NULL`?
-
-    static const char PREFIX[] = "Error: ";
-    static const char SUFFIX[] = "\n";
-
-    Write(PREFIX, sizeof PREFIX - 1, output);
-    Write(description, strlen(description), output);
-    Write(SUFFIX, sizeof SUFFIX - 1, output);
-}
-
-static unsigned
-ReadLine(char *buffer, unsigned size, OpenFileId input) {
-    // TO DO: how to make sure that `buffer` is not `NULL`?
-
-    unsigned i;
-
-    for (i = 0; i < size; i++) {
-        Read(&buffer[i], 1, input);
-        // TO DO: what happens when the input ends?
-        if (buffer[i] == '\n') {
-            buffer[i] = '\0';
-            break;
-        }
-    }
-    return i;
-}
 
 static int
 PrepareArguments(char *line, char **argv, unsigned argvSize) {
@@ -91,19 +48,17 @@ PrepareArguments(char *line, char **argv, unsigned argvSize) {
 
 int
 main(void) {
-    const OpenFileId INPUT  = CONSOLE_INPUT;
-    const OpenFileId OUTPUT = CONSOLE_OUTPUT;
     char             line[MAX_LINE_SIZE];
     char            *argv[MAX_ARG_COUNT];
 
     for (;;) {
-        WritePrompt(OUTPUT);
-        const unsigned lineSize = ReadLine(line, MAX_LINE_SIZE, INPUT);
-        if (lineSize == 0)
-            continue;
+        print("> ");
+        scan(line);
+        const unsigned lineSize = strlen(line);
+        if (!lineSize) Halt();
 
         if (PrepareArguments(line, argv, MAX_ARG_COUNT) == 0) {
-            WriteError("too many arguments.", OUTPUT);
+            print("Error: too many arguments.\n");
             continue;
         }
 

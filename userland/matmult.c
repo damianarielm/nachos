@@ -5,7 +5,8 @@
 /// Ideally, we could read the matrices off of the file system, and store the
 /// result back to the file system!
 
-#include "syscall.h"
+#include "stdio.h"
+#include "string.h"
 
 /// Sum total of the arrays does not fit in physical memory.
 #define DIM  20
@@ -13,6 +14,30 @@
 static int A[DIM][DIM];
 static int B[DIM][DIM];
 static int C[DIM][DIM];
+
+void printMatrix(int M[DIM][DIM]) {
+    char tmp[5];
+
+    print("┌ ");
+    for (int j = 0; j < DIM; j++) print("\t");
+    print("┐ ");
+    print("\n");
+
+    for (int i = 0; i < DIM; i++) {
+        print("│ ");
+        for (int j = 0; j < DIM; j++) {
+            itoa(tmp, M[i][j]);
+            print(tmp);
+            print("\t");
+        }
+        print("│\n");
+    }
+
+    print("└ ");
+    for (int j = 0; j < DIM; j++) print("\t");
+    print("┘ ");
+    print("\n");
+}
 
 int
 main(void) {
@@ -32,8 +57,13 @@ main(void) {
             for (k = 0; k < DIM; k++)
                 C[i][j] += A[i][k] * B[k][j];
 
-    Write("Multiplication finished.\n", 25, CONSOLE_OUTPUT);
+    print("Multiplication finished.\n");
 
     // And then we are done.
-    Exit(C[DIM - 1][DIM - 1]);
+
+    printMatrix(A);
+    printMatrix(B);
+    printMatrix(C);
+
+    Exit(0);
 }
