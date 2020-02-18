@@ -68,6 +68,7 @@ THREAD_SRC = ../threads/main.cc        \
              ../threads/menu.cc        \
              ../threads/thread_test.cc \
              ../threads/garden.cc      \
+             ../threads/prodcons.cc    \
              ../machine/interrupt.cc   \
              ../machine/.system_dep.cc \
              ../machine/statistics.cc  \
@@ -86,6 +87,7 @@ THREAD_OBJ = main.o        \
              menu.o        \
              thread_test.o \
              garden.o      \
+             prodcons.o    \
              interrupt.o   \
              statistics.o  \
              .system_dep.o \
