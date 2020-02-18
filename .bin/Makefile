@@ -26,7 +26,7 @@ CC     = gcc
 CFLAGS = -std=c99 -I./ -I../ $(HOST)
 LD     = gcc
 
-TARGETS = coff2noff coff2flat disassemble readnoff
+TARGETS = coff2noff #coff2flat disassemble readnoff
 
 .PHONY: all clean
 

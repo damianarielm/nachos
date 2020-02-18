@@ -3,7 +3,7 @@
 all: $(PROGRAM)
 
 clean:
-	$(RM) $(PROGRAM) $(OBJ_FILES) DISK
+	$(RM) $(PROGRAM) $(OBJ_FILES) Makefile.depends
 
 depend: $(SRC_FILES) $(HDR_FILES)
     # WARNING: this may break if the preprocessor outputs something, because

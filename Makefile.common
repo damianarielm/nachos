@@ -30,10 +30,16 @@
 CXXFLAGS = -std=c++11 -g -Wall -Wshadow $(INCLUDE_DIRS) $(DEFINES) $(HOST)
 LDFLAGS  =
 
+ifeq (, $(shell which ccache 2> /dev/null))
+    CCACHE =
+else
+    CCACHE = ccache
+endif
+
 # These definitions may change as the software is updated.
 # Some of them are also system dependent
-CXX = g++
-LD  = g++
+CXX = $(CCACHE) g++
+LD  = $(CCACHE) g++
 
 PROGRAM = nachos
 

@@ -55,4 +55,4 @@ start.o: start.s ../userprog/syscall.h
 
 $(PROGRAMS): %: %.o start.o
 	$(LD) $(LDFLAGS) start.o $*.o -o $*.coff
-	../.bin/coff2noff $*.coff $@
+	../.bin/coff2noff $*.coff $@ > /dev/null

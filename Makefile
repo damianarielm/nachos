@@ -3,45 +3,40 @@
 # All rights reserved.  See `copyright.h` for copyright notice and
 # limitation of liability and disclaimer of warranty provisions.
 
-MAKE = make
-LPR  = lpr
-SH   = bash
+MAKE   = make
+SH     = bash
+ITALIC = \e[3m
 
-.PHONY: all clean test print
+.PHONY: all clean
 
 all:
-	$(MAKE) -C threads depend
-	$(MAKE) -C threads all
-	$(MAKE) -C userprog depend
-	$(MAKE) -C userprog all
-	$(MAKE) -C vmem depend
-	$(MAKE) -C vmem all
-	$(MAKE) -C filesys depend
-	$(MAKE) -C filesys all
-	$(MAKE) -C .network depend
-	$(MAKE) -C .network all
-	$(MAKE) -C .bin
-	$(MAKE) -C userland
+	@echo -e "$(ITALIC)Making thread...\e[0m"
+	@$(MAKE) -s -C threads depend
+	@$(MAKE) -s -C threads all
+	@echo -e "$(ITALIC)Making userprog...\e[0m"
+	@$(MAKE) -s -C userprog depend
+	@$(MAKE) -s -C userprog all
+	@echo -e "$(ITALIC)Making vmem...\e[0m"
+	@$(MAKE) -s -C vmem depend
+	@$(MAKE) -s -C vmem all
+	@echo -e "$(ITALIC)Making filesys...\e[0m"
+	@$(MAKE) -s -C filesys depend
+	@$(MAKE) -s -C filesys all
+#	@echo -e "$(ITALIC)Making .network...\e[0m"
+#	@$(MAKE) -s -C .network depend
+#	@$(MAKE) -s -C .network all
+	@echo -e "$(ITALIC)Making .bin...\e[0m"
+	@$(MAKE) -s -C .bin
+	@echo -e "$(ITALIC)Making userland...\e[0m"
+	@$(MAKE) -s -C userland
 
 # Do not delete executables in `userland` in case there is no cross-compiler.
 clean:
-	$(MAKE) -C threads clean
-	$(MAKE) -C userprog clean
-	$(MAKE) -C vmem clean
-	$(MAKE) -C filesys clean
-	$(MAKE) -C .network clean
-	$(MAKE) -C .bin clean
-	$(MAKE) -C userland clean
-
-test:
-	@./tests/check.sh
-
-print:
-	$(SH) -c '$(LPR) Makefile* */Makefile                              \
-	                 threads/*.h threads/*.hh threads/*.cc threads/*.s \
-	                 userprog/*.h userprog/*.hh userprog/*.cc          \
-	                 filesys/*.hh filesys/*.cc                         \
-	                 .network/*.hh .network/*.cc                       \
-	                 machine/*.hh machine/*.cc                         \
-	                 bin/noff.h bin/coff.h bin/coff2noff.c             \
-	                 userland/*.h userland/*.c userland/*.s'
+	@echo -e "$(ITALIC)Cleaning all...\e[0m"
+	@$(MAKE) -s -C threads clean
+	@$(MAKE) -s -C userprog clean
+	@$(MAKE) -s -C vmem clean
+	@$(MAKE) -s -C filesys clean
+#	@$(MAKE) -s -C .network clean
+	@$(MAKE) -s -C .bin clean
+	@$(MAKE) -s -C userland clean
