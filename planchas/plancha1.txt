@@ -1,0 +1,148 @@
+1. ¿Cuanta memoria tiene la maquina simulada para Nachos?
+
+La constante MEMORY_SIZE determina el tamaño de la memoria.
+MEMORY_SIZE = NUM_PHYS_PAGES * PAGE_SIZE = 32 * SECTOR_SIZE = 32 * 128 = 4096 bytes.
+
+2. ¿Como cambiaria ese valor?
+
+Lo mas adecuado seria modificar el numero de paginas (NUM_PHYS_PAGES).
+
+3. ¿De que tamaño es un disco?
+El tamaño de un disco esta determinado por la cantidad de sectores que tiene.
+NUM_SECTORS = SECTORS_PER_TRACK * NUM_TRACKS = 32 * 32 = 1024.
+Por lo tanto el disco tiene NUM_SECTORS * SECTOR_SIZE = 131072 bytes de capacidad.
+
+4. ¿Cuantas instrucciones de MIPS simula Nachos?
+
+Pueden observarse 56 instrucciones simuladas en el fichero machine/.mips_sim.cc:
+* ADD     * ADDI  * ADDIU   * AADU   * AND     * ANDI  * BEQ     * BGEZAL
+* BGEZ    * BGTZ  * BLEZ    * BLTZAL * BLTZ    * BNE   * DIV     * DIVU
+* JAL     * J     * JALR    * JR     * LBU     * LHU   * LUI     * LW
+* LWL     * LWR   * MFHI    * MFLO   * MTHI    * MTLO  * MULT    * MULTU
+* NOR     * OR    * ORI     * SB     * SH      * SLL   * SLLV    * SLT
+* SLTI    * SLTIU * SLTU    * SRA    * SRAV    * SRL   * SRLV    * SUB
+* SUBU    * SW    * SWL     * SWR    * SYSCALL * XOR   * XORI    * UNIMP
+
+5. Explique el codigo que procesa la instruccion add.
+
+Suma los registros indicados en la instruccion y los guarda en el registro correspondiente,
+siempre que no haya desbordamiento en cuyo cazo lanza una excepcion.
+
+6. Nombre los archivos fuente en los que figuran las funciones y metodos llamados
+   por el main de nachos al ejecutarlo en el directorio threads (hasta dos niveles
+   de profundidad).
+
+* Initialize: threads/system.cc
+  - ASSERT: lib/utility.hh
+  - strcmp: C Library
+  - RandomInit: machine/.system_dep.cc
+  - aoti: C Library
+  - SetFlags: lib/debug.cc
+  - Timer: machine/timer.cc
+  - SetStatus: threads/thread.cc
+  - Enable: machine/interrupt.cc
+  - CallOnUserAbort: machine/.system_dep.cc
+  - SetUp: threads/.preemptive.cc
+* DEBUG: lib/utility.hh
+  - Print: lib/debug.cc
+* PrintVersion: threads/main.cc
+  - printf: C Library
+* ThreadTest: threads/thread_test.cc
+  - DEBUG: lib/utility.hh
+  - Fork: threads/thread.cc
+  - SimpleThread: threads/thread_test.cc
+* Finish: threads/thread.cc
+  - SetLevel: machine/interrupt.cc
+  - ASSERT: lib/utility.hh
+  - DEBUG: lib/utility.hh
+  - Sleep: threads/thread.cc
+
+7. ¿Por que se prefiere emular una CPU en vez de utilizar directamente la CPU existente?
+
+La arquitectura elegida es una arquitectura que no solo es mas simple que x86-64 sino que
+ademas, al emularla pueden ocultarse detalles de funcionamiento; logrando de esta manera
+simplificar la complejidad.
+
+8. ¿Que efecto hacen las macros ASSERT y DEBUG definidas en lib/utility.hh?
+
+ASSERT aborta el programa en caso de que una condicion no se cumpla.
+DEBUG se encarga de imprimir mensajes de depuracion. Verifica si una bandera esta
+habilitada y en tal caso muestra la informacion correspondiente.
+
+9. Comente el efecto de las distintas banderas de depuracion.
+
+Dichos efectos se encuentran explicados en lib/debug.hh:
+
+* '+': Todos los mensajes de depuracion.
+* 'n': Muestra numero de linea en los mensajes.
+* 'e': Hace una pausa entre mensajes.
+* 't': Mensajes sobre el sistema de threads.
+* 's': Mensajes sobre semaforos.
+* 'i': Mensajes sobre emulacion de interrupciones.
+* 'm': Mensajes sobre emulacion de la maquina.
+* 'd': Mensajes sobre emulacion del disco.
+* 'f': Mensajes sobre el sistema de archivos.
+* 'a': Mensajes sobre el espacio de direcciones.
+* 'k': Mensajes sobre emulacion de red.
+* 'y': Mensajes sobre llamadas a sistema.
+* 'r': Mensajes sobre multitarea apropiativa.
+
+10. ¿Donde estan definidas las constantes USER_PROGRAM, FILESYS_NEEDED, FILESYS_STUB
+    y NETWORK?
+
+Estan definidas en los archivos Makefile.
+
+11. ¿Cual es la diferencia entre las clases List y SynchList?
+
+La clase List define una lista simplemente enlazada normal.
+La clase SynchList es tambien la lista, pero solo puede ser accedida por un thread
+a la vez. Ademas si un thread intenta quitar un elemento de una lista vacia, debera
+esperar hasta que haya algun elemento.
+
+12. ¿En que archivos esta definida la funcion main? ¿En que archivo esta definida la
+    funcion main del ejecutable nachos del directorio userprog?
+
+Podemos averiguarlo mediante el comando `grep "main(" -rI .`:
+
+* threads/main.cc
+* userland/filetest.c
+* userland/sort.c
+* userland/matmult.c
+* userland/shell.c
+* userland/halt.c
+* userland/echo.c
+* userland/tiny_shell.c
+* .bin/fuse/nachosfuse.c
+* .bin/disasm.c
+* .bin/readnoff.c
+* .bin/coff2flat.c
+* .bin/main.c
+* .bin/out.c
+* .bin/coff2noff.c
+
+La funcion main del ejecutable del directorio userprog esta definida en el
+directorio threads.
+
+13. ¿Que linea de comandos soporta Nachos? ¿Que efecto hace la opcion -rs?
+
+La informacion respecto a la linea de comandos se encuentra en threads/main.cc:
+
+* -d: Activa banderas de depuracion.
+* -p: Activa la multitarea apropiativa.
+* -rs: Hace ocurrir `Yields` al azar, a partir de una semilla.
+* -i: Muestra informacion del sistema.
+* -z: Imprime la version.
+* -s: Ejecuta programas paso a paso.
+* -x: Ejecuta un programa de usuario.
+* -tc: Testea la consola.
+* -f: Formatea el disco fisico.
+* -F: Formatea el disco y escribe ceros.
+* -cp: Copia un archivo de UNIX a Nachos.
+* -pr: Imprime un archivo de Nachos por la salida estandar.
+* -rm: Borra un archivo del sistema de ficheros de Nachos.
+* -ls: Lista el contenido del directorio de Nachos.
+* -D: Imprime el contenido de todo el sistema de archivos.
+* -tf: Testea la perfomance del sistema de archivos.
+* -n: Setea la fiabilidad de la red.
+* -id: Setea el id de la maquina.
+* -tn: Ejecuta un testeo del software de red de Nachos.
