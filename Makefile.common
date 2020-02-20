@@ -68,6 +68,7 @@ THREAD_SRC = ../threads/main.cc        \
              ../threads/lock.cc        \
              ../threads/condition.cc   \
              ../threads/port.cc        \
+             ../threads/port_test.cc   \
              ../threads/system.cc      \
              ../threads/.switch.S      \
              ../threads/thread.cc      \
@@ -89,6 +90,7 @@ THREAD_OBJ = main.o        \
              lock.o        \
              condition.o   \
              port.o        \
+             port_test.o   \
              system.o      \
              thread.o      \
              debug.o       \
