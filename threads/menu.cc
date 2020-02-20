@@ -4,6 +4,7 @@ void ThreadTest();
 void Garden();
 void ProdCons();
 void PortTest();
+void InversionTest();
 
 void Menu() {
     unsigned opt;
@@ -12,6 +13,7 @@ void Menu() {
     printf("1 - Ornamental garden.\n");
     printf("2 - Producer/consumer.\n");
     printf("3 - Port test.\n");
+    printf("4 - Priority inversion.\n");
     printf("Enter an option: ");
     scanf("%u", &opt);
 
@@ -20,6 +22,7 @@ void Menu() {
         case 1: Garden(); break;
         case 2: ProdCons(); break;
         case 3: PortTest(); break;
+        case 4: InversionTest(); break;
         default: printf("Invalid option.\n");
     }
 }
