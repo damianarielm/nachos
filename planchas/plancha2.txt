@@ -1,0 +1,8 @@
+4. b) Explique (en un archivo de texto) por que no puede hacerse lo mismo con los
+      semaforos.
+
+Una diferencia importante entre un semaforo y un lock, es que el lock solo puede
+ser liberado por el mismo proceso que lo adquirio.
+En el caso de los semaforos, no es posible identificar cual de todos los procesos
+que lo comparten sera el que lo libera; razon por la cual no podemos subir su
+prioridad.
