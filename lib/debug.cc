@@ -114,4 +114,5 @@ Debug::Color(char flag) const {
 
     if (flag == 'l' || flag == 'L') fprintf(stderr, YELLOW);
     if (flag == 'c' || flag == 'C') fprintf(stderr, YELLOW);
+    if (flag == 'p' || flag == 'P') fprintf(stderr, YELLOW);
 }
