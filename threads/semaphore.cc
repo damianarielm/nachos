@@ -33,6 +33,8 @@ Semaphore::GetName() const {
 void
 Semaphore::P() {
     IntStatus oldLevel = interrupt->SetLevel(INT_OFF); // Disable interrupts.
+    DEBUG('s', "Thread `%s` doing " BOLD RED "P ", currentThread->GetName());
+    DEBUG_CONT('s', "on semaphore `%s` with value %d.\n", name, value);
 
     while (value == 0) {  // Semaphore not available.
         queue->Append(currentThread);  // So go to sleep.
@@ -51,6 +53,8 @@ Semaphore::P() {
 void
 Semaphore::V() {
     IntStatus oldLevel = interrupt->SetLevel(INT_OFF);
+    DEBUG('s', "Thread `%s` doing " BOLD GREEN "V ", currentThread->GetName());
+    DEBUG_CONT('s', "on semaphore `%s` with value %d.\n", name, value);
 
     Thread *thread = queue->Pop();
     if (thread)
