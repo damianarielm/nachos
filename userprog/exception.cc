@@ -106,15 +106,20 @@ SyscallHandler(ExceptionType _et) {
                 DEBUG_ERROR('y', "Error: address to filename string is null.\n");
             else if (size < 0)
                 DEBUG_ERROR('y', "Error: invalid size.\n");
-            else if (fd != CONSOLE_OUTPUT)
+            else if (fd < CONSOLE_OUTPUT)
                 DEBUG_ERROR('y', "Error: invalid file descriptor.\n");
+            else if (!currentThread->openFiles->HasKey(fd))
+                DEBUG_ERROR('y', "Error: file descriptor not opened.\n");
             else {
                 char towrite[size];
 
                 ReadBufferFromUser(stringAddr, towrite, size);
                 DEBUG('y', "String to write: %s.\n", towrite);
 
-                for (int i = 0; i < size; i++) synchConsole->PutChar(towrite[i]);
+                if (fd == CONSOLE_OUTPUT)
+                    for (int i = 0; i < size; i++) synchConsole->PutChar(towrite[i]);
+                else
+                    currentThread->openFiles->Get(fd)->Write(towrite, size);
             }
 
             break;
@@ -132,13 +137,19 @@ SyscallHandler(ExceptionType _et) {
                 DEBUG_ERROR('y', "Error: address to filename string is null.\n");
             else if (size < 0)
                 DEBUG_ERROR('y', "Error: invalid size.\n");
-            else if (fd != CONSOLE_INPUT)
+            else if (fd == CONSOLE_OUTPUT || fd < 0)
                 DEBUG_ERROR('y', "Error: invalid file descriptor.\n");
+            else if (!currentThread->openFiles->HasKey(fd))
+                DEBUG_ERROR('y', "Error: file descriptor not opened.\n");
             else {
                 char readed[size + 1];
 
-                for(i = 0; i < size; i++) readed[i] = synchConsole->GetChar();
-                readed[i--] = '\0';
+                if (fd == CONSOLE_INPUT) {
+                    for(i = 0; i < size; i++) readed[i] = synchConsole->GetChar();
+                    readed[i--] = '\0';
+                } else {
+                    i = currentThread->openFiles->Get(fd)->Read(readed, size);
+                }
 
                 WriteStringToUser(readed, usrAddr);
                 DEBUG('y', "String readed: %s. Size: %d\n", readed, i);
