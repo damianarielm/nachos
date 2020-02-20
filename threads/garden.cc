@@ -39,11 +39,16 @@ void Garden() {
     scanf("%d", &total);
 
     l = new Lock("Garden");
+    Thread* ts[turnstiles];
 
     for (int i = 0; i < turnstiles; i++) {
         char* name = new char[15];
         sprintf(name, "%s %d", "Turnstile", i);
-        Thread* newThread = new Thread(name, false);
-        newThread->Fork(Turnstile, nullptr);
+        ts[i] = new Thread(name, true);
+        ts[i]->Fork(Turnstile, nullptr);
     }
+
+    for (int i = 0; i < turnstiles; i++) ts[i]->Join();
+
+    printf("Total visitors: %d.\n", visitors);
 }
