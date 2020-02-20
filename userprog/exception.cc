@@ -80,15 +80,18 @@ SyscallHandler(ExceptionType _et) {
 
         case SC_CREATE: {
             int filenameAddr = machine->ReadRegister(4);
-            if (filenameAddr == 0)
-                DEBUG_ERROR('y', "Error: address to filename string is null.\n");
-
             char filename[FILE_NAME_MAX_LEN + 1];
-            if (!ReadStringFromUser(filenameAddr, filename, sizeof filename))
+
+            if (!filenameAddr)
+                DEBUG_ERROR('y', "Error: address to filename string is null.\n");
+            else if (!ReadStringFromUser(filenameAddr, filename, sizeof filename))
                 DEBUG_ERROR('y', "Error: filename string too long (maximum is %u bytes).\n",
                       FILE_NAME_MAX_LEN);
+            else if (!fileSystem->Create(filename, 0))
+                DEBUG_ERROR('y', "Error: cannot create file %s.\n", filename);
+            else
+                DEBUG('y', "File %s created.\n", filename);
 
-            DEBUG('y', "Open requested for file %s.\n", filename);
             break;
         }
 
