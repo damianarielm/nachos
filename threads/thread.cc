@@ -42,6 +42,7 @@ Thread::Thread(const char *threadName, bool join, unsigned startingPriority) {
     joinable = join;
     if (joinable) port = new Port(name);
     priority = startingPriority > MAX_PRIORITY ? MAX_PRIORITY : startingPriority;
+    oldPriority = priority;
 #ifdef USER_PROGRAM
     space    = nullptr;
 #endif
@@ -299,4 +300,14 @@ Thread::Join() {
 unsigned
 Thread::GetPriority() {
     return priority;
+}
+
+unsigned
+Thread::GetOldPriority() {
+    return oldPriority;
+}
+
+void
+Thread::SetPriority(unsigned newPriority) {
+    priority = newPriority;
 }

@@ -39,6 +39,9 @@ public:
     // Print contents of ready list.
     void Print();
 
+    /// Update the priority of a thread, moving it to the corresponding queue.
+    void UpdatePriority(Thread* thread);
+
 private:
 
     // Queue of threads that are ready to run, but not running.

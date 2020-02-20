@@ -128,6 +128,10 @@ public:
 
     unsigned GetPriority();
 
+    unsigned GetOldPriority();
+
+    void SetPriority(unsigned netPriority);
+
 private:
     // Some of the private data for this class is listed above.
 
@@ -154,6 +158,9 @@ private:
 
      /// Current priotity of the thread.
     unsigned priority;
+
+    /// Original priotity of the thread.
+    unsigned oldPriority;
 
 #ifdef USER_PROGRAM
     /// User-level CPU register state.

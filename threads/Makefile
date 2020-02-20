@@ -9,7 +9,7 @@
 # All rights reserved.  See `copyright.h` for copyright notice and
 # limitation of liability and disclaimer of warranty provisions.
 
-DEFINES      = -DTHREADS -DDFS_TICKS_FIX -DSEMAPHORE_TEST
+DEFINES      = -DTHREADS -DDFS_TICKS_FIX -DSEMAPHORE_TEST -DINVERSION
 INCLUDE_DIRS = -I.. -I../machine
 HDR_FILES    = $(THREAD_HDR)
 SRC_FILES    = $(THREAD_SRC)

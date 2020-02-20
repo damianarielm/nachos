@@ -141,3 +141,14 @@ Scheduler::Print() {
         printf("\n");
     }
 }
+
+void
+Scheduler::UpdatePriority(Thread* thread) {
+    for (unsigned i = 0; i <= MAX_PRIORITY; i++)
+        if (readyList[i]->Has(thread)) {
+            readyList[i]->Remove(thread);
+            readyList[thread->GetPriority()]->Append(thread);
+
+            return;
+        }
+}
