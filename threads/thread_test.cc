@@ -60,7 +60,7 @@ ThreadTest() {
     for (unsigned i = 0; i < threads; i++) {
         name = new char [4];
         sprintf(name, "%uº", i + 1);
-        newThread = new Thread(name);
+        newThread = new Thread(name, false);
         printf("Starting thread %s.\n", name);
         newThread->Fork(SimpleThread, num);
     }

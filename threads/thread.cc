@@ -34,11 +34,13 @@ IsThreadStatus(ThreadStatus s) {
 /// `Thread::Fork`.
 ///
 /// * `threadName` is an arbitrary string, useful for debugging.
-Thread::Thread(const char *threadName) {
+Thread::Thread(const char *threadName, bool join) {
     name     = threadName;
     stackTop = nullptr;
     stack    = nullptr;
     status   = JUST_CREATED;
+    joinable = join;
+    if (joinable) port = new Port(name);
 #ifdef USER_PROGRAM
     space    = nullptr;
 #endif
@@ -142,6 +144,8 @@ void
 Thread::Finish() {
     DEBUG('t', "Finishing thread %s.\n", GetName());
     ASSERT(this == currentThread);
+
+    if (joinable) port->Send(0);
 
     interrupt->SetLevel(INT_OFF);
     threadToBeDestroyed = currentThread;
@@ -283,3 +287,10 @@ Thread::RestoreUserState() {
 }
 
 #endif
+
+void
+Thread::Join() {
+    int dummy;
+
+    if (joinable) port->Receive(&dummy);
+}

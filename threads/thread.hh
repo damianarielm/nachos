@@ -39,6 +39,7 @@
 #define NACHOS_THREADS_THREAD__HH
 
 #include "lib/utility.hh"
+class Port;
 
 #ifdef USER_PROGRAM
 #include "machine/machine.hh"
@@ -92,7 +93,7 @@ private:
 public:
 
     /// Initialize a `Thread`.
-    Thread(const char *debugName);
+    Thread(const char *debugName, bool join);
 
     /// Deallocate a Thread.
     ///
@@ -123,6 +124,8 @@ public:
 
     void Print() const;
 
+    void Join();
+
 private:
     // Some of the private data for this class is listed above.
 
@@ -138,6 +141,14 @@ private:
 
     /// Allocate a stack for thread.  Used internally by `Fork`.
     void StackAllocate(VoidFunctionPtr func, void *arg);
+
+    /// True if this thread is going to be joined.
+    bool joinable;
+
+    /// Port to wait until somebody calls Join.
+    /// Note that a lock would not work becaus the thread acquiring it
+    /// is not the same that the thread releasing it.
+    Port* port;
 
 #ifdef USER_PROGRAM
     /// User-level CPU register state.

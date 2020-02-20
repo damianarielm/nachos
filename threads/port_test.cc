@@ -64,7 +64,7 @@ PortTest() {
     for (unsigned i = 1; i <= threads; i++) {
         char *name = new char [4];
         sprintf(name, "%u", i);
-        Thread *newThread = new Thread(name);
+        Thread *newThread = new Thread(name, false);
         newThread->Fork(PortThread, (void *) name);
     }
 }

@@ -43,7 +43,7 @@ void Garden() {
     for (int i = 0; i < turnstiles; i++) {
         char* name = new char[15];
         sprintf(name, "%s %d", "Turnstile", i);
-        Thread* newThread = new Thread(name);
+        Thread* newThread = new Thread(name, false);
         newThread->Fork(Turnstile, nullptr);
     }
 }
