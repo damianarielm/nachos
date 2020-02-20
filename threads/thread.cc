@@ -45,6 +45,9 @@ Thread::Thread(const char *threadName, bool join, unsigned startingPriority) {
     oldPriority = priority;
 #ifdef USER_PROGRAM
     space    = nullptr;
+    openFiles = new Table<OpenFile*>;
+    openFiles->Add(nullptr); //< CONSOLE_INPUT
+    openFiles->Add(nullptr); //< CONSOLE_OUTPUT
 #endif
 }
 
@@ -65,6 +68,11 @@ Thread::~Thread() {
 
 #ifdef USER_PROGRAM
     ASSERT(space);
+
+    for (unsigned i = 2; i < openFiles->SIZE; i++)
+        if (openFiles->HasKey(i))
+            delete openFiles->Remove(i);
+
     delete space;
 #endif
 }

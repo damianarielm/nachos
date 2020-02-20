@@ -148,9 +148,41 @@ SyscallHandler(ExceptionType _et) {
             break;
         }
 
+        case SC_OPEN: {
+            int filenameAddr = machine->ReadRegister(4);
+            DEBUG('y', "Open request. Filename address: %d.\n", filenameAddr);
+
+            char filename[FILE_NAME_MAX_LEN + 1];
+            OpenFile *o;
+            machine->WriteRegister(2, -1);
+            if (!filenameAddr)
+                DEBUG_ERROR('y', "Error: address to filename string is null.\n");
+            else if (!ReadStringFromUser(filenameAddr, filename, sizeof filename))
+                DEBUG_ERROR('y', "Error: filename string too long.\n");
+            else if ((o = fileSystem->Open(filename)) == nullptr)
+                DEBUG_ERROR('y', "Error: cannot open file `%s`.\n", filename);
+            else {
+                int fd = currentThread->openFiles->Add(o);
+                DEBUG('y', "File %s opened. Assigned Fd: %d.\n", filename, fd);
+                machine->WriteRegister(2, fd);
+            }
+
+            break;
+        }
+
         case SC_CLOSE: {
             int fid = machine->ReadRegister(4);
             DEBUG('y', "Close requested for id %u.\n", fid);
+
+            if (fid < 0)
+                DEBUG_ERROR('y', "Error: invalid file descriptor.\n");
+            else if (!currentThread->openFiles->HasKey(fid))
+                DEBUG_ERROR('y', "Error: file descriptor not opened.\n");
+            else {
+                currentThread->openFiles->Remove(fid);
+                DEBUG('y', "File closed.\n");
+            }
+
             break;
         }
 
