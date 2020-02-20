@@ -10,6 +10,7 @@
 
 #include "address_space.hh"
 #include "machine/console.hh"
+#include "userprog/synch_console.hh"
 #include "threads/synch.hh"
 #include "threads/system.hh"
 
@@ -77,6 +78,21 @@ ConsoleTest(const char *in, const char *out) {
         char ch = console->GetChar();
         console->PutChar(ch);  // Echo it!
         writeDone->P();        // Wait for write to finish.
+        if (ch == 'q') return;  // If `q`, then quit.
+    }
+}
+
+/// Test the synch console by echoing characters typed at the input onto the
+/// output.
+///
+/// Stop when the user types a `q`.
+void
+SynchConsoleTest() {
+    synchConsole = new SynchConsole();
+
+    for (;;) {
+        char ch = synchConsole->GetChar();
+        synchConsole->PutChar(ch);  // Echo it!
         if (ch == 'q') return;  // If `q`, then quit.
     }
 }

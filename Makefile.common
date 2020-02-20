@@ -116,6 +116,7 @@ USERPROG_HDR = ../userprog/address_space.hh             \
                ../filesys/open_file.hh                  \
                ../lib/bitmap.hh                         \
                ../machine/console.hh                    \
+               ../userprog/synch_console.hh             \
                ../machine/.encoding.hh                  \
                ../machine/.endianness.hh                \
                ../machine/.exception_type.hh            \
@@ -132,6 +133,7 @@ USERPROG_SRC = ../userprog/address_space.cc             \
                ../userprog/transfer.cc                  \
                ../lib/bitmap.cc                         \
                ../machine/console.cc                    \
+               ../userprog/synch_console.cc             \
                ../machine/.encoding.cc                  \
                ../machine/.endianness.cc                \
                ../machine/.exception_type.cc            \
@@ -148,6 +150,7 @@ USERPROG_OBJ = address_space.o             \
                .exception_type.o           \
                prog_test.o                 \
                console.o                   \
+               synch_console.o             \
                .encoding.o                 \
                .endianness.o               \
                .instruction.o              \

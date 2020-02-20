@@ -33,6 +33,7 @@
 /// * `-s`  -- causes user programs to be executed in single-step mode.
 /// * `-x`  -- runs a user program.
 /// * `-tc` -- tests the console.
+/// * `-sc` -- tests the synch console.
 ///
 /// *FILESYS* options
 /// -----------------
@@ -78,6 +79,7 @@ void Print(const char *file);
 void PerformanceTest(void);
 void StartProcess(const char *file);
 void ConsoleTest(const char *in, const char *out);
+void SynchConsoleTest();
 void MailTest(int networkID);
 
 static inline void
@@ -144,6 +146,7 @@ main(int argc, char **argv) {
 #ifdef USER_PROGRAM
         if (!strcmp(*argv, "-x")) {          // Run a user program.
             ASSERT(argc > 1);
+            synchConsole = new SynchConsole();
             StartProcess(*(argv + 1));
             argCount = 2;
         } else if (!strcmp(*argv, "-tc")) {  // Test the console.
@@ -154,6 +157,11 @@ main(int argc, char **argv) {
                 ConsoleTest(*(argv + 1), *(argv + 2));
                 argCount = 3;
             }
+            interrupt->Halt();  // Once we start the console, then Nachos
+                                // will loop forever waiting for console
+                                // input.
+        } else if (!strcmp(*argv, "-sc")) {  // Test the console.
+            SynchConsoleTest();
             interrupt->Halt();  // Once we start the console, then Nachos
                                 // will loop forever waiting for console
                                 // input.
