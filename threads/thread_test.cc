@@ -71,7 +71,7 @@ ThreadTest() {
     for (unsigned i = 0; i < threads; i++) {
         name = new char [4];
         sprintf(name, "%uº", i + 1);
-        ts[i] = new Thread(name, b);
+        ts[i] = new Thread(name, b, Random() % (MAX_PRIORITY + 1));
         printf("Starting thread %s.\n", name);
         ts[i]->Fork(SimpleThread, num);
     }

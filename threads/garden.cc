@@ -44,7 +44,7 @@ void Garden() {
     for (int i = 0; i < turnstiles; i++) {
         char* name = new char[15];
         sprintf(name, "%s %d", "Turnstile", i);
-        ts[i] = new Thread(name, true);
+        ts[i] = new Thread(name, true, Random() % (MAX_PRIORITY + 1));
         ts[i]->Fork(Turnstile, nullptr);
     }
 

@@ -93,7 +93,7 @@ private:
 public:
 
     /// Initialize a `Thread`.
-    Thread(const char *debugName, bool join);
+    Thread(const char *debugName, bool join, unsigned startingPriority);
 
     /// Deallocate a Thread.
     ///
@@ -126,6 +126,8 @@ public:
 
     void Join();
 
+    unsigned GetPriority();
+
 private:
     // Some of the private data for this class is listed above.
 
@@ -149,6 +151,9 @@ private:
     /// Note that a lock would not work becaus the thread acquiring it
     /// is not the same that the thread releasing it.
     Port* port;
+
+     /// Current priotity of the thread.
+    unsigned priority;
 
 #ifdef USER_PROGRAM
     /// User-level CPU register state.

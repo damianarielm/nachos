@@ -101,14 +101,14 @@ void ProdCons() {
     for (int i = 1; i <= ps; i++) {
         char *name = new char[10];
         sprintf(name, "%s %d", "Producer", i);
-        Thread *t = new Thread(name, false);
+        Thread *t = new Thread(name, false, Random() % (MAX_PRIORITY + 1));
         t->Fork(productor, nullptr);
     }
 
     for (int i = 1; i <= cs; i++) {
         char *name = new char[10];
         sprintf(name, "%s %d", "Consumer", i);
-        Thread *t = new Thread(name, false);
+        Thread *t = new Thread(name, false, Random() % (MAX_PRIORITY + 1));
         t->Fork(consumidor, nullptr);
     }
 }
