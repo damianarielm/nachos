@@ -45,9 +45,9 @@ SimpleThread(void* args) {
 void
 ThreadTest() {
     char* name;
-    Thread* newThread;
     unsigned* num = new unsigned;
     unsigned threads = 5;
+    static unsigned j, b;
 
     printf("How many iterations: ");
     scanf("%u", num);
@@ -55,15 +55,28 @@ ThreadTest() {
     printf("How may threads: ");
     scanf("%u", &threads);
 
+    printf("0 - Not joinable threads.\n");
+    printf("1 - Joinable threads.\n");
+    printf("Enter a number: ");
+    scanf("%d", &b);
+
+    printf("0 - Do not join threads.\n");
+    printf("1 - Join threads.\n");
+    printf("Enter a number: ");
+    scanf("%d", &j);
+
     printf("Starting thread test.\n");
 
+    Thread* ts[threads];
     for (unsigned i = 0; i < threads; i++) {
         name = new char [4];
         sprintf(name, "%uº", i + 1);
-        newThread = new Thread(name, false);
+        ts[i] = new Thread(name, b);
         printf("Starting thread %s.\n", name);
-        newThread->Fork(SimpleThread, num);
+        ts[i]->Fork(SimpleThread, num);
     }
+
+    if (j) for (unsigned i = 0; i < threads; i++) ts[i]->Join();
 
     printf("End of thread test.\n");
 }
