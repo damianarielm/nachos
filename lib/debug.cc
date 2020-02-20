@@ -111,4 +111,6 @@ Debug::Color(char flag) const {
     if (flag == 'd' || flag == 'D') fprintf(stderr, GREEN);
     if (flag == 'f' || flag == 'F') fprintf(stderr, BRIGHT_BLUE);
     if (flag == 'a' || flag == 'A') fprintf(stderr, MAGENTA);
+
+    if (flag == 'l' || flag == 'L') fprintf(stderr, YELLOW);
 }

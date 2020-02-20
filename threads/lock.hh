@@ -40,4 +40,7 @@ private:
     const char *name;
 
     // Add other needed fields here.
+    Thread* owner;
+
+    Semaphore* semaphore;
 };
