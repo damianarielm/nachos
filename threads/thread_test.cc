@@ -34,13 +34,17 @@ ThreadTest() {
     char* name;
     Thread* newThread;
     unsigned* num = new unsigned;
+    unsigned threads = 5;
 
     printf("How many iterations: ");
     scanf("%u", num);
 
+    printf("How may threads: ");
+    scanf("%u", &threads);
+
     printf("Starting thread test.\n");
 
-    for (unsigned i = 0; i < 2; i++) {
+    for (unsigned i = 0; i < threads; i++) {
         name = new char [4];
         sprintf(name, "%uº", i + 1);
         newThread = new Thread(name);
