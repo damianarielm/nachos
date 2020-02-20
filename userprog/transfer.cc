@@ -18,4 +18,25 @@ bool ReadStringFromUser(int userAddress, char *outString, unsigned maxByteCount)
     return *(outString - 1) == '\0';
 }
 
-// TODO: complete...
+void ReadBufferFromUser(int userAddress, char *outBuffer, unsigned byteCount) {
+    ASSERT(userAddress != 0);
+    ASSERT(outBuffer);
+
+    for (; byteCount--; outBuffer++)
+        ASSERT(machine->ReadMem(userAddress++, 1, (int*) outBuffer));
+}
+
+void WriteBufferToUser(int userAddress, const char *buffer, unsigned byteCount) {
+    ASSERT(userAddress != 0);
+    ASSERT(buffer);
+
+    for (; byteCount--; buffer++)
+        ASSERT(machine->WriteMem(userAddress++, 1, *buffer));
+}
+
+void WriteStringToUser(const char *string, int userAddress) {
+    ASSERT(string);
+
+    for (; *string; string++)
+        ASSERT(machine->WriteMem(userAddress++, 1, *string));
+}
