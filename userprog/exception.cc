@@ -95,6 +95,59 @@ SyscallHandler(ExceptionType _et) {
             break;
         }
 
+        case SC_WRITE: {
+            int stringAddr = machine->ReadRegister(4);
+            int size = machine->ReadRegister(5);
+            OpenFileId fd = machine->ReadRegister(6);
+            DEBUG('y', "Write request. String addres: %d; Size: %d, Fd: %d.\n",
+                    stringAddr, size, fd);
+
+            if (!stringAddr)
+                DEBUG_ERROR('y', "Error: address to filename string is null.\n");
+            else if (size < 0)
+                DEBUG_ERROR('y', "Error: invalid size.\n");
+            else if (fd != CONSOLE_OUTPUT)
+                DEBUG_ERROR('y', "Error: invalid file descriptor.\n");
+            else {
+                char towrite[size];
+
+                ReadBufferFromUser(stringAddr, towrite, size);
+                DEBUG('y', "String to write: %s.\n", towrite);
+
+                for (int i = 0; i < size; i++) synchConsole->PutChar(towrite[i]);
+            }
+
+            break;
+        }
+
+        case SC_READ: {
+            int usrAddr = machine->ReadRegister(4);
+            int size = machine->ReadRegister(5);
+            OpenFileId fd = machine->ReadRegister(6);
+            DEBUG('y', "Read request. User address: %d, Size: %d, Fd: %d.\n",
+                  usrAddr, size, fd);
+
+            int i;
+            if (!usrAddr)
+                DEBUG_ERROR('y', "Error: address to filename string is null.\n");
+            else if (size < 0)
+                DEBUG_ERROR('y', "Error: invalid size.\n");
+            else if (fd != CONSOLE_INPUT)
+                DEBUG_ERROR('y', "Error: invalid file descriptor.\n");
+            else {
+                char readed[size + 1];
+
+                for(i = 0; i < size; i++) readed[i] = synchConsole->GetChar();
+                readed[i--] = '\0';
+
+                WriteStringToUser(readed, usrAddr);
+                DEBUG('y', "String readed: %s. Size: %d\n", readed, i);
+            }
+            machine->WriteRegister(2, i);
+
+            break;
+        }
+
         case SC_CLOSE: {
             int fid = machine->ReadRegister(4);
             DEBUG('y', "Close requested for id %u.\n", fid);
