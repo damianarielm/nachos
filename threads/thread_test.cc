@@ -12,9 +12,18 @@
 
 #include "system.hh"
 
+#ifdef SEMAPHORE_TEST
+#include "synch.hh"
+Semaphore* semaphore = new Semaphore("Ejercicio 15", 3);
+#endif
+
 /// Loops yielding the CPU to another ready thread each iteration.
 void
 SimpleThread(void* args) {
+#ifdef SEMAPHORE_TEST
+    semaphore->P();
+#endif
+
     // If the lines dealing with interrupts are commented, the code will
     // behave incorrectly, because printf execution may cause race
     // conditions.
@@ -24,6 +33,10 @@ SimpleThread(void* args) {
         currentThread->Yield();
     }
     printf("!!! Thread %s has finished.\n", currentThread->GetName());
+
+#ifdef SEMAPHORE_TEST
+    semaphore->V();
+#endif
 }
 
 /// Set up a ping-pong between several threads.
