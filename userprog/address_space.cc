@@ -41,19 +41,28 @@ AddressSpace::AddressSpace(OpenFile *executable) {
     // How big is address space?
     unsigned size = codeSize + initDataSize + uninitDataSize + USER_STACK_SIZE;
       // We need to increase the size to leave room for the stack.
+
     numPages = DivRoundUp(size, PAGE_SIZE);
     size = numPages * PAGE_SIZE;
 
     DEBUG('a', "Initializing address space, num pages %u, size %u.\n", numPages, size);
+
+    // Check we are not trying to run anything too big -- at least until we have virtual memory.
+#ifdef MULTIPROGRAMMING
+    ASSERT(numPages <= memMap->CountClear());
+#else
     ASSERT(numPages <= NUM_PHYS_PAGES);
-      // Check we are not trying to run anything too big -- at least until we have virtual memory.
+#endif
 
     // First, set up the translation.
     pageTable = new TranslationEntry[numPages];
     for (unsigned i = 0; i < numPages; i++) {
         pageTable[i].virtualPage  = i;
-          // For now, virtual page number = physical page number.
+#ifdef MULTIPROGRAMMING
+        pageTable[i].physicalPage = memMap->Find();
+#else
         pageTable[i].physicalPage = i;
+#endif
         pageTable[i].valid        = true;
         pageTable[i].use          = false;
         pageTable[i].dirty        = false;
@@ -64,18 +73,44 @@ AddressSpace::AddressSpace(OpenFile *executable) {
 
     char *mainMemory = machine->GetMMU()->mainMemory;
 
+#ifndef MULTIPROGRAMMING
     // Zero out the entire address space, to zero the unitialized data
     // segment and the stack segment.
     memset(mainMemory, 0, size);
+#endif
 
-    // Then, copy in the code and data segments into memory.
+    // Copy in the code and data segments into memory.
     if (codeSize > 0) {
-        DEBUG('a', "Initializing code segment, size %u\n", codeSize);
+        DEBUG('a', "Initializing code segment. Num pages: %u; Size: %u.\n",
+                codeSize / PAGE_SIZE, codeSize);
+#ifndef MULTIPROGRAMMING
         executable->ReadAt(&(mainMemory[codeVirtualAddr]), codeSize, codeInFileAddr);
+#else
+        for (unsigned i = 0; i < codeSize; i++) {
+            int realAddr = Translate(codeVirtualAddr + i);
+
+            DEBUG('a', "Writing byte %d from virtual adress 0x%X to real addres 0x%X.\n",
+                    i, codeVirtualAddr + i, realAddr);
+
+            executable->ReadAt(&(mainMemory[realAddr]), 1, codeInFileAddr + i);
+        }
+#endif
     }
     if (initDataSize > 0) {
-        DEBUG('a', "Initializing data segment, size %u\n", initDataSize);
+        DEBUG('a', "Initializing data segment. Num pages: %u; Size: %u.\n",
+                initDataSize / PAGE_SIZE, initDataSize);
+#ifndef MULTIPROGRAMMING
         executable->ReadAt(&(mainMemory[initDataVirtualAddr]), initDataSize, initDataInFileAddr);
+#else
+        for (unsigned i = 0; i < initDataSize; i++) {
+            int realAddr = Translate(initDataVirtualAddr + i);
+
+            DEBUG('a', "Writing byte %d from virtual adress 0x%X to real addres 0x%X.\n",
+                    i, codeVirtualAddr + i, realAddr);
+
+            executable->ReadAt(&(mainMemory[realAddr]), 1, initDataInFileAddr + i);
+        }
+#endif
     }
 }
 
@@ -83,6 +118,15 @@ AddressSpace::AddressSpace(OpenFile *executable) {
 ///
 /// Nothing for now!
 AddressSpace::~AddressSpace() {
+#ifdef MULTIPROGRAMMING
+    for (unsigned i = 0; i < numPages; i++) {
+        unsigned physicalPage = pageTable[i].physicalPage;
+
+        memMap->Clear(physicalPage);
+        memset(&machine->GetMMU()->mainMemory[physicalPage * PAGE_SIZE], 0, PAGE_SIZE);
+    }
+#endif
+
     delete [] pageTable;
 }
 
@@ -107,7 +151,6 @@ AddressSpace::InitRegisters() {
     // allocated the stack; but subtract off a bit, to make sure we do not
     // accidentally reference off the end!
     machine->WriteRegister(STACK_REG, numPages * PAGE_SIZE - 16);
-
     DEBUG('a', "Initializing stack register to %u.\n", numPages * PAGE_SIZE - 16);
 }
 
@@ -127,4 +170,14 @@ void
 AddressSpace::RestoreState() {
     machine->GetMMU()->pageTable     = pageTable;
     machine->GetMMU()->pageTableSize = numPages;
+}
+
+/// Given a virtual address, returns the real address in memory.
+int
+AddressSpace::Translate(int virtualAddr) {
+    int page   = virtualAddr / PAGE_SIZE;
+    int offset = virtualAddr % PAGE_SIZE;
+    int frame  = pageTable[page].physicalPage;
+
+    return frame * PAGE_SIZE + offset;
 }

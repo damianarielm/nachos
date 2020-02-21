@@ -36,6 +36,11 @@ extern Timer *timer;                 ///< The hardware alarm clock.
 extern Machine *machine;  // User program memory and registers.
 extern SynchConsole* synchConsole;
 extern Table<Thread*> *threadTable;
+
+    #ifdef MULTIPROGRAMMING
+    #include "lib/bitmap.hh"
+    extern Bitmap *memMap;
+    #endif
 #endif
 
 #ifdef FILESYS_NEEDED  // *FILESYS* or *FILESYS_STUB*.

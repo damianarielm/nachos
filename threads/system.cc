@@ -41,6 +41,9 @@ SynchDisk *synchDisk;
 Machine *machine;  ///< User program memory and registers.
 SynchConsole* synchConsole;
 Table<Thread*> *threadTable;
+    #ifdef MULTIPROGRAMMING
+    Bitmap *memMap;
+    #endif
 #endif
 
 #ifdef NETWORK
@@ -181,6 +184,9 @@ Initialize(int argc, char **argv) {
 #ifdef USER_PROGRAM
     Debugger *d = debugUserProg ? new Debugger : nullptr;
     machine = new Machine(d);  // This must come first.
+    #ifdef MULTIPROGRAMMING
+    memMap = new Bitmap(NUM_PHYS_PAGES);
+    #endif
     SetExceptionHandlers();
 #endif
 
@@ -212,6 +218,9 @@ Cleanup() {
 #ifdef USER_PROGRAM
     delete machine;
     delete synchConsole;
+    #ifdef MULTIPROGRAMMING
+    delete memMap;
+    #endif
 #endif
 
 #ifdef FILESYS_NEEDED
