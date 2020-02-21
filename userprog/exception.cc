@@ -26,6 +26,13 @@
 #include "filesys/directory_entry.hh"
 #include "threads/system.hh"
 
+void Forker(void* args) {
+    currentThread->space->InitRegisters();
+    currentThread->space->RestoreState();
+
+    machine->Run();
+}
+
 static void
 IncrementPC() {
     unsigned pc;
@@ -214,6 +221,33 @@ SyscallHandler(ExceptionType _et) {
                 DEBUG_ERROR('y', "Error: invalid PID.\n");
             else
                 machine->WriteRegister(2, threadTable->Get(threadId)->Join());
+
+            break;
+        }
+
+        case SC_EXEC: {
+#ifdef MULTIPROGRAMMING
+            int filenameAddr = machine->ReadRegister(4);
+            DEBUG('y', "Exec requested. Filename address: %d.\n", filenameAddr);
+
+            char* filename = new char[FILE_NAME_MAX_LEN + 1];
+            OpenFile *o;
+            if (!filenameAddr)
+                DEBUG_ERROR('y', "Error: address to filename string is null.\n");
+            else if (!ReadStringFromUser(filenameAddr, filename, sizeof filename * FILE_NAME_MAX_LEN))
+                DEBUG_ERROR('y', "Error: filename string too long.\n");
+            else if ((o = fileSystem->Open(filename)) == nullptr)
+                DEBUG_ERROR('y', "Error: cannot open file %s.\n", filename);
+            else {
+                Thread *t = new Thread(filename, true, currentThread->GetPriority());
+                t->space = new AddressSpace(o);
+                t->Fork(Forker, nullptr);
+
+                machine->WriteRegister(2, t->threadId);
+            }
+#else
+            DEBUG_ERROR('y', "Error: this machine doesn't support multiprogramming.\n");
+#endif
 
             break;
         }
