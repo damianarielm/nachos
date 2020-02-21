@@ -260,6 +260,23 @@ SyscallHandler(ExceptionType _et) {
             break;
         }
 
+        case SC_REMOVE: {
+            int filenameAddr = machine->ReadRegister(4);
+            char filename[FILE_NAME_MAX_LEN + 1];
+
+            if (!filenameAddr)
+                DEBUG_ERROR('y', "Error: address to filename string is null.\n");
+            else if (!ReadStringFromUser(filenameAddr, filename, sizeof filename))
+                DEBUG_ERROR('y', "Error: filename string too long (maximum is %u bytes).\n",
+                      FILE_NAME_MAX_LEN);
+            else if (!fileSystem->Remove(filename))
+                DEBUG_ERROR('y', "Error: cannot remove file %s.\n", filename);
+            else
+                DEBUG('y', "File %s deleted.\n", filename);
+
+            break;
+        }
+
         default:
             fprintf(stderr, "Unexpected system call: id %d.\n", scid);
             ASSERT(false);
