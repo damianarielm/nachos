@@ -197,6 +197,15 @@ SyscallHandler(ExceptionType _et) {
             break;
         }
 
+        case SC_EXIT: {
+            int status = machine->ReadRegister(4);
+            DEBUG('y', "Exiting with status: %d.\n", status);
+
+            currentThread->Finish(status);
+
+            break;
+        }
+
         default:
             fprintf(stderr, "Unexpected system call: id %d.\n", scid);
             ASSERT(false);

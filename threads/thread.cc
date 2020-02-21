@@ -151,11 +151,11 @@ Thread::Print() const {
 /// NOTE: we disable interrupts, so that we do not get a time slice between
 /// setting `threadToBeDestroyed`, and going to sleep.
 void
-Thread::Finish() {
-    DEBUG('t', "Finishing thread %s.\n", GetName());
+Thread::Finish(int value) {
+    DEBUG('t', "Finishing thread %s with value %d.\n", GetName(), value);
     ASSERT(this == currentThread);
 
-    if (joinable) port->Send(0);
+    if (joinable) port->Send(value);
 
     interrupt->SetLevel(INT_OFF);
     threadToBeDestroyed = currentThread;
@@ -229,7 +229,7 @@ Thread::Sleep() {
 /// can pass a pointer to), that then simply calls the member function.
 static void
 ThreadFinish() {
-    currentThread->Finish();
+    currentThread->Finish(0);
 }
 
 static void
@@ -298,11 +298,13 @@ Thread::RestoreUserState() {
 
 #endif
 
-void
+int
 Thread::Join() {
-    int dummy;
+    int value;
 
-    if (joinable) port->Receive(&dummy);
+    if (joinable) port->Receive(&value);
+
+    return value;
 }
 
 unsigned

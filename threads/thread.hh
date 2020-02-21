@@ -114,7 +114,7 @@ public:
     void Sleep();
 
     /// The thread is done executing.
-    void Finish();
+    void Finish(int value);
 
     /// Check if thread has overflowed its stack.
     void CheckOverflow() const;
@@ -125,7 +125,7 @@ public:
 
     void Print() const;
 
-    void Join();
+    int Join();
 
     unsigned GetPriority();
 
