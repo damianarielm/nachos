@@ -30,12 +30,18 @@ Statistics::Print() {
         printf("WARNING: the tick counter was reset %lu times; the following"
                " statistics may be invalid.\n\n", tickResets);
 #endif
+    int numMemoryTrys = numPageFaults + numPageHits;
+
     printf("Ticks: total %u, idle %u, system %u, user %u.\n",
            totalTicks, idleTicks, systemTicks, userTicks);
     printf("Disk I/O: reads %u, writes %u.\n", numDiskReads, numDiskWrites);
     printf("Console I/O: reads %u, writes %u.\n",
            numConsoleCharsRead, numConsoleCharsWritten);
-    printf("Paging: faults %u.\n", numPageFaults);
+    printf("Memory: reads %u, writes %u, trys %u.\n",
+            numMemoryReads, numMemoryWrites, numMemoryTrys);
+    printf("Paging: faults %u, hits %u, total %u, ratio %f.\n",
+            numPageFaults, numPageHits, numMemoryTrys,
+            (double) numPageHits / (double) numMemoryTrys);
     printf("Network I/O: packets received %u, sent %u.\n",
            numPacketsRecvd, numPacketsSent);
 }

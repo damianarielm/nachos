@@ -168,8 +168,14 @@ AddressSpace::SaveState()
 /// For now, tell the machine where to find the page table.
 void
 AddressSpace::RestoreState() {
+#ifndef USE_TLB
     machine->GetMMU()->pageTable     = pageTable;
     machine->GetMMU()->pageTableSize = numPages;
+#else
+    DEBUG('b', "Emptying TLB.\n");
+    for (unsigned i = 0; i < TLB_SIZE; i++)
+        machine->GetMMU()->tlb[i].valid = false;
+#endif
 }
 
 /// Given a virtual address, returns the real address in memory.

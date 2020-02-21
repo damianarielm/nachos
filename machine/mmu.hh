@@ -75,6 +75,8 @@ public:
 
     void PrintTLB() const;
 
+    void TLBLoadEntry(TranslationEntry* entry);
+
 private:
 
     /// Retrieve a page entry either from a page table or the TLB.
@@ -87,6 +89,8 @@ private:
     /// completed.
     ExceptionType Translate(unsigned virtAddr, unsigned *physAddr,
                             unsigned size, bool writing);
+
+    unsigned tlbIdx;
 };
 
 #endif

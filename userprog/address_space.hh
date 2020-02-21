@@ -42,10 +42,10 @@ public:
     /// Given a virtual address, returns the real address in memory.
     int Translate(int virtualAddr);
 
-private:
-
     /// Assume linear page table translation for now!
     TranslationEntry *pageTable;
+
+private:
 
     /// Number of pages in the virtual address space.
     unsigned numPages;

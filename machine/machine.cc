@@ -86,6 +86,8 @@ Machine::ReadMem(unsigned addr, unsigned size, int *value) {
         return false;
     }
 
+    stats->numMemoryReads++;
+    stats->numPageHits++;
     return true;
 }
 
@@ -98,6 +100,8 @@ Machine::WriteMem(unsigned addr, unsigned size, int value) {
         return false;
     }
 
+    stats->numMemoryWrites++;
+    stats->numPageHits++;
     return true;
 }
 

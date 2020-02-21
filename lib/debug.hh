@@ -23,6 +23,7 @@
 /// * `l` -- locks.
 /// * `c` -- condition variables.
 /// * `p` -- ports.
+/// * `b` -- tlb.
 ///
 /// Copyright (c) 1992-1993 The Regents of the University of California.
 ///               2016-2018 Docentes de la Universidad Nacional de Rosario.

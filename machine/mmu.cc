@@ -241,3 +241,16 @@ MMU::PrintTLB() const {
                     i, tlb[i].virtualPage, tlb[i].physicalPage, tlb[i].valid,
                     tlb[i].readOnly, tlb[i].use, tlb[i].dirty);
 }
+
+void
+MMU::TLBLoadEntry(TranslationEntry* entry) {
+    tlb[tlbIdx].virtualPage  = entry->virtualPage;
+    tlb[tlbIdx].physicalPage = entry->physicalPage;
+    tlb[tlbIdx].valid        = entry->valid;
+    tlb[tlbIdx].readOnly     = entry->readOnly;
+    tlb[tlbIdx].use          = entry->use;
+    tlb[tlbIdx].dirty        = entry->dirty;
+
+    tlbIdx++;
+    tlbIdx %= TLB_SIZE;
+}
