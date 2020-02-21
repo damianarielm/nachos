@@ -11,7 +11,7 @@
 # limitation of liability and disclaimer of warranty provisions.
 
 DEFINES      = -DUSER_PROGRAM -DFILESYS_NEEDED -DFILESYS_STUB \
-               -DDFS_TICKS_FIX -DMULTIPROGRAMMING
+               -DDFS_TICKS_FIX -DMULTIPROGRAMMING -DTIME_SLICING
 INCLUDE_DIRS = -I.. -I../bin -I../filesys -I../threads -I../machine
 HDR_FILES    = $(THREAD_HDR) $(USERPROG_HDR)
 SRC_FILES    = $(THREAD_SRC) $(USERPROG_SRC)

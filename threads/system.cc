@@ -163,6 +163,10 @@ Initialize(int argc, char **argv) {
     scheduler = new Scheduler;  // Initialize the ready queue.
     if (randomYield)            // Start the timer (if needed).
         timer = new Timer(TimerInterruptHandler, 0, randomYield);
+#ifdef TIME_SLICING
+    else
+        timer = new Timer(TimerInterruptHandler, 0, false);
+#endif
 
     threadToBeDestroyed = nullptr;
 
