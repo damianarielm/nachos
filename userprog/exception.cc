@@ -206,6 +206,18 @@ SyscallHandler(ExceptionType _et) {
             break;
         }
 
+        case SC_JOIN: {
+            int threadId = machine->ReadRegister(4);
+            DEBUG('y', "Join requested. PID: %d.\n", threadId);
+
+            if (threadId < 0 || !threadTable->HasKey(threadId))
+                DEBUG_ERROR('y', "Error: invalid PID.\n");
+            else
+                machine->WriteRegister(2, threadTable->Get(threadId)->Join());
+
+            break;
+        }
+
         default:
             fprintf(stderr, "Unexpected system call: id %d.\n", scid);
             ASSERT(false);

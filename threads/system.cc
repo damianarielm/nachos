@@ -40,6 +40,7 @@ SynchDisk *synchDisk;
 #ifdef USER_PROGRAM  // Requires either *FILESYS* or *FILESYS_STUB*.
 Machine *machine;  ///< User program memory and registers.
 SynchConsole* synchConsole;
+Table<Thread*> *threadTable;
 #endif
 
 #ifdef NETWORK
@@ -94,6 +95,7 @@ Initialize(int argc, char **argv) {
 
 #ifdef USER_PROGRAM
     bool debugUserProg = false;  // Single step user program.
+    threadTable = new Table<Thread*>();
 #endif
 #ifdef FILESYS_NEEDED
     unsigned format = false;  // Format disk.

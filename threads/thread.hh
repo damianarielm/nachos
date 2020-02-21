@@ -184,6 +184,9 @@ public:
 
     // Table of opened files by this thread.
     Table<OpenFile*> *openFiles;
+
+    // Process Id.
+    int threadId;
 #endif
 };
 

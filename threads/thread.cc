@@ -45,6 +45,7 @@ Thread::Thread(const char *threadName, bool join, unsigned startingPriority) {
     oldPriority = priority;
 #ifdef USER_PROGRAM
     space    = nullptr;
+    threadId  = threadTable->Add(this);
     openFiles = new Table<OpenFile*>;
     openFiles->Add(nullptr); //< CONSOLE_INPUT
     openFiles->Add(nullptr); //< CONSOLE_OUTPUT
@@ -73,6 +74,7 @@ Thread::~Thread() {
         if (openFiles->HasKey(i))
             delete openFiles->Remove(i);
 
+    threadTable->Remove(threadId);
     delete space;
 #endif
 }
