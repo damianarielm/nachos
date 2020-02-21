@@ -8,7 +8,7 @@ int main(void) {
         scan(buffer);
 
         if (buffer[0]) {
-            SpaceId newProc = Exec(buffer);
+            SpaceId newProc = Exec(buffer, (char**) "", 1);
             Join(newProc);
         }
     }

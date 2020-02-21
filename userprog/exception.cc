@@ -25,10 +25,16 @@
 #include "syscall.h"
 #include "filesys/directory_entry.hh"
 #include "threads/system.hh"
+#include "userprog/args.hh"
 
 void Forker(void* args) {
     currentThread->space->InitRegisters();
     currentThread->space->RestoreState();
+
+    if (args) {
+        machine->WriteRegister(4, WriteArgs((char**) args));
+        machine->WriteRegister(5, machine->ReadRegister(STACK_REG) + 16);
+    }
 
     machine->Run();
 }
@@ -228,6 +234,8 @@ SyscallHandler(ExceptionType _et) {
         case SC_EXEC: {
 #ifdef MULTIPROGRAMMING
             int filenameAddr = machine->ReadRegister(4);
+            char** args = SaveArgs(machine->ReadRegister(5));
+            int join = machine->ReadRegister(6);
             DEBUG('y', "Exec requested. Filename address: %d.\n", filenameAddr);
 
             char* filename = new char[FILE_NAME_MAX_LEN + 1];
@@ -239,9 +247,9 @@ SyscallHandler(ExceptionType _et) {
             else if ((o = fileSystem->Open(filename)) == nullptr)
                 DEBUG_ERROR('y', "Error: cannot open file %s.\n", filename);
             else {
-                Thread *t = new Thread(filename, true, currentThread->GetPriority());
+                Thread *t = new Thread(filename, join, currentThread->GetPriority());
                 t->space = new AddressSpace(o);
-                t->Fork(Forker, nullptr);
+                t->Fork(Forker, args);
 
                 machine->WriteRegister(2, t->threadId);
             }
