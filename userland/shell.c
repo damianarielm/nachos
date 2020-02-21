@@ -20,6 +20,7 @@ PrepareArguments(char *line, char **argv, unsigned argvSize) {
 
     argv[0] = line;
     argCount = 1;
+    int join = (line[0] == '&') ? 0 : 1;
 
     // Traverse the whole line and replace spaces between arguments by null
     // characters, so as to be able to treat each argument as a standalone
@@ -36,20 +37,21 @@ PrepareArguments(char *line, char **argv, unsigned argvSize) {
                 // The maximum of allowed arguments is exceeded, and
                 // therefore the size of `argv` is too.  Note that 1 is
                 // decreased in order to leave space for the NULL at the end.
-                return 0;
+                return -1;
             line[i] = '\0';
             argv[argCount] = &line[i + 1];
             argCount++;
         }
 
     argv[argCount] = NULL;
-    return 1;
+    return join;
 }
 
 int
 main(void) {
     char             line[MAX_LINE_SIZE];
     char            *argv[MAX_ARG_COUNT];
+    int join;
 
     for (;;) {
         print("> ");
@@ -57,7 +59,7 @@ main(void) {
         const unsigned lineSize = strlen(line);
         if (!lineSize) Halt();
 
-        if (PrepareArguments(line, argv, MAX_ARG_COUNT) == 0) {
+        if ((join = PrepareArguments(line, argv, MAX_ARG_COUNT)) == -1) {
             print("Error: too many arguments.\n");
             continue;
         }
@@ -65,12 +67,13 @@ main(void) {
         // Comment and uncomment according to whether command line arguments
         // are given in the system call or not.
         //const SpaceId newProc = Exec(line);
-        const SpaceId newProc = Exec(line, argv, 1);
+        if (!join) for (int i = 0; i < strlen(line); i++) line[i] = line[i + 1];
+        const SpaceId newProc = Exec(line, argv, join);
 
         // TO DO: check for errors when calling `Exec`; this depends on how
         //        errors are reported.
 
-        Join(newProc);
+        if (!join) Join(newProc);
         // TO DO: is it necessary to check for errors after `Join` too, or
         //        can you be sure that, with the implementation of the system
         //        call handler you made, it will never give an error?; what
