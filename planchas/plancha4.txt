@@ -1,0 +1,27 @@
+2. Calcule el porcentaje de aciertos ("hit ratio") de la TLB (al menos para dos
+   programas razonablemente grandes). Vea como se modifica este porcentaje al agregar
+   mas entradas a la TLB (32 entradas = MIPS R2000, 64 = MIPS R4000). ¿Que tamaño
+   sugerir ́ıa para la TLB?
+
+2 entradas:
+matmult: 87.02%
+sort:    82.77%
+
+4 entradas:
+matmult: 93.38%
+sort:    94.47%
+
+8 entradas:
+matmult: 97.03%
+sort:    99.92%
+
+16 entradas:
+matmult: 97.89%
+sort:    99.95%
+
+32 entradas:
+matmult: 98.52%
+sort:    99.98%
+
+Teniendo en cuenta que el crecimiento del ratio parece ser logaritmico y que el
+costo del hardware debe ser alto, un tamaño de 8 entradas parece ser apropiado.
