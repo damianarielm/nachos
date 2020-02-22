@@ -42,6 +42,10 @@ Statistics::Print() {
     printf("Paging: faults %u, hits %u, total %u, ratio %f.\n",
             numPageFaults, numPageHits, numMemoryTrys,
             (double) numPageHits / (double) numMemoryTrys);
+#ifdef PAGINATION
+    printf("Swapping: loaded pages %u, swapped pages %u.\n",
+            numLoadedPages, numSwappedPages);
+#endif
     printf("Network I/O: packets received %u, sent %u.\n",
            numPacketsRecvd, numPacketsSent);
 }

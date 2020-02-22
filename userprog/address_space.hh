@@ -26,7 +26,7 @@ public:
     /// the file `executable`.
     ///
     /// * `executable` is the open file that corresponds to the program.
-    AddressSpace(OpenFile *executable);
+    AddressSpace(OpenFile *executable, Thread* thread);
 
     /// De-allocate an address space.
     ~AddressSpace();
@@ -47,6 +47,14 @@ public:
     unsigned LoadPage(unsigned virtualPage);
 #endif
 
+#ifdef PAGINATION
+    /// Removes a pgae from memory and swap it if needed.
+    void RemovePage();
+
+    /// Writes a page to the swap file.
+    void SwapPage(unsigned virtualPage);
+#endif
+
     /// Assume linear page table translation for now!
     TranslationEntry *pageTable;
 
@@ -58,6 +66,11 @@ private:
 #ifdef DEMAND_LOADING
     /// Executable file.
     OpenFile* file;
+#endif
+
+#ifdef PAGINATION
+    /// Swap file.
+    OpenFile* swapFile;
 #endif
 
     // Code segment information.

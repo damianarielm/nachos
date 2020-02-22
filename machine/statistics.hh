@@ -55,6 +55,14 @@ public:
     /// Number of virtual memory page faults.
     unsigned numPageFaults;
 
+#ifdef PAGINATION
+    /// Number of loaded pages.
+    unsigned numLoadedPages;
+
+    /// Number of swapped pages.
+    unsigned numSwappedPages;
+#endif
+
     /// Number of packets sent over the network.
     unsigned numPacketsSent;
 

@@ -19,8 +19,17 @@
 #include ".bin/noff.h"
 #include "machine/.endianness.hh"
 #include "threads/system.hh"
+#include "filesys/directory_entry.hh"
 
 #ifdef DEMAND_LOADING
+    #ifndef MULTIPROGRAMMING
+        #error Compilation flags set not supported.
+    #endif
+#endif
+#ifdef PAGINATION
+    #ifndef DEMAND_LOADING
+        #error Compilation flags set not supported.
+    #endif
     #ifndef MULTIPROGRAMMING
         #error Compilation flags set not supported.
     #endif
@@ -39,7 +48,7 @@
 ///
 /// * `executable` is the file containing the object code to load into
 ///   memory.
-AddressSpace::AddressSpace(OpenFile *executable) {
+AddressSpace::AddressSpace(OpenFile *executable, Thread* thread) {
     ASSERT(executable);
 
     InitSegments(); // Initialize segments metadata.
@@ -54,11 +63,22 @@ AddressSpace::AddressSpace(OpenFile *executable) {
     numPages = DivRoundUp(size, PAGE_SIZE);
     size = numPages * PAGE_SIZE;
 
+#ifdef PAGINATION
+    // Initialize swap file.
+    char swapFileName[FILE_NAME_MAX_LEN];
+    snprintf(swapFileName, FILE_NAME_MAX_LEN, "SWAP.%u", thread->threadId);
+    fileSystem->Remove(swapFileName);
+    fileSystem->Create(swapFileName, size);
+    swapFile = fileSystem->Open(swapFileName);
+#endif
+
     DEBUG('a', "Initializing address space, num pages %u, size %u.\n", numPages, size);
 
     // Check we are not trying to run anything too big -- at least until we have virtual memory.
 #ifdef MULTIPROGRAMMING
+    #ifndef DEMAND_LOADING
     ASSERT(numPages <= memMap->CountClear());
+    #endif
 #else
     ASSERT(numPages <= NUM_PHYS_PAGES);
 #endif
@@ -181,8 +201,13 @@ AddressSpace::InitRegisters() {
 ///
 /// For now, nothing!
 void
-AddressSpace::SaveState()
-{}
+AddressSpace::SaveState() {
+#ifdef PAGINATION
+    DEBUG('b', "Saving TLB.\n");
+    for (unsigned i = 0; i < TLB_SIZE; i++)
+        machine->GetMMU()->TLBSaveEntry(i);
+#endif
+}
 
 /// On a context switch, restore the machine state so that this address space
 /// can run.
@@ -214,16 +239,71 @@ AddressSpace::Translate(int virtualAddr) {
 unsigned
 AddressSpace::LoadPage(unsigned virtualPage) {
     int physicalFrame = memMap->Find();
+    #ifdef PAGINATION
+    if (physicalFrame == -1) {
+        DEBUG_ERROR('w', "No room for virtual page %u. ", virtualPage);
+        RemovePage();
+        physicalFrame = memMap->Find();
+    }
+    #endif
     int realAddr = physicalFrame * PAGE_SIZE;
     char* mainMemory = machine->GetMMU()->mainMemory;
-    DEBUG('a', "Loading virtual page %u on physical frame %u.\n",
+    DEBUG('a', "Loading virtual page %u on physical frame %u",
             virtualPage, physicalFrame);
     ASSERT(physicalFrame != -1);
 
     memset(&(mainMemory[realAddr]), 0, PAGE_SIZE);
+    #ifndef PAGINATION
     file->ReadAt(&(mainMemory[realAddr]), PAGE_SIZE, codeInFileAddr +
                                                      virtualPage * PAGE_SIZE);
+    #else
+    if (!pageTable[virtualPage].dirty) {
+        DEBUG_CONT('a', " from executalbe");
+        file->ReadAt(&(mainMemory[realAddr]), PAGE_SIZE, codeInFileAddr +
+                                                         virtualPage * PAGE_SIZE);
+    } else {
+        DEBUG_CONT('a', " from swap");
+        swapFile->ReadAt(&(mainMemory[realAddr]), PAGE_SIZE, virtualPage * PAGE_SIZE);
+    }
+
+    stats->numLoadedPages++;
+    #endif
+    DEBUG_CONT('a', ".\n");
 
     return physicalFrame;
 }
+
+    #ifdef PAGINATION
+void
+AddressSpace::RemovePage() {
+    unsigned physicalFrame = machine->GetMMU()->ChooseFrame();
+    unsigned virtualPage   = memMap->coreMap[physicalFrame].virtualPage;
+    Thread* thread         = memMap->coreMap[physicalFrame].thread;
+    DEBUG_CONT_ERROR('w', "Removing physical frame %d.\n", physicalFrame);
+
+    TranslationEntry* tlb = machine->GetMMU()->tlb;
+
+    // Invalidates tlb and page talbe entries.
+    for (unsigned i = 0; i < TLB_SIZE; i++)
+        if (tlb[i].physicalPage == physicalFrame && tlb[i].valid)
+            machine->GetMMU()->TLBSaveEntry(i);
+    thread->space->pageTable[virtualPage].virtualPage = thread->space->numPages + 1;
+
+    // If it's a dirty page, swap it on disk.
+    if (thread->space->pageTable[virtualPage].dirty)
+        thread->space->SwapPage(virtualPage);
+
+    memMap->Clear(physicalFrame);
+}
+
+void
+AddressSpace::SwapPage(unsigned virtualPage) {
+    DEBUG('W', "Writing virtual page %u on disk.\n", virtualPage);
+
+    unsigned physicalAddress = pageTable[virtualPage].physicalPage * PAGE_SIZE;
+    char* mainMemory = machine->GetMMU()->mainMemory;
+    swapFile->WriteAt(&mainMemory[physicalAddress], PAGE_SIZE, virtualPage * PAGE_SIZE);
+    stats->numSwappedPages++;
+}
+    #endif
 #endif

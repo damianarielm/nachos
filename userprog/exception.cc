@@ -248,7 +248,7 @@ SyscallHandler(ExceptionType _et) {
                 DEBUG_ERROR('y', "Error: cannot open file %s.\n", filename);
             else {
                 Thread *t = new Thread(filename, join, currentThread->GetPriority());
-                t->space = new AddressSpace(o);
+                t->space = new AddressSpace(o, t);
                 t->Fork(Forker, args);
 
                 machine->WriteRegister(2, t->threadId);
@@ -303,6 +303,11 @@ PageFaultHandler(ExceptionType et) {
     if (entry->virtualPage == currentThread->space->numPages + 1) {
         entry->physicalPage = currentThread->space->LoadPage(virtualPage);
         entry->virtualPage = virtualPage;
+
+    #ifdef PAGINATION
+        memMap->coreMap[entry->physicalPage].thread = currentThread;
+        memMap->coreMap[entry->physicalPage].virtualPage = virtualPage;
+    #endif
     }
 #endif
 
