@@ -298,6 +298,14 @@ PageFaultHandler(ExceptionType et) {
 
     entry->valid = true;
 
+#ifdef DEMAND_LOADING
+    // Not in memory.
+    if (entry->virtualPage == currentThread->space->numPages + 1) {
+        entry->physicalPage = currentThread->space->LoadPage(virtualPage);
+        entry->virtualPage = virtualPage;
+    }
+#endif
+
     machine->GetMMU()->TLBLoadEntry(entry);
 }
 

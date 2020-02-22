@@ -20,6 +20,12 @@
 #include "machine/.endianness.hh"
 #include "threads/system.hh"
 
+#ifdef DEMAND_LOADING
+    #ifndef MULTIPROGRAMMING
+        #error Compilation flags set not supported.
+    #endif
+#endif
+
 /// Create an address space to run a user program.
 ///
 /// Load the program from a file `executable`, and set everything up so that
@@ -37,6 +43,9 @@ AddressSpace::AddressSpace(OpenFile *executable) {
     ASSERT(executable);
 
     InitSegments(); // Initialize segments metadata.
+#ifdef DEMAND_LOADING
+    file = executable;
+#endif
 
     // How big is address space?
     unsigned size = codeSize + initDataSize + uninitDataSize + USER_STACK_SIZE;
@@ -57,9 +66,15 @@ AddressSpace::AddressSpace(OpenFile *executable) {
     // First, set up the translation.
     pageTable = new TranslationEntry[numPages];
     for (unsigned i = 0; i < numPages; i++) {
+#ifdef DEMAND_LOADING
+        pageTable[i].virtualPage  = numPages + 1; // Not on memory.
+#else
         pageTable[i].virtualPage  = i;
+#endif
 #ifdef MULTIPROGRAMMING
+    #ifndef DEMAND_LOADING
         pageTable[i].physicalPage = memMap->Find();
+    #endif
 #else
         pageTable[i].physicalPage = i;
 #endif
@@ -71,7 +86,9 @@ AddressSpace::AddressSpace(OpenFile *executable) {
           // set its pages to be read-only.
     }
 
+#ifndef DEMAND_LOADING
     char *mainMemory = machine->GetMMU()->mainMemory;
+#endif
 
 #ifndef MULTIPROGRAMMING
     // Zero out the entire address space, to zero the unitialized data
@@ -79,13 +96,14 @@ AddressSpace::AddressSpace(OpenFile *executable) {
     memset(mainMemory, 0, size);
 #endif
 
+#ifndef DEMAND_LOADING
     // Copy in the code and data segments into memory.
     if (codeSize > 0) {
         DEBUG('a', "Initializing code segment. Num pages: %u; Size: %u.\n",
                 codeSize / PAGE_SIZE, codeSize);
-#ifndef MULTIPROGRAMMING
+    #ifndef MULTIPROGRAMMING
         executable->ReadAt(&(mainMemory[codeVirtualAddr]), codeSize, codeInFileAddr);
-#else
+    #else
         for (unsigned i = 0; i < codeSize; i++) {
             int realAddr = Translate(codeVirtualAddr + i);
 
@@ -94,14 +112,14 @@ AddressSpace::AddressSpace(OpenFile *executable) {
 
             executable->ReadAt(&(mainMemory[realAddr]), 1, codeInFileAddr + i);
         }
-#endif
+    #endif
     }
     if (initDataSize > 0) {
         DEBUG('a', "Initializing data segment. Num pages: %u; Size: %u.\n",
                 initDataSize / PAGE_SIZE, initDataSize);
-#ifndef MULTIPROGRAMMING
+    #ifndef MULTIPROGRAMMING
         executable->ReadAt(&(mainMemory[initDataVirtualAddr]), initDataSize, initDataInFileAddr);
-#else
+    #else
         for (unsigned i = 0; i < initDataSize; i++) {
             int realAddr = Translate(initDataVirtualAddr + i);
 
@@ -110,8 +128,9 @@ AddressSpace::AddressSpace(OpenFile *executable) {
 
             executable->ReadAt(&(mainMemory[realAddr]), 1, initDataInFileAddr + i);
         }
-#endif
+    #endif
     }
+#endif
 }
 
 /// Deallocate an address space.
@@ -120,6 +139,9 @@ AddressSpace::AddressSpace(OpenFile *executable) {
 AddressSpace::~AddressSpace() {
 #ifdef MULTIPROGRAMMING
     for (unsigned i = 0; i < numPages; i++) {
+    #ifdef DEMAND_LOADING
+        if (pageTable[i].virtualPage == numPages + 1) continue; // Not on memory.
+    #endif
         unsigned physicalPage = pageTable[i].physicalPage;
 
         memMap->Clear(physicalPage);
@@ -187,3 +209,21 @@ AddressSpace::Translate(int virtualAddr) {
 
     return frame * PAGE_SIZE + offset;
 }
+
+#ifdef DEMAND_LOADING
+unsigned
+AddressSpace::LoadPage(unsigned virtualPage) {
+    int physicalFrame = memMap->Find();
+    int realAddr = physicalFrame * PAGE_SIZE;
+    char* mainMemory = machine->GetMMU()->mainMemory;
+    DEBUG('a', "Loading virtual page %u on physical frame %u.\n",
+            virtualPage, physicalFrame);
+    ASSERT(physicalFrame != -1);
+
+    memset(&(mainMemory[realAddr]), 0, PAGE_SIZE);
+    file->ReadAt(&(mainMemory[realAddr]), PAGE_SIZE, codeInFileAddr +
+                                                     virtualPage * PAGE_SIZE);
+
+    return physicalFrame;
+}
+#endif

@@ -42,13 +42,23 @@ public:
     /// Given a virtual address, returns the real address in memory.
     int Translate(int virtualAddr);
 
+#ifdef DEMAND_LOADING
+    /// Load the virtual page in memory. Returns the physical frame.
+    unsigned LoadPage(unsigned virtualPage);
+#endif
+
     /// Assume linear page table translation for now!
     TranslationEntry *pageTable;
 
-private:
-
     /// Number of pages in the virtual address space.
     unsigned numPages;
+
+private:
+
+#ifdef DEMAND_LOADING
+    /// Executable file.
+    OpenFile* file;
+#endif
 
     // Code segment information.
     uint32_t codeSize;        /// Size of the code segment.
