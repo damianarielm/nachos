@@ -77,6 +77,12 @@ public:
 
     void TLBLoadEntry(TranslationEntry* entry);
 
+#ifdef PAGINATION
+    void TLBSaveEntry(unsigned index);
+
+    unsigned ChooseFrame();
+#endif
+
 private:
 
     /// Retrieve a page entry either from a page table or the TLB.

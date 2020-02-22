@@ -29,6 +29,7 @@
 
 #include "mmu.hh"
 #include ".endianness.hh"
+#include "threads/system.hh"
 
 MMU::MMU() {
     mainMemory = new char [MEMORY_SIZE];
@@ -244,6 +245,9 @@ MMU::PrintTLB() const {
 
 void
 MMU::TLBLoadEntry(TranslationEntry* entry) {
+#ifdef PAGINATION
+    TLBSaveEntry(tlbIdx);
+#endif
     tlb[tlbIdx].virtualPage  = entry->virtualPage;
     tlb[tlbIdx].physicalPage = entry->physicalPage;
     tlb[tlbIdx].valid        = entry->valid;
@@ -254,3 +258,30 @@ MMU::TLBLoadEntry(TranslationEntry* entry) {
     tlbIdx++;
     tlbIdx %= TLB_SIZE;
 }
+
+#ifdef PAGINATION
+void
+MMU::TLBSaveEntry(unsigned index) {
+    if (tlb[index].valid) {
+        tlb[index].valid = false;
+
+        unsigned physicalPage   = tlb[index].physicalPage;
+        Thread* thread          = memMap->coreMap[physicalPage].thread;
+        unsigned virtualPage    = memMap->coreMap[physicalPage].virtualPage;
+        TranslationEntry* entry = &thread->space->pageTable[virtualPage];
+
+        entry->virtualPage  = tlb[index].virtualPage;
+        entry->physicalPage = tlb[index].physicalPage;
+        entry->valid        = tlb[index].valid;
+        entry->readOnly     = tlb[index].readOnly;
+        entry->use          = tlb[index].use;
+        entry->dirty        = tlb[index].dirty;
+    }
+}
+
+unsigned
+MMU::ChooseFrame() {
+    return Random() % NUM_PHYS_PAGES;
+}
+#endif
+
