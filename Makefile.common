@@ -124,7 +124,8 @@ USERPROG_HDR = ../userprog/address_space.hh             \
                ../machine/.instruction.hh               \
                ../machine/machine.hh                    \
                ../machine/mmu.hh                        \
-               ../machine/translation_entry.hh
+               ../machine/translation_entry.hh          \
+               ../machine/coremap_entry.hh
 
 USERPROG_SRC = ../userprog/address_space.cc             \
                ../userprog/.debugger.cc                 \

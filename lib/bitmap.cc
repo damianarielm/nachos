@@ -18,12 +18,18 @@ Bitmap::Bitmap(unsigned nitems) {
     numBits  = nitems;
     numWords = DivRoundUp(numBits, BITS_IN_WORD);
     map      = new unsigned [numWords];
+#ifdef PAGINATION
+    coreMap  = new CoreMapEntry [nitems];
+#endif
     for (unsigned i = 0; i < numBits; i++) Clear(i);
 }
 
 /// De-allocate a bitmap.
 Bitmap::~Bitmap() {
     delete [] map;
+#ifdef PAGINATION
+    delete [] coreMap;
+#endif
 }
 
 /// Set the “nth” bit in a bitmap.

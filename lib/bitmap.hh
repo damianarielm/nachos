@@ -18,6 +18,7 @@
 
 #include "utility.hh"
 #include "filesys/open_file.hh"
+#include "machine/coremap_entry.hh"
 
 /// Definitions helpful for representing a bitmap as an array of integers.
 
@@ -74,6 +75,10 @@ public:
     /// Note: this is not needed until the *FILESYS* assignment, when we will
     /// need to read and write the bitmap to a file.
     void WriteBack(OpenFile *file) const;
+
+#ifdef PAGINATION
+    CoreMapEntry* coreMap;
+#endif
 
 private:
 
