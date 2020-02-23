@@ -281,7 +281,15 @@ MMU::TLBSaveEntry(unsigned index) {
 
 unsigned
 MMU::ChooseFrame() {
-    return Random() % NUM_PHYS_PAGES;
+    static unsigned frame = -1;
+
+    #ifdef FIFO
+    frame++;
+    #else
+    frame = Random();
+    #endif
+
+    return frame % NUM_PHYS_PAGES;
 }
 #endif
 
