@@ -285,6 +285,21 @@ MMU::ChooseFrame() {
 
     #ifdef FIFO
     frame++;
+    #elif CLOCK
+    static unsigned clock = 0;
+    AddressSpace* space  = memMap->coreMap[clock].thread->space;
+    unsigned virtualPage = memMap->coreMap[clock].virtualPage;
+
+    if (!space->pageTable[virtualPage].use) {
+        frame = clock;
+        clock++;
+        clock %= NUM_PHYS_PAGES;
+    } else {
+        space->pageTable[virtualPage].use = false;
+        clock++;
+        clock %= NUM_PHYS_PAGES;
+        frame = ChooseFrame();
+    }
     #else
     frame = Random();
     #endif
