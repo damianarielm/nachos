@@ -63,6 +63,9 @@ public:
     /// system at a low level.
     const RawFileHeader *GetRaw() const;
 
+    /// Deletes all the info stored in the header.
+    void ClearRaw();
+
     /// Return the name of the file.
     const char* GetName();
 

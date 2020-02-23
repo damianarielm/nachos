@@ -138,3 +138,9 @@ const char*
 FileHeader::GetName() {
     return name;
 }
+
+void
+FileHeader::ClearRaw() {
+    for (unsigned i = 0; i < NUM_DIRECT; i++) raw.dataSectors[i] = 0;
+    raw.nextHeader = raw.level = raw.numBytes = raw.numSectors = 0;
+}

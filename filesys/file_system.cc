@@ -60,11 +60,6 @@ FileSystem::FileSystem(unsigned format) {
     DEBUG('f', "Initializing the file system.\n");
 
     if (format) {
-        Bitmap     *freeMap   = new Bitmap(NUM_SECTORS);
-        Directory  *directory = new Directory(NUM_DIR_ENTRIES);
-        FileHeader *mapHeader = new FileHeader(FREE_MAP_SECTOR, FREE_MAP_NAME);
-        FileHeader *dirHeader = new FileHeader(DIRECTORY_SECTOR, DIRECTORY_NAME);
-
         DEBUG('f', "Formatting the file system.\n");
 
         if (format == 2) {
@@ -75,6 +70,11 @@ FileSystem::FileSystem(unsigned format) {
                 synchDisk->WriteSector(i, zero);
             delete zero;
         }
+
+        Bitmap     *freeMap   = new Bitmap(NUM_SECTORS);
+        Directory  *directory = new Directory(NUM_DIR_ENTRIES);
+        FileHeader *mapHeader = new FileHeader(FREE_MAP_SECTOR, FREE_MAP_NAME);
+        FileHeader *dirHeader = new FileHeader(DIRECTORY_SECTOR, DIRECTORY_NAME);
 
         // First, allocate space for FileHeaders for the directory and bitmap
         // (make sure no one else grabs these!)
@@ -190,6 +190,7 @@ FileSystem::Create(const char *name, unsigned initialSize) {
             success = false;  // No space in directory.
         } else {
             header = new FileHeader(sector, name);
+            header->ClearRaw();
             if (!header->Allocate(freeMap, initialSize)) {
                 DEBUG_ERROR('f', "No free space for file %s. Free space: %u bytes.\n",
                     name, freeMap->CountClear() * SECTOR_SIZE);
