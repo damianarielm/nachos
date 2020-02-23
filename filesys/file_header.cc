@@ -50,7 +50,28 @@ FileHeader::Allocate(Bitmap *freeMap, unsigned fileSize) {
         return false;  // Not enough space.
     }
 
-    for (unsigned i = 0; i < raw.numSectors; i++) raw.dataSectors[i] = freeMap->Find();
+    for (unsigned i = 0; i < raw.numSectors; i++) {
+        // New header needed.
+        if (i == NUM_DIRECT) {
+            raw.nextHeader = freeMap->Find();
+            if (raw.nextHeader == -1) return false;
+            DEBUG_CONT('f', "\n");
+            DEBUG('f', "Creating extra header for %s on sector %d...\n",
+                    name, raw.nextHeader);
+
+            FileHeader* header = new FileHeader(raw.nextHeader, name);
+            header->ClearRaw();
+            header->raw.level = raw.level + 1;
+            bool tmp = header->Allocate(freeMap, raw.numBytes - MAX_FILE_SIZE);
+            header->WriteBack();
+
+            delete header;
+            return tmp;
+        }
+
+        raw.dataSectors[i] = freeMap->Find();
+    }
+
     DEBUG_CONT('f', "Succeed.\n");
 
     return true;
@@ -64,9 +85,15 @@ FileHeader::Deallocate(Bitmap *freeMap) {
     DEBUG('f', "Deallocating %u bytes from file %s.\n", raw.numBytes, name);
     ASSERT(freeMap);
 
-    for (unsigned i = 0; i < raw.numSectors; i++) {
-        ASSERT(freeMap->Test(raw.dataSectors[i]));  // ought to be marked!
-        freeMap->Clear(raw.dataSectors[i]);
+    for (unsigned i = 0; i < NUM_DIRECT; i++)
+        if (freeMap->Test(raw.dataSectors[i]) && raw.dataSectors[i])
+            freeMap->Clear(raw.dataSectors[i]);
+
+    if (raw.nextHeader) {
+        FileHeader* header = new FileHeader(raw.nextHeader, name);
+        header->Deallocate(freeMap);
+        freeMap->Clear(raw.nextHeader);
+        delete header;
     }
 }
 
@@ -98,7 +125,18 @@ FileHeader::WriteBack() {
 /// * `offset` is the location within the file of the byte in question.
 unsigned
 FileHeader::ByteToSector(unsigned offset) {
-    return raw.dataSectors[offset / SECTOR_SIZE];
+    unsigned idx = (offset / SECTOR_SIZE) % NUM_DIRECT;
+
+    if (offset / (NUM_DIRECT * SECTOR_SIZE) != raw.level) {
+        ASSERT(raw.nextHeader);
+
+        FileHeader* header = new FileHeader(raw.nextHeader, name);
+        unsigned tmp = header->ByteToSector(offset);
+        delete header;
+        return tmp;
+    } else {
+        return raw.dataSectors[idx];
+    }
 }
 
 /// Return the number of bytes in the file.
@@ -112,20 +150,45 @@ FileHeader::FileLength() const {
 void
 FileHeader::Print() {
     char *data = new char [SECTOR_SIZE];
+    FileHeader *header = this;
 
     printf("Size: %u bytes.\nBlock numbers: ", raw.numBytes);
-    for (unsigned i = 0; i < raw.numSectors; i++) printf("%u ", raw.dataSectors[i]);
+    for (unsigned i = 0; i < raw.numSectors; i++) {
+        if (i && !(i % NUM_DIRECT)) {
+            ASSERT(header->raw.nextHeader);
+
+            printf(BOLD WHITE "|| " RESET);
+            int tmp = header->raw.nextHeader;
+            if (header != this) delete header;
+            header = new FileHeader(tmp, name);
+        }
+        printf("%u ", header->raw.dataSectors[i % NUM_DIRECT]);
+    }
     printf("\n");
 
-    for (unsigned i = 0, k = 0; i < raw.numSectors; i++) {
-        synchDisk->ReadSector(raw.dataSectors[i], data);
+    if (header != this) {
+        delete header;
+        header = this;
+    }
 
-        printf(YELLOW "[%u] " RESET, raw.dataSectors[i]);
+    for (unsigned i = 0, k = 0; i < raw.numSectors; i++) {
+        if (i && !(i % NUM_DIRECT)) {
+            printf(YELLOW "[%u] ", header->raw.nextHeader);
+            printf("--------------------------------------------------------------\n" RESET);
+            int tmp = header->raw.nextHeader;
+            if (header != this) delete header;
+            header = new FileHeader(tmp, name);
+        }
+
+        synchDisk->ReadSector(header->raw.dataSectors[i % NUM_DIRECT], data);
+
+        printf(YELLOW "[%u] " RESET, header->raw.dataSectors[i % NUM_DIRECT]);
         for (unsigned j = 0; j < SECTOR_SIZE && k < raw.numBytes; j++, k++)
             PrintByte(data[j]);
         printf("\n");
     }
 
+    if (header != this) delete header;
     delete [] data;
 }
 

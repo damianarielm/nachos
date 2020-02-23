@@ -8,10 +8,12 @@
 
 #include "machine/disk.hh"
 
-static const unsigned NUM_DIRECT = (SECTOR_SIZE - 2 * sizeof (int)) / sizeof (int);
+static const unsigned NUM_DIRECT = (SECTOR_SIZE - 4 * sizeof (int)) / sizeof (int);
 const unsigned MAX_FILE_SIZE = NUM_DIRECT * SECTOR_SIZE;
 
 struct RawFileHeader {
+    int nextHeader;                   ///< Sector where the next header is located.
+    unsigned level;                   ///< Level of the current header.
     unsigned numBytes;                ///< Number of bytes in the file.
     unsigned numSectors;              ///< Number of data sectors in the file.
     unsigned dataSectors[NUM_DIRECT]; ///< Disk sector numbers for each data
