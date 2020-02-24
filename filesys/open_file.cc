@@ -137,11 +137,14 @@ OpenFile::WriteAt(const char *from, unsigned numBytes, unsigned position) {
     bool firstAligned, lastAligned;
     char *buf;
 
-    if (position >= fileLength) return 0;  // Check request.
-    if (position + numBytes > fileLength) numBytes = fileLength - position;
-
     DEBUG('F', "Writing %u bytes at %u, from file %s.\n",
             numBytes, position, hdr->GetName());
+
+    if (position + numBytes > fileLength) {
+        unsigned expand = position + numBytes - fileLength;
+        DEBUG('f', "Expanding %u bytes to file %s.\n", expand, hdr->GetName());
+        hdr->Expand(expand);
+    }
 
     firstSector = DivRoundDown(position, SECTOR_SIZE);
     lastSector  = DivRoundDown(position + numBytes - 1, SECTOR_SIZE);

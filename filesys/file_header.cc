@@ -44,13 +44,22 @@ FileHeader::Allocate(Bitmap *freeMap, unsigned fileSize) {
 
     raw.numBytes = fileSize;
     raw.numSectors = DivRoundUp(fileSize, SECTOR_SIZE);
-    if (freeMap->CountClear() < raw.numSectors) {
+    if (!fileSize) {
+        DEBUG_CONT('f', "Succeed.\n");
+        return true; // Empty file.
+    }
+
+    // Skip to the first unasigned sector.
+    unsigned i = 0;
+    while (i != NUM_DIRECT && raw.dataSectors[i]) i++;
+
+    if (freeMap->CountClear() < raw.numSectors - i) {
         DEBUG_CONT_ERROR('f', "Failed. Space left: %u bytes.\n",
                 freeMap->CountClear() * SECTOR_SIZE);
         return false;  // Not enough space.
     }
 
-    for (unsigned i = 0; i < raw.numSectors; i++) {
+    for (; i < raw.numSectors; i++) {
         // New header needed.
         if (i == NUM_DIRECT) {
             raw.nextHeader = freeMap->Find();
@@ -63,6 +72,8 @@ FileHeader::Allocate(Bitmap *freeMap, unsigned fileSize) {
             header->ClearRaw();
             header->raw.level = raw.level + 1;
             bool tmp = header->Allocate(freeMap, raw.numBytes - MAX_FILE_SIZE);
+            raw.numBytes = MAX_FILE_SIZE;
+            raw.numSectors = NUM_DIRECT;
             header->WriteBack();
 
             delete header;
@@ -206,4 +217,39 @@ void
 FileHeader::ClearRaw() {
     for (unsigned i = 0; i < NUM_DIRECT; i++) raw.dataSectors[i] = 0;
     raw.nextHeader = raw.level = raw.numBytes = raw.numSectors = 0;
+}
+
+void
+FileHeader::Expand(unsigned numBytes) {
+    ASSERT(numBytes);
+
+    // Always update file size on the main header and last header.
+    if (!raw.level || !raw.nextHeader) {
+        raw.numBytes += numBytes;
+        raw.numSectors = DivRoundUp(raw.numBytes, SECTOR_SIZE);
+        WriteBack();
+    }
+
+    // If there is a next header, delegate the request.
+    if (raw.nextHeader) {
+        FileHeader* header = new FileHeader(raw.nextHeader, name);
+        header->Expand(numBytes);
+        delete header;
+        return;
+    }
+
+    // Skip to the first unasigned sector. Maybe we don't really need to expand.
+    unsigned i = 0;
+    while (i != NUM_DIRECT && raw.dataSectors[i]) i++;
+
+    if (i < raw.numSectors) {
+        // Loads the map of free sectors.
+        OpenFile* freeMapFile = new OpenFile(0, ITALIC "Free Sectors Map" FAINT);
+        Bitmap* freeMap = new Bitmap(NUM_SECTORS);
+        freeMap->FetchFrom(freeMapFile);
+
+        Allocate(freeMap, raw.numBytes);
+        WriteBack();
+        freeMap->WriteBack(freeMapFile);
+    }
 }

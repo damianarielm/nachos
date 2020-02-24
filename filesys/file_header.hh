@@ -69,6 +69,9 @@ public:
     /// Return the name of the file.
     const char* GetName();
 
+    /// Expands the size of the current file.
+    void Expand(unsigned numBytes);
+
 private:
     const char* name;
 
