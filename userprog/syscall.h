@@ -30,6 +30,7 @@
 #define SC_CLOSE   13
 #define SC_READ    14
 #define SC_WRITE   15
+#define SC_LS      16
 
 #ifndef IN_ASM
 
@@ -116,6 +117,9 @@ int Read(char *buffer, int size, OpenFileId id);
 
 /// Close the file, we are done reading and writing to it.
 void Close(OpenFileId id);
+
+/// List the current directory.
+void Ls();
 
 #endif
 

@@ -278,6 +278,13 @@ SyscallHandler(ExceptionType _et) {
             break;
         }
 
+#ifdef FILESYS
+        case SC_LS: {
+            fileSystem->List();
+            break;
+        }
+#endif
+
         default:
             fprintf(stderr, "Unexpected system call: id %d.\n", scid);
             ASSERT(false);
