@@ -94,7 +94,7 @@ typedef int OpenFileId;
 #define CONSOLE_OUTPUT  1
 
 /// Create a Nachos file, with `name`.
-void Create(const char *name);
+void Create(const char *name, int isDirectory);
 
 /// Remove the Nachos file named `name`.
 int Remove(const char *name);

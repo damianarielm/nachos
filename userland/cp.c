@@ -10,7 +10,7 @@ void main(int argc, char** argv) {
         print(argv[1]);
         print(".\n");
     } else {
-        Create(argv[2]);
+        Create(argv[2], 0);
         dst = Open(argv[2]);
         while (Read(c, 1, src)) Write(c, 1, dst);
         Close(src); Close(dst);

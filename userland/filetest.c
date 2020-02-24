@@ -13,7 +13,7 @@
 int
 main(void) {
     print("Creating file test.txt.\n");
-    Create("test.txt");
+    Create("test.txt", 0);
 
     print("Opening file test.txt.\n");
     OpenFileId o = Open("test.txt");

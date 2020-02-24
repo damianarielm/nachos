@@ -93,6 +93,7 @@ SyscallHandler(ExceptionType _et) {
 
         case SC_CREATE: {
             int filenameAddr = machine->ReadRegister(4);
+            int isDirectory = machine->ReadRegister(5);
             char filename[FILE_NAME_MAX_LEN + 1];
 
             if (!filenameAddr)
@@ -100,7 +101,7 @@ SyscallHandler(ExceptionType _et) {
             else if (!ReadStringFromUser(filenameAddr, filename, sizeof filename))
                 DEBUG_ERROR('y', "Error: filename string too long (maximum is %u bytes).\n",
                       FILE_NAME_MAX_LEN);
-            else if (!fileSystem->Create(filename, 0, false))
+            else if (!fileSystem->Create(filename, 0, isDirectory))
                 DEBUG_ERROR('y', "Error: cannot create file %s.\n", filename);
             else
                 DEBUG('y', "File %s created.\n", filename);
