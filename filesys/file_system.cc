@@ -187,10 +187,14 @@ FileSystem::Create(const char *name, unsigned initialSize) {
             DEBUG_ERROR('f', "No free space for the header of %s. Free space: %u bytes.\n",
                     name, freeMap->CountClear() * SECTOR_SIZE);
             success = false;  // No free block for file header.
-        } else if (!directory->Add(name, sector)) {
-            DEBUG_ERROR('f', "No enough space in the current directory.\n");
-            success = false;  // No space in directory.
+         } else if (!directory->Add(name, sector)) {
+            DEBUG_ERROR('f', "The directory %s already exists.\n", name);
+            success = false;
         } else {
+            freeMap->WriteBack(freeMapFile); // ??
+            directory->Add(name, sector); // ??
+            directory->WriteBack(directoryFile); // ??
+            freeMap->FetchFrom(freeMapFile); // ??
             header = new FileHeader(sector, name);
             header->ClearRaw();
             if (!header->Allocate(freeMap, initialSize)) {

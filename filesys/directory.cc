@@ -32,14 +32,14 @@
 Directory::Directory(unsigned size) {
     ASSERT(size);
 
-    raw.table = new DirectoryEntry [size];
+    raw.table = (DirectoryEntry*) malloc(sizeof(DirectoryEntry) * size);
     raw.tableSize = size;
     for (unsigned i = 0; i < raw.tableSize; i++) raw.table[i].inUse = false;
 }
 
 /// De-allocate directory data structure.
 Directory::~Directory() {
-    delete [] raw.table;
+    free(raw.table);
 }
 
 /// Read the contents of the directory from disk.
@@ -49,7 +49,10 @@ void
 Directory::FetchFrom(OpenFile *file) {
     ASSERT(file);
 
-    file->ReadAt((char *) raw.table, raw.tableSize * sizeof (DirectoryEntry), 0);
+    file->ReadAt((char *) &raw.tableSize, 1, 0); // Reads the number of entries.
+    raw.table = (DirectoryEntry*) realloc(raw.table,
+            raw.tableSize * sizeof(DirectoryEntry));
+    file->ReadAt((char *) raw.table, raw.tableSize * sizeof (DirectoryEntry), 1);
 }
 
 /// Write any modifications to the directory back to disk.
@@ -59,7 +62,8 @@ void
 Directory::WriteBack(OpenFile *file) {
     ASSERT(file);
 
-    file->WriteAt((char *) raw.table, raw.tableSize * sizeof (DirectoryEntry), 0);
+    file->WriteAt((char *) &raw.tableSize, 1, 0); // Writes the number of entries.
+    file->WriteAt((char *) raw.table, raw.tableSize * sizeof (DirectoryEntry), 1);
 }
 
 /// Look up file name in directory, and return its location in the table of
@@ -112,7 +116,12 @@ Directory::Add(const char *name, int newSector) {
             return true;
         }
 
-    return false;  // no space.  Fix when we have extensible files.
+    // Expands the directory.
+    raw.table = (DirectoryEntry*) realloc(raw.table,
+            ++raw.tableSize * sizeof(DirectoryEntry));
+    raw.table[raw.tableSize - 1].inUse = false;
+
+    return Add(name, newSector);
 }
 
 /// Remove a file name from the directory.   Return true if successful;
