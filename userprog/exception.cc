@@ -100,7 +100,7 @@ SyscallHandler(ExceptionType _et) {
             else if (!ReadStringFromUser(filenameAddr, filename, sizeof filename))
                 DEBUG_ERROR('y', "Error: filename string too long (maximum is %u bytes).\n",
                       FILE_NAME_MAX_LEN);
-            else if (!fileSystem->Create(filename, 0))
+            else if (!fileSystem->Create(filename, 0, false))
                 DEBUG_ERROR('y', "Error: cannot create file %s.\n", filename);
             else
                 DEBUG('y', "File %s created.\n", filename);

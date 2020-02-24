@@ -72,6 +72,12 @@ public:
     /// Expands the size of the current file.
     void Expand(unsigned numBytes);
 
+    /// Returns true if the header belongs to a directory.
+    bool IsDirectory();
+
+    /// Set the directory flag to true.
+    void SetDirectory();
+
 private:
     const char* name;
 

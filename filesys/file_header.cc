@@ -160,6 +160,7 @@ FileHeader::FileLength() const {
 /// blocks pointed to by the file header.
 void
 FileHeader::Print() {
+    if (IsDirectory()) return;
     char *data = new char [SECTOR_SIZE];
     FileHeader *header = this;
 
@@ -252,4 +253,14 @@ FileHeader::Expand(unsigned numBytes) {
         WriteBack();
         freeMap->WriteBack(freeMapFile);
     }
+}
+
+bool
+FileHeader::IsDirectory() {
+    return raw.isDirectory;
+}
+
+void
+FileHeader::SetDirectory() {
+    raw.isDirectory = true;
 }

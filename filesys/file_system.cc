@@ -160,7 +160,7 @@ FileSystem::~FileSystem() {
 /// * `name` is the name of file to be created.
 /// * `initialSize` is the size of file to be created.
 bool
-FileSystem::Create(const char *name, unsigned initialSize) {
+FileSystem::Create(const char *name, unsigned initialSize, bool isDirectory) {
     ASSERT(name);
 #ifndef FILESYS
     ASSERT(initialSize < MAX_FILE_SIZE);
@@ -197,6 +197,7 @@ FileSystem::Create(const char *name, unsigned initialSize) {
             freeMap->FetchFrom(freeMapFile); // ??
             header = new FileHeader(sector, name);
             header->ClearRaw();
+            if (isDirectory) header->SetDirectory();
             if (!header->Allocate(freeMap, initialSize)) {
                 DEBUG_ERROR('f', "No free space for file %s. Free space: %u bytes.\n",
                     name, freeMap->CountClear() * SECTOR_SIZE);
@@ -207,6 +208,13 @@ FileSystem::Create(const char *name, unsigned initialSize) {
                 header->WriteBack();
                 directory->WriteBack(directoryFile);
                 freeMap->WriteBack(freeMapFile);
+                if (isDirectory) {
+                    Directory* newDirectory = new Directory(NUM_DIR_ENTRIES);
+                    OpenFile* newDirectoryFile = new OpenFile(sector, name);
+                    newDirectory->WriteBack(newDirectoryFile);
+                    delete newDirectory;
+                    delete newDirectoryFile;
+                }
             }
             delete header;
         }

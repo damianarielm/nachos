@@ -65,7 +65,7 @@ public:
 
     ~FileSystem() {}
 
-    bool Create(const char *name, unsigned initialSize) {
+    bool Create(const char *name, unsigned initialSize, bool isDirectory) {
         ASSERT(name);
 
         int fileDescriptor = OpenForWrite(name);
@@ -106,7 +106,7 @@ public:
     ~FileSystem();
 
     /// Create a file (UNIX `creat`).
-    bool Create(const char *name, unsigned initialSize);
+    bool Create(const char *name, unsigned initialSize, bool isDirectory);
 
     /// Open a file (UNIX `open`).
     OpenFile *Open(const char *name);

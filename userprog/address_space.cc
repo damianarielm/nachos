@@ -67,7 +67,7 @@ AddressSpace::AddressSpace(OpenFile *executable, Thread* thread) {
     // Initialize swap file.
     char swapFileName[FILE_NAME_MAX_LEN];
     snprintf(swapFileName, FILE_NAME_MAX_LEN, "SWAP.%u", thread->threadId);
-    fileSystem->Create(swapFileName, size);
+    fileSystem->Create(swapFileName, size, false);
     swapFile = fileSystem->Open(swapFileName);
     ASSERT(swapFile);
 #endif

@@ -146,7 +146,8 @@ Directory::List() const {
         if (raw.table[i].inUse) {
             FileHeader* hdr = new FileHeader(raw.table[i].sector, raw.table[i].name);
 
-            printf("%s\t\t(%u bytes).\n", raw.table[i].name, hdr->FileLength());
+            if (hdr->IsDirectory()) printf(BOLD);
+            printf("%s\t\t(%u bytes)" RESET ".\n", raw.table[i].name, hdr->FileLength());
 
             delete hdr;
         }
