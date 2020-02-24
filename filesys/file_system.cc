@@ -492,3 +492,16 @@ FileSystem::Print() {
     delete freeMap;
     delete directory;
 }
+
+bool
+FileSystem::ChangeDirectory(const char* name) {
+    int tmp;
+
+    Directory* directory = new Directory(NUM_DIR_ENTRIES);
+    directory->FetchFrom(directoryFile);
+    if ((tmp = directory->Find(name)) == -1) return false;
+
+    delete directoryFile;
+    directoryFile = new OpenFile(tmp, name);
+    return true;
+}

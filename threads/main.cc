@@ -44,6 +44,7 @@
 /// * `-pr` -- prints a Nachos file to standard output.
 /// * `-rm` -- removes a Nachos file from the file system.
 /// * `-ls` -- lists the contents of the Nachos directory.
+/// * `-cd` -- changes the directory.
 /// * `-mkdir  creates a new directory.
 /// * `-D`  -- prints the contents of the entire file system.
 /// * `-tf` -- tests the performance of the Nachos file system.
@@ -188,6 +189,9 @@ main(int argc, char **argv) {
         } else if (!strcmp(*argv, "-mkdir")) {
             ASSERT(argc > 1);
             fileSystem->Create(*(argv + 1), 0, true);
+        } else if (!strcmp(*argv, "-cd")) {
+            ASSERT(argc > 1);
+            fileSystem->ChangeDirectory(*(argv + 1));
         } else if (!strcmp(*argv, "-D")) {   // Print entire filesystem.
             fileSystem->Print();
             printf("\n");

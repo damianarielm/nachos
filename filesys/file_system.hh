@@ -123,6 +123,9 @@ public:
     /// List all the files and their contents.
     void Print();
 
+    /// Changes the current directory;
+    bool ChangeDirectory(const char* name);
+
 private:
     OpenFile *freeMapFile;  ///< Bit map of free disk blocks, represented as a
                             ///< file.
