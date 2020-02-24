@@ -31,6 +31,7 @@
 #define SC_READ    14
 #define SC_WRITE   15
 #define SC_LS      16
+#define SC_CD      17
 
 #ifndef IN_ASM
 
@@ -120,6 +121,9 @@ void Close(OpenFileId id);
 
 /// List the current directory.
 void Ls();
+
+/// Change the current directory.
+int Cd(const char* name);
 
 #endif
 
