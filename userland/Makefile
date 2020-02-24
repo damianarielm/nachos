@@ -33,7 +33,7 @@ CFLAGS       = -std=c99 -G 0 -c $(INCLUDE_DIRS) -mips1 -mfp32 \
                -nostdlib -nostartfiles -nodefaultlibs -mno-abicalls
 
 PROGRAMS = halt shell tiny_shell matmult sort filetest touch rm echo hello cat \
-           cp
+           cp mkdir
 
 .PHONY: all clean
 
